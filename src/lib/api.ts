@@ -1,50 +1,52 @@
 
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
 
-// Mock functions for now - will be replaced with Supabase integration
 export const api = {
   auth: {
     signUp: async (data: AuthFormData): Promise<{ user: any; error: any }> => {
-      // Mock signup
-      console.log("Sign up with:", data);
+      console.log("Signing up with:", data);
       
-      // Simulate successful signup
-      const user = {
-        id: "user-" + Math.random().toString(36).substring(2, 9),
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
-        username: data.username || data.email.split("@")[0],
-        created_at: new Date().toISOString(),
-      };
+        password: data.password,
+        options: {
+          data: {
+            username: data.username || data.email.split("@")[0],
+          }
+        }
+      });
       
-      return { user, error: null };
+      return { 
+        user: authData.user, 
+        error 
+      };
     },
     
     signIn: async (data: { email: string; password: string }): Promise<{ user: any; error: any }> => {
-      // Mock signin
-      console.log("Sign in with:", data);
+      console.log("Signing in with:", data);
       
-      // Simulate successful login
-      const user = {
-        id: "user-" + Math.random().toString(36).substring(2, 9),
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
-        username: data.email.split("@")[0],
-        created_at: new Date().toISOString(),
-      };
+        password: data.password,
+      });
       
-      return { user, error: null };
+      return { 
+        user: authData.user, 
+        error 
+      };
     },
     
     signOut: async (): Promise<{ error: any }> => {
-      // Mock signout
-      console.log("Sign out");
-      return { error: null };
+      console.log("Signing out");
+      const { error } = await supabase.auth.signOut();
+      return { error };
     },
     
     getUser: async () => {
-      // Mock getting current user
-      // Return null to simulate not logged in
-      return null;
+      const { data } = await supabase.auth.getSession();
+      return data.session?.user || null;
     }
   },
   

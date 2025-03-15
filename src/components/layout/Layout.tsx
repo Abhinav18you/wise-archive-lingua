@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
-import { api } from "@/lib/api";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,11 +15,20 @@ const Layout = ({ children }: LayoutProps) => {
   // Check authentication status on mount and route change
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await api.auth.getUser();
-      setIsAuthenticated(!!user);
+      const { data } = await supabase.auth.getSession();
+      setIsAuthenticated(!!data.session);
     };
     
     checkAuth();
+    
+    // Subscribe to auth changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      setIsAuthenticated(!!session);
+    });
+    
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
   }, [location.pathname]);
 
   return (
