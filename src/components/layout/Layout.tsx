@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,20 +10,26 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Check authentication status on mount and route change
   useEffect(() => {
     const checkAuth = async () => {
+      setIsLoading(true);
       const { data } = await supabase.auth.getSession();
       setIsAuthenticated(!!data.session);
+      setIsLoading(false);
     };
     
     checkAuth();
     
     // Subscribe to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, !!session);
       setIsAuthenticated(!!session);
+      setIsLoading(false);
     });
     
     return () => {

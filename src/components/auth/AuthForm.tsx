@@ -1,25 +1,35 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/lib/toast";
 import { api, handleApiError } from "@/lib/api";
 import { AuthFormData } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 
 const AuthForm = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [confirmationSent, setConfirmationSent] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   
   const [formData, setFormData] = useState<AuthFormData>({
     email: "",
     password: "",
     username: "",
   });
+
+  useEffect(() => {
+    // Clear any error when changing auth mode
+    setAuthError(null);
+    setConfirmationSent(false);
+  }, [authMode]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -29,28 +39,79 @@ const AuthForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setAuthError(null);
 
     try {
       if (authMode === "signup") {
         const { user, error } = await api.auth.signUp(formData);
+        
         if (error) throw error;
-        toast.success("Account created successfully!");
-        navigate("/dashboard");
+        
+        // For Supabase, the user typically needs to confirm their email
+        setConfirmationSent(true);
+        toast.success("Verification email sent! Please check your inbox.");
       } else {
         const { user, error } = await api.auth.signIn({
           email: formData.email,
           password: formData.password,
         });
+        
         if (error) throw error;
+        
         toast.success("Signed in successfully!");
         navigate("/dashboard");
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Auth error:", error);
+      setAuthError(error.message || "Authentication failed. Please try again.");
       handleApiError(error);
     } finally {
       setLoading(false);
     }
   };
+
+  const checkAuthSession = async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      navigate("/dashboard");
+    }
+  };
+
+  // Check if user is already logged in
+  useEffect(() => {
+    checkAuthSession();
+  }, []);
+
+  if (confirmationSent) {
+    return (
+      <Card className="w-full max-w-md glassmorphism animate-scale-in">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold text-center">Email Verification Sent</CardTitle>
+          <CardDescription className="text-center pt-2">
+            Please check your email to confirm your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <AlertDescription>
+              We've sent a verification link to <strong>{formData.email}</strong>. 
+              Please check your inbox and click the link to complete your registration.
+            </AlertDescription>
+          </Alert>
+          <div className="text-center mt-4">
+            <Button variant="outline" onClick={() => setConfirmationSent(false)}>
+              Return to Login
+            </Button>
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
+            Didn't receive the email? Check your spam folder or try again.
+          </p>
+        </CardFooter>
+      </Card>
+    );
+  }
 
   return (
     <div className="flex justify-center items-center w-full animate-fade-in">
@@ -74,6 +135,12 @@ const AuthForm = () => {
           </CardHeader>
           
           <CardContent>
+            {authError && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{authError}</AlertDescription>
+              </Alert>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-5">
               <TabsContent value="signup" className="space-y-5">
                 <div className="space-y-2">
