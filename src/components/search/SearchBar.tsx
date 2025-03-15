@@ -1,11 +1,10 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search as SearchIcon, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { Content } from "@/types";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 
 interface SearchBarProps {
   onResults: (results: Content[]) => void;

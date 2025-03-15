@@ -1,5 +1,5 @@
 
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
 
 // Mock functions for now - will be replaced with Supabase integration

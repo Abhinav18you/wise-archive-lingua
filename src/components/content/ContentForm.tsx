@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 import { ContentType } from "@/types";
 import { Link, ArrowLeft } from "lucide-react";
 

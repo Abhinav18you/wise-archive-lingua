@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Search, Plus, User, LogOut, Menu, X } from "lucide-react";
 import { api } from "@/lib/api";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 
 type NavbarProps = {
   isAuthenticated: boolean;

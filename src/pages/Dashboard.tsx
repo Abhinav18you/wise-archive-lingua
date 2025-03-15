@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Filter } from "lucide-react";
 import { Content, ContentType } from "@/types";
 import { api } from "@/lib/api";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 import ContentCard from "@/components/content/ContentCard";
 import { Input } from "@/components/ui/input";
 import {

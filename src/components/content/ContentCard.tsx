@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/lib/toast";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
