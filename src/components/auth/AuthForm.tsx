@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,9 +7,12 @@ import { Spinner } from "@/components/ui/spinner";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 import ConfirmationSent from "./ConfirmationSent";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const AuthForm = () => {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const navigate = useNavigate();
   
   const {
     formData,
@@ -24,6 +27,19 @@ const AuthForm = () => {
     setAuthError
   } = useAuth();
 
+  // Check if logged in already
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        console.log("Already authenticated in AuthForm, redirecting to dashboard");
+        navigate("/dashboard");
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
+
   // Clear any error when changing auth mode
   const handleModeChange = (mode: "signin" | "signup") => {
     setAuthMode(mode);
@@ -32,6 +48,7 @@ const AuthForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted in mode:", authMode);
     if (authMode === "signup") {
       await handleSignUp();
     } else {

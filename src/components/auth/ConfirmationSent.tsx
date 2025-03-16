@@ -22,7 +22,7 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
         <Alert>
           <AlertDescription>
             We've sent a verification link to <strong>{email}</strong>. 
-            Please check your inbox and click the link to complete your registration.
+            Please check your inbox (and spam folder) and click the link to complete your registration.
           </AlertDescription>
         </Alert>
         
@@ -37,7 +37,7 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
           <div className="flex items-start gap-2">
             <InfoIcon className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <p>
-              Once verified, you'll be automatically redirected to the dashboard. If you see a blank page, try manually going to the dashboard.
+              Once verified, you'll be automatically redirected to the dashboard.
             </p>
           </div>
           

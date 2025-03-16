@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "@/lib/toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -27,7 +28,7 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
           console.error("Error checking auth session:", error);
           setIsAuthenticated(false);
         } else {
-          console.log("Session check result:", !!data.session);
+          console.log("Session check result:", !!data.session, data.session?.user?.id);
           setIsAuthenticated(!!data.session);
         }
       } catch (err) {
@@ -44,28 +45,31 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, !!session);
       setIsAuthenticated(!!session);
-      setIsLoading(false);
       
       // Handle sign-in and sign-out events
-      if (event === 'SIGNED_IN' && location.pathname === '/auth') {
+      if (event === 'SIGNED_IN') {
+        console.log("User signed in, redirecting to dashboard");
         navigate('/dashboard');
+        toast.success("Signed in successfully!");
       } else if (event === 'SIGNED_OUT' && requireAuth) {
+        console.log("User signed out, redirecting to auth");
         navigate('/auth');
+        toast.info("Signed out");
       }
     });
     
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [location.pathname, navigate, requireAuth]);
+  }, [navigate, requireAuth]);
 
   // Handle protected routes
   useEffect(() => {
     if (!isLoading && requireAuth && isAuthenticated === false) {
-      console.log("Redirecting to auth page - not authenticated");
-      navigate('/auth');
+      console.log("Redirecting to auth page - not authenticated. Current path:", location.pathname);
+      navigate('/auth', { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate, requireAuth]);
+  }, [isAuthenticated, isLoading, navigate, requireAuth, location.pathname]);
 
   if (isLoading) {
     return (

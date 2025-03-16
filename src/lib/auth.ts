@@ -55,7 +55,7 @@ export const signInWithEmail = async (email: string, password: string) => {
       console.error("Sign in error:", error);
       return { data: null, error };
     } else {
-      console.log("Sign in successful:", data);
+      console.log("Sign in successful:", data.user?.id);
       return { data, error: null };
     }
   } catch (err) {
@@ -160,7 +160,7 @@ export const handleAuthCallback = async () => {
     }
     
     if (data.session) {
-      console.log("Authentication successful, session established", data.session);
+      console.log("Authentication successful, session established", data.session.user.id);
       return { session: data.session, error: null };
     } else {
       console.log("No session found after redirect");
@@ -168,7 +168,7 @@ export const handleAuthCallback = async () => {
       try {
         const refreshResult = await supabase.auth.refreshSession();
         if (refreshResult.data.session) {
-          console.log("Successfully refreshed session", refreshResult.data.session);
+          console.log("Successfully refreshed session", refreshResult.data.session.user.id);
           return { session: refreshResult.data.session, error: null };
         }
       } catch (refreshErr) {

@@ -22,7 +22,10 @@ const Index = () => {
           <div className="flex flex-wrap justify-center gap-4 mt-10 animate-slide-up" style={{ animationDelay: "300ms" }}>
             <Button 
               size="lg" 
-              onClick={() => navigate("/auth")}
+              onClick={() => {
+                console.log("Get Started button clicked, navigating to /auth");
+                navigate("/auth");
+              }}
               className="gap-2"
             >
               Get Started

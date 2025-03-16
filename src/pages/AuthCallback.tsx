@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/lib/toast";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -34,12 +35,14 @@ const AuthCallback = () => {
           const { data } = await supabase.auth.getSession();
           if (data.session) {
             console.log("Found existing session despite error, redirecting to dashboard");
-            navigate("/dashboard");
+            toast.success("Authentication successful!");
+            navigate("/dashboard", { replace: true });
             return;
           }
         } else if (session) {
           console.log("Auth successful, redirecting to dashboard");
-          navigate("/dashboard");
+          toast.success("Authentication successful!");
+          navigate("/dashboard", { replace: true });
         } else {
           console.log("No session or error returned");
           
@@ -47,7 +50,8 @@ const AuthCallback = () => {
           const { data } = await supabase.auth.refreshSession();
           if (data.session) {
             console.log("Successfully refreshed session, redirecting");
-            navigate("/dashboard");
+            toast.success("Authentication successful!");
+            navigate("/dashboard", { replace: true });
             return;
           }
           
@@ -64,7 +68,8 @@ const AuthCallback = () => {
           const { data } = await supabase.auth.getSession();
           if (data.session) {
             console.log("Found existing session despite error, redirecting to dashboard");
-            navigate("/dashboard");
+            toast.success("Authentication successful!");
+            navigate("/dashboard", { replace: true });
             return;
           }
         } catch (sessionErr) {

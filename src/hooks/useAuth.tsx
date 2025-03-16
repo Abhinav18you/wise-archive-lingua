@@ -28,6 +28,7 @@ export const useAuth = () => {
     setAuthError(null);
 
     try {
+      console.log("Signing up user with email:", formData.email);
       const { error } = await signUpWithEmail(
         formData.email,
         formData.password,
@@ -51,6 +52,7 @@ export const useAuth = () => {
     setAuthError(null);
 
     try {
+      console.log("Signing in user with email:", formData.email);
       const { error } = await signInWithEmail(
         formData.email,
         formData.password
@@ -73,8 +75,9 @@ export const useAuth = () => {
     const checkAuthSession = async () => {
       setCheckingSession(true);
       const { session } = await getSession();
+      console.log("useAuth: checking session", !!session);
       if (session) {
-        navigate("/dashboard");
+        console.log("Found existing session, user is authenticated");
       }
       setCheckingSession(false);
     };

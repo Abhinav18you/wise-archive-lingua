@@ -13,7 +13,14 @@ import Search from "./pages/Search";
 import Add from "./pages/Add";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -24,9 +31,30 @@ const App = () => (
           <Route path="/" element={<Layout><Index /></Layout>} />
           <Route path="/auth" element={<Layout><Auth /></Layout>} />
           <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/dashboard" element={<Layout requireAuth={true}><Dashboard /></Layout>} />
-          <Route path="/search" element={<Layout requireAuth={true}><Search /></Layout>} />
-          <Route path="/add" element={<Layout requireAuth={true}><Add /></Layout>} />
+          <Route 
+            path="/dashboard" 
+            element={
+              <Layout requireAuth={true}>
+                <Dashboard />
+              </Layout>
+            } 
+          />
+          <Route 
+            path="/search" 
+            element={
+              <Layout requireAuth={true}>
+                <Search />
+              </Layout>
+            } 
+          />
+          <Route 
+            path="/add" 
+            element={
+              <Layout requireAuth={true}>
+                <Add />
+              </Layout>
+            } 
+          />
           <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
       </BrowserRouter>
