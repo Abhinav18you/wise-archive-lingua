@@ -5,6 +5,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -16,23 +17,59 @@ const AuthCallback = () => {
     const processAuthRedirect = async () => {
       try {
         console.log("Processing auth redirect...");
+        console.log("Current URL:", window.location.href);
+        
+        // Log important details for debugging
+        console.log("URL hash:", window.location.hash);
+        console.log("URL search params:", window.location.search);
+        
         const { session, error } = await handleAuthCallback();
         
         if (error) {
           console.error("Auth callback error:", error);
           setError(error.message);
           setDebugInfo(JSON.stringify(error, null, 2));
+          
+          // Try to recover by checking if we already have a session
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            console.log("Found existing session despite error, redirecting to dashboard");
+            navigate("/dashboard");
+            return;
+          }
         } else if (session) {
           console.log("Auth successful, redirecting to dashboard");
           navigate("/dashboard");
         } else {
           console.log("No session or error returned");
+          
+          // Try to recover by refreshing the session
+          const { data } = await supabase.auth.refreshSession();
+          if (data.session) {
+            console.log("Successfully refreshed session, redirecting");
+            navigate("/dashboard");
+            return;
+          }
+          
           setError("Authentication failed. No session was created.");
+          setDebugInfo("No session object returned and no error was thrown. This might indicate an issue with the authentication flow.");
         }
       } catch (err: any) {
         console.error("Unhandled error in auth callback:", err);
         setError(err.message || "An error occurred during authentication");
         setDebugInfo(JSON.stringify(err, null, 2));
+        
+        // Last resort recovery attempt
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            console.log("Found existing session despite error, redirecting to dashboard");
+            navigate("/dashboard");
+            return;
+          }
+        } catch (sessionErr) {
+          console.error("Failed to check session in recovery:", sessionErr);
+        }
       } finally {
         setLoading(false);
       }
@@ -46,6 +83,7 @@ const AuthCallback = () => {
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)]">
         <h1 className="text-2xl font-semibold mb-4">Verifying your account...</h1>
         <Spinner size="lg" />
+        <p className="text-muted-foreground mt-4">This may take a few moments</p>
       </div>
     );
   }

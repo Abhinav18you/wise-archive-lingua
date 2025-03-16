@@ -24,9 +24,9 @@ const App = () => (
           <Route path="/" element={<Layout><Index /></Layout>} />
           <Route path="/auth" element={<Layout><Auth /></Layout>} />
           <Route path="/auth/callback" element={<AuthCallback />} />
-          <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/search" element={<Layout><Search /></Layout>} />
-          <Route path="/add" element={<Layout><Add /></Layout>} />
+          <Route path="/dashboard" element={<Layout requireAuth={true}><Dashboard /></Layout>} />
+          <Route path="/search" element={<Layout requireAuth={true}><Search /></Layout>} />
+          <Route path="/add" element={<Layout requireAuth={true}><Add /></Layout>} />
           <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
       </BrowserRouter>

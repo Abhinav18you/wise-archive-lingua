@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { InfoIcon, RefreshCwIcon } from "lucide-react";
+import { InfoIcon, RefreshCwIcon, AlertTriangleIcon } from "lucide-react";
 
 interface ConfirmationSentProps {
   email: string;
@@ -26,7 +26,7 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
           </AlertDescription>
         </Alert>
         
-        <div className="bg-muted p-4 rounded-md text-sm space-y-2">
+        <div className="bg-muted p-4 rounded-md text-sm space-y-3">
           <div className="flex items-start gap-2">
             <InfoIcon className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <p>
@@ -37,7 +37,14 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
           <div className="flex items-start gap-2">
             <InfoIcon className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <p>
-              If you experience any issues with the verification process, try returning to the login page and signing in with your credentials.
+              Once verified, you'll be automatically redirected to the dashboard. If you see a blank page, try manually going to the dashboard.
+            </p>
+          </div>
+          
+          <div className="flex items-start gap-2">
+            <AlertTriangleIcon className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <p>
+              <strong>Important:</strong> Make sure your Supabase project has the correct redirect URL set to <strong>{window.location.origin}/auth/callback</strong> in the authentication settings.
             </p>
           </div>
         </div>

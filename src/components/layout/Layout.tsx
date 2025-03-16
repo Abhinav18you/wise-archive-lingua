@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import { supabase } from "@/integrations/supabase/client";
+import { Spinner } from "@/components/ui/spinner";
 
 interface LayoutProps {
   children: React.ReactNode;
+  requireAuth?: boolean;
 }
 
-const Layout = ({ children }: LayoutProps) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const Layout = ({ children, requireAuth = false }: LayoutProps) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,10 +19,23 @@ const Layout = ({ children }: LayoutProps) => {
   // Check authentication status on mount and route change
   useEffect(() => {
     const checkAuth = async () => {
-      setIsLoading(true);
-      const { data } = await supabase.auth.getSession();
-      setIsAuthenticated(!!data.session);
-      setIsLoading(false);
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error checking auth session:", error);
+          setIsAuthenticated(false);
+        } else {
+          console.log("Session check result:", !!data.session);
+          setIsAuthenticated(!!data.session);
+        }
+      } catch (err) {
+        console.error("Unexpected error checking session:", err);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
     };
     
     checkAuth();
@@ -30,16 +45,42 @@ const Layout = ({ children }: LayoutProps) => {
       console.log("Auth state changed:", event, !!session);
       setIsAuthenticated(!!session);
       setIsLoading(false);
+      
+      // Handle sign-in and sign-out events
+      if (event === 'SIGNED_IN' && location.pathname === '/auth') {
+        navigate('/dashboard');
+      } else if (event === 'SIGNED_OUT' && requireAuth) {
+        navigate('/auth');
+      }
     });
     
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [location.pathname]);
+  }, [location.pathname, navigate, requireAuth]);
+
+  // Handle protected routes
+  useEffect(() => {
+    if (!isLoading && requireAuth && isAuthenticated === false) {
+      console.log("Redirecting to auth page - not authenticated");
+      navigate('/auth');
+    }
+  }, [isAuthenticated, isLoading, navigate, requireAuth]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <Navbar isAuthenticated={false} />
+        <main className="flex-1 container py-8 px-4 sm:px-6 flex items-center justify-center">
+          <Spinner size="lg" />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Navbar isAuthenticated={isAuthenticated} />
+      <Navbar isAuthenticated={!!isAuthenticated} />
       <main className="flex-1 container py-8 px-4 sm:px-6">
         {children}
       </main>
