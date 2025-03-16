@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import Search from "./pages/Search";
 import Add from "./pages/Add";
@@ -19,17 +20,17 @@ const App = () => (
     <TooltipProvider>
       <Sonner position="top-right" closeButton />
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/add" element={<Add />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          <Route path="/" element={<Layout><Index /></Layout>} />
+          <Route path="/auth" element={<Layout><Auth /></Layout>} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
+          <Route path="/search" element={<Layout><Search /></Layout>} />
+          <Route path="/add" element={<Layout><Add /></Layout>} />
+          <Route path="*" element={<Layout><NotFound /></Layout>} />
+        </Routes>
       </BrowserRouter>
+      <Toaster />
     </TooltipProvider>
   </QueryClientProvider>
 );

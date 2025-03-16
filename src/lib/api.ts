@@ -1,25 +1,21 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
+import { signUpWithEmail, signInWithEmail, signOut, getSession } from "@/lib/auth";
 
 export const api = {
   auth: {
     signUp: async (data: AuthFormData): Promise<{ user: any; error: any }> => {
       console.log("Signing up with:", data);
       
-      const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            username: data.username || data.email.split("@")[0],
-          }
-        }
-      });
+      const { data: authData, error } = await signUpWithEmail(
+        data.email,
+        data.password,
+        data.username
+      );
       
       return { 
-        user: authData.user, 
+        user: authData?.user, 
         error 
       };
     },
@@ -27,26 +23,23 @@ export const api = {
     signIn: async (data: { email: string; password: string }): Promise<{ user: any; error: any }> => {
       console.log("Signing in with:", data);
       
-      const { data: authData, error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
+      const { data: authData, error } = await signInWithEmail(data.email, data.password);
       
       return { 
-        user: authData.user, 
+        user: authData?.user, 
         error 
       };
     },
     
     signOut: async (): Promise<{ error: any }> => {
       console.log("Signing out");
-      const { error } = await supabase.auth.signOut();
+      const { error } = await signOut();
       return { error };
     },
     
     getUser: async () => {
-      const { data } = await supabase.auth.getSession();
-      return data.session?.user || null;
+      const { session } = await getSession();
+      return session?.user || null;
     }
   },
   

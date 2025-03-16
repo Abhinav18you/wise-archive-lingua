@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,9 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "@/lib/toast";
-import { api, handleApiError } from "@/lib/api";
+import { signUpWithEmail, signInWithEmail, getSession } from "@/lib/auth";
 import { AuthFormData } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
+import { Spinner } from "@/components/ui/spinner";
 
 const AuthForm = () => {
   const navigate = useNavigate();
@@ -18,6 +17,7 @@ const AuthForm = () => {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
   
   const [formData, setFormData] = useState<AuthFormData>({
     email: "",
@@ -43,7 +43,11 @@ const AuthForm = () => {
 
     try {
       if (authMode === "signup") {
-        const { user, error } = await api.auth.signUp(formData);
+        const { error } = await signUpWithEmail(
+          formData.email,
+          formData.password,
+          formData.username
+        );
         
         if (error) throw error;
         
@@ -51,10 +55,10 @@ const AuthForm = () => {
         setConfirmationSent(true);
         toast.success("Verification email sent! Please check your inbox.");
       } else {
-        const { user, error } = await api.auth.signIn({
-          email: formData.email,
-          password: formData.password,
-        });
+        const { error } = await signInWithEmail(
+          formData.email,
+          formData.password
+        );
         
         if (error) throw error;
         
@@ -64,23 +68,32 @@ const AuthForm = () => {
     } catch (error: any) {
       console.error("Auth error:", error);
       setAuthError(error.message || "Authentication failed. Please try again.");
-      handleApiError(error);
     } finally {
       setLoading(false);
     }
   };
 
-  const checkAuthSession = async () => {
-    const { data } = await supabase.auth.getSession();
-    if (data.session) {
-      navigate("/dashboard");
-    }
-  };
-
   // Check if user is already logged in
   useEffect(() => {
+    const checkAuthSession = async () => {
+      setCheckingSession(true);
+      const { session } = await getSession();
+      if (session) {
+        navigate("/dashboard");
+      }
+      setCheckingSession(false);
+    };
+    
     checkAuthSession();
-  }, []);
+  }, [navigate]);
+
+  if (checkingSession) {
+    return (
+      <div className="flex justify-center items-center h-40">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
 
   if (confirmationSent) {
     return (
@@ -99,6 +112,9 @@ const AuthForm = () => {
             </AlertDescription>
           </Alert>
           <div className="text-center mt-4">
+            <p className="text-sm text-muted-foreground mb-4">
+              After clicking the verification link, you'll be redirected to complete your registration.
+            </p>
             <Button variant="outline" onClick={() => setConfirmationSent(false)}>
               Return to Login
             </Button>
