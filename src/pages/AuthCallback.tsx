@@ -42,7 +42,11 @@ const AuthCallback = () => {
         } else if (session) {
           console.log("Auth successful, redirecting to dashboard");
           toast.success("Authentication successful!");
-          navigate("/dashboard", { replace: true });
+          
+          // Force a small delay to ensure session is properly established
+          setTimeout(() => {
+            navigate("/dashboard", { replace: true });
+          }, 300);
         } else {
           console.log("No session or error returned");
           
@@ -51,7 +55,9 @@ const AuthCallback = () => {
           if (data.session) {
             console.log("Successfully refreshed session, redirecting");
             toast.success("Authentication successful!");
-            navigate("/dashboard", { replace: true });
+            setTimeout(() => {
+              navigate("/dashboard", { replace: true });
+            }, 300);
             return;
           }
           

@@ -26,10 +26,10 @@ export const signUpWithEmail = async (email: string, password: string, username?
     if (error) {
       console.error("Sign up error:", error);
       return { data: null, error };
-    } else {
-      console.log("Sign up successful, awaiting confirmation:", data);
-      return { data, error: null };
     }
+
+    console.log("Sign up successful, awaiting confirmation:", data);
+    return { data, error: null };
   } catch (err) {
     console.error("Unexpected error during signup:", err);
     return { 
@@ -54,15 +54,95 @@ export const signInWithEmail = async (email: string, password: string) => {
     if (error) {
       console.error("Sign in error:", error);
       return { data: null, error };
-    } else {
-      console.log("Sign in successful:", data.user?.id);
-      return { data, error: null };
     }
+
+    console.log("Sign in successful:", data.user?.id);
+    return { data, error: null };
   } catch (err) {
     console.error("Unexpected error during signin:", err);
     return { 
       data: null, 
       error: err instanceof Error ? err : new Error('Unknown error during signin') 
+    };
+  }
+};
+
+/**
+ * Handle the auth callback after email verification
+ */
+export const handleAuthCallback = async () => {
+  console.log("Handling auth callback");
+  
+  try {
+    // Get the current URL hash and query parameters
+    const hash = window.location.hash;
+    const query = new URLSearchParams(window.location.search);
+    
+    // Log hash and query for debugging
+    if (hash) console.log("URL hash present:", hash);
+    if (query.toString()) console.log("URL query params:", query.toString());
+    
+    // Check for error in query parameters
+    const errorDescription = query.get("error_description");
+    if (errorDescription) {
+      console.error("Error in redirect:", errorDescription);
+      return { 
+        session: null, 
+        error: new Error(`Authentication error: ${errorDescription}`) 
+      };
+    }
+    
+    // Exchange the auth code for a session
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error("Error getting session after redirect:", error);
+      return { session: null, error };
+    }
+    
+    if (data.session) {
+      console.log("Authentication successful, session established");
+      return { session: data.session, error: null };
+    }
+    
+    console.log("No session found after redirect");
+    return { 
+      session: null, 
+      error: new Error("No session was established after authentication.") 
+    };
+  } catch (err) {
+    console.error("Unexpected error in auth callback:", err);
+    return { 
+      session: null, 
+      error: err instanceof Error ? err : new Error('Unknown error during authentication') 
+    };
+  }
+};
+
+/**
+ * Get the current user's session
+ */
+export const getSession = async () => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error("Get session error:", error);
+      return { session: null, error };
+    }
+    
+    if (data.session) {
+      console.log("Session found for user:", data.session.user.id);
+      return { session: data.session, error: null };
+    }
+    
+    console.log("No active session found");
+    return { session: null, error: null };
+  } catch (err) {
+    console.error("Unexpected error getting session:", err);
+    return { 
+      session: null, 
+      error: err instanceof Error ? err : new Error('Unknown error getting session') 
     };
   }
 };
@@ -80,40 +160,14 @@ export const signOut = async () => {
       console.error("Sign out error:", error);
       toast.error("Failed to sign out. Please try again.");
       return { error };
-    } else {
-      toast.success("Signed out successfully");
-      return { error: null };
     }
+    
+    toast.success("Signed out successfully");
+    return { error: null };
   } catch (err) {
     console.error("Unexpected error during signout:", err);
     return { 
       error: err instanceof Error ? err : new Error('Unknown error during signout') 
-    };
-  }
-};
-
-/**
- * Get the current user's session
- */
-export const getSession = async () => {
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      console.error("Get session error:", error);
-      return { session: null, error };
-    } else if (data.session) {
-      console.log("Session found for user:", data.session.user.id);
-      return { session: data.session, error: null };
-    } else {
-      console.log("No active session found");
-      return { session: null, error: null };
-    }
-  } catch (err) {
-    console.error("Unexpected error getting session:", err);
-    return { 
-      session: null, 
-      error: err instanceof Error ? err : new Error('Unknown error getting session') 
     };
   }
 };
@@ -124,70 +178,4 @@ export const getSession = async () => {
 export const onAuthStateChange = (callback: (event: string, session: any) => void) => {
   console.log("Setting up auth state change listener");
   return supabase.auth.onAuthStateChange(callback);
-};
-
-/**
- * Handle the auth callback after email verification
- */
-export const handleAuthCallback = async () => {
-  console.log("Handling auth callback");
-  
-  try {
-    // Get the current URL hash and query parameters (Supabase uses these for auth)
-    const hash = window.location.hash;
-    const query = new URLSearchParams(window.location.search);
-    
-    // Log hash and query for debugging
-    if (hash) console.log("URL hash present:", hash);
-    if (query.toString()) console.log("URL query params:", query.toString());
-    
-    // Check for error in query parameters
-    const errorDescription = query.get("error_description");
-    if (errorDescription) {
-      console.error("Error in redirect:", errorDescription);
-      return { 
-        session: null, 
-        error: { message: `Authentication error: ${errorDescription}` } 
-      };
-    }
-    
-    // This will exchange the auth code for a session
-    const { data, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      console.error("Error getting session after redirect:", error);
-      return { session: null, error };
-    }
-    
-    if (data.session) {
-      console.log("Authentication successful, session established", data.session.user.id);
-      return { session: data.session, error: null };
-    } else {
-      console.log("No session found after redirect");
-      // Try refreshing auth state
-      try {
-        const refreshResult = await supabase.auth.refreshSession();
-        if (refreshResult.data.session) {
-          console.log("Successfully refreshed session", refreshResult.data.session.user.id);
-          return { session: refreshResult.data.session, error: null };
-        }
-      } catch (refreshErr) {
-        console.error("Error refreshing session:", refreshErr);
-      }
-      
-      return { 
-        session: null, 
-        error: { message: "No session was established after authentication." } 
-      };
-    }
-  } catch (err) {
-    console.error("Unexpected error in auth callback:", err);
-    return { 
-      session: null, 
-      error: { 
-        message: "An unexpected error occurred during authentication.",
-        details: err instanceof Error ? err.message : String(err)
-      } 
-    };
-  }
 };
