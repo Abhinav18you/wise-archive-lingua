@@ -10,6 +10,10 @@ interface ConfirmationSentProps {
 }
 
 const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
+  // Get the current origin dynamically
+  const currentOrigin = window.location.origin;
+  const callbackUrl = `${currentOrigin}/auth/callback`;
+
   return (
     <Card className="w-full max-w-md glassmorphism animate-scale-in">
       <CardHeader>
@@ -30,7 +34,7 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
           <div className="flex items-start gap-2">
             <InfoIcon className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
             <p>
-              After clicking the verification link, you'll be redirected to <strong>{window.location.origin}/auth/callback</strong>
+              After clicking the verification link, you'll be redirected to the authentication callback page.
             </p>
           </div>
           
@@ -44,7 +48,7 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
           <div className="flex items-start gap-2">
             <AlertTriangleIcon className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
             <p>
-              <strong>Important:</strong> Make sure your Supabase project has the correct redirect URL set to <strong>{window.location.origin}/auth/callback</strong> in the authentication settings.
+              <strong>Important:</strong> Make sure your Supabase project has the correct redirect URL set to <strong>{callbackUrl}</strong> in the authentication settings.
             </p>
           </div>
         </div>

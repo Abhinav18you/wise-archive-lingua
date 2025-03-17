@@ -12,21 +12,16 @@ const AuthCallback = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
   useEffect(() => {
     const processAuthRedirect = async () => {
       try {
         console.log("Processing auth redirect...");
         console.log("Current URL:", window.location.href);
-        console.log("URL hash:", window.location.hash);
-        console.log("URL search params:", window.location.search);
         
         // Parse query parameters to check for error or access_token
         const query = new URLSearchParams(location.search);
         const errorDescription = query.get("error_description");
-        const hashParams = new URLSearchParams(location.hash.replace('#', ''));
-        const accessToken = hashParams.get("access_token");
         
         if (errorDescription) {
           console.error("Error in redirect:", errorDescription);
@@ -35,46 +30,6 @@ const AuthCallback = () => {
           return;
         }
         
-        // If we have an access token in the URL, we can use it directly
-        if (accessToken) {
-          console.log("Found access token in URL, setting session");
-          
-          try {
-            const { data, error } = await supabase.auth.getSession();
-            if (error) throw error;
-            
-            console.log("Session established:", !!data.session);
-            toast.success("Authentication successful!");
-            navigate("/dashboard", { replace: true });
-            return;
-          } catch (err) {
-            console.error("Error setting session from token:", err);
-            setError("Failed to set session from token.");
-            setLoading(false);
-            return;
-          }
-        }
-        
-        // Handle normal email confirmation flow
-        const { data, error } = await supabase.auth.getSession();
-        console.log("Get session result:", !!data.session, error);
-        
-        if (error) {
-          console.error("Error getting session:", error);
-          setError(error.message);
-          setLoading(false);
-          return;
-        }
-        
-        if (data.session) {
-          console.log("Session found, authentication successful");
-          toast.success("Email verified successfully!");
-          setTimeout(() => {
-            navigate("/dashboard", { replace: true });
-          }, 300);
-          return;
-        }
-
         // Try exchanging the auth code for a session if present
         const code = query.get("code");
         if (code) {
@@ -105,6 +60,23 @@ const AuthCallback = () => {
           }
         }
         
+        // If no code, check if we already have a session
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error getting session:", error);
+          setError(error.message);
+          setLoading(false);
+          return;
+        }
+        
+        if (data.session) {
+          console.log("Session found, authentication successful");
+          toast.success("Email verified successfully!");
+          navigate("/dashboard", { replace: true });
+          return;
+        }
+        
         // If we reach here, no session was established
         console.log("No session established");
         setError("Authentication failed. Please try signing in again.");
@@ -112,7 +84,6 @@ const AuthCallback = () => {
       } catch (err: any) {
         console.error("Unhandled error in auth callback:", err);
         setError(err.message || "An error occurred during authentication");
-        setDebugInfo(JSON.stringify(err, null, 2));
         setLoading(false);
       }
     };
@@ -136,12 +107,6 @@ const AuthCallback = () => {
         <Alert variant="destructive" className="mb-6">
           <AlertDescription className="text-center">{error}</AlertDescription>
         </Alert>
-        
-        {debugInfo && (
-          <div className="bg-muted p-4 rounded-md w-full mb-6 max-h-60 overflow-auto">
-            <pre className="text-xs">{debugInfo}</pre>
-          </div>
-        )}
         
         <div className="flex flex-col gap-4 w-full max-w-xs">
           <Button 
