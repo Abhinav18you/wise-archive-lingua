@@ -72,6 +72,7 @@ export const signInWithEmail = async (email: string, password: string) => {
  */
 export const handleAuthCallback = async () => {
   console.log("Handling auth callback");
+  console.log("Current URL:", window.location.href);
   
   try {
     // Get the current URL hash and query parameters
@@ -123,6 +124,8 @@ export const handleAuthCallback = async () => {
  * Get the current user's session
  */
 export const getSession = async () => {
+  console.log("Getting user session");
+  
   try {
     const { data, error } = await supabase.auth.getSession();
     

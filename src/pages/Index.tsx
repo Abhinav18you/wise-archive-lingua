@@ -6,6 +6,16 @@ import { ArrowRight, Database, Search, FileText, Link, Image } from "lucide-reac
 const Index = () => {
   const navigate = useNavigate();
 
+  const handleGetStarted = () => {
+    console.log("Get Started button clicked, attempting navigation to /auth");
+    try {
+      navigate("/auth");
+      console.log("Navigation to /auth completed");
+    } catch (error) {
+      console.error("Navigation error:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col items-center">
       <section className="py-10 md:py-16 w-full max-w-5xl mx-auto text-center animate-fade-in">
@@ -22,10 +32,7 @@ const Index = () => {
           <div className="flex flex-wrap justify-center gap-4 mt-10 animate-slide-up" style={{ animationDelay: "300ms" }}>
             <Button 
               size="lg" 
-              onClick={() => {
-                console.log("Get Started button clicked, navigating to /auth");
-                navigate("/auth");
-              }}
+              onClick={handleGetStarted}
               className="gap-2"
             >
               Get Started

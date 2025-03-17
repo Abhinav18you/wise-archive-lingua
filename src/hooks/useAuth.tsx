@@ -53,15 +53,20 @@ export const useAuth = () => {
 
     try {
       console.log("Signing in user with email:", formData.email);
-      const { error } = await signInWithEmail(
+      const { data, error } = await signInWithEmail(
         formData.email,
         formData.password
       );
       
       if (error) throw error;
       
+      console.log("Sign in successful, data:", data);
       toast.success("Signed in successfully!");
-      navigate("/dashboard");
+      
+      // Force a small delay before navigation
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 300);
     } catch (error: any) {
       console.error("Auth error:", error);
       setAuthError(error.message || "Sign in failed. Please try again.");
@@ -74,12 +79,23 @@ export const useAuth = () => {
   useEffect(() => {
     const checkAuthSession = async () => {
       setCheckingSession(true);
-      const { session } = await getSession();
-      console.log("useAuth: checking session", !!session);
-      if (session) {
-        console.log("Found existing session, user is authenticated");
+      try {
+        console.log("useAuth: checking session");
+        const { session, error } = await getSession();
+        console.log("useAuth: session check result", !!session);
+        
+        if (error) {
+          console.error("Session check error:", error);
+        }
+        
+        if (session) {
+          console.log("Found existing session, user is authenticated");
+        }
+      } catch (err) {
+        console.error("Error checking session in useAuth:", err);
+      } finally {
+        setCheckingSession(false);
       }
-      setCheckingSession(false);
     };
     
     checkAuthSession();
