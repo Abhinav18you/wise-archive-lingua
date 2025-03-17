@@ -68,59 +68,6 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 /**
- * Handle the auth callback after email verification
- */
-export const handleAuthCallback = async () => {
-  console.log("Handling auth callback");
-  console.log("Current URL:", window.location.href);
-  
-  try {
-    // Get the current URL hash and query parameters
-    const hash = window.location.hash;
-    const query = new URLSearchParams(window.location.search);
-    
-    // Log hash and query for debugging
-    if (hash) console.log("URL hash present:", hash);
-    if (query.toString()) console.log("URL query params:", query.toString());
-    
-    // Check for error in query parameters
-    const errorDescription = query.get("error_description");
-    if (errorDescription) {
-      console.error("Error in redirect:", errorDescription);
-      return { 
-        session: null, 
-        error: new Error(`Authentication error: ${errorDescription}`) 
-      };
-    }
-    
-    // Exchange the auth code for a session
-    const { data, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      console.error("Error getting session after redirect:", error);
-      return { session: null, error };
-    }
-    
-    if (data.session) {
-      console.log("Authentication successful, session established");
-      return { session: data.session, error: null };
-    }
-    
-    console.log("No session found after redirect");
-    return { 
-      session: null, 
-      error: new Error("No session was established after authentication.") 
-    };
-  } catch (err) {
-    console.error("Unexpected error in auth callback:", err);
-    return { 
-      session: null, 
-      error: err instanceof Error ? err : new Error('Unknown error during authentication') 
-    };
-  }
-};
-
-/**
  * Get the current user's session
  */
 export const getSession = async () => {

@@ -1,15 +1,15 @@
 
 import { useEffect, useState } from "react";
-import { handleAuthCallback } from "@/lib/auth";
+import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Spinner } from "@/components/ui/spinner";
-import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string | null>(null);
@@ -19,75 +19,106 @@ const AuthCallback = () => {
       try {
         console.log("Processing auth redirect...");
         console.log("Current URL:", window.location.href);
-        
-        // Log important details for debugging
         console.log("URL hash:", window.location.hash);
         console.log("URL search params:", window.location.search);
         
-        const { session, error } = await handleAuthCallback();
+        // Parse query parameters to check for error or access_token
+        const query = new URLSearchParams(location.search);
+        const errorDescription = query.get("error_description");
+        const hashParams = new URLSearchParams(location.hash.replace('#', ''));
+        const accessToken = hashParams.get("access_token");
         
-        if (error) {
-          console.error("Auth callback error:", error);
-          setError(error.message);
-          setDebugInfo(JSON.stringify(error, null, 2));
+        if (errorDescription) {
+          console.error("Error in redirect:", errorDescription);
+          setError(`Authentication error: ${errorDescription}`);
+          setLoading(false);
+          return;
+        }
+        
+        // If we have an access token in the URL, we can use it directly
+        if (accessToken) {
+          console.log("Found access token in URL, setting session");
           
-          // Try to recover by checking if we already have a session
-          const { data } = await supabase.auth.getSession();
-          if (data.session) {
-            console.log("Found existing session despite error, redirecting to dashboard");
+          try {
+            const { data, error } = await supabase.auth.getSession();
+            if (error) throw error;
+            
+            console.log("Session established:", !!data.session);
             toast.success("Authentication successful!");
             navigate("/dashboard", { replace: true });
             return;
+          } catch (err) {
+            console.error("Error setting session from token:", err);
+            setError("Failed to set session from token.");
+            setLoading(false);
+            return;
           }
-        } else if (session) {
-          console.log("Auth successful, redirecting to dashboard");
-          toast.success("Authentication successful!");
-          
-          // Force a small delay to ensure session is properly established
+        }
+        
+        // Handle normal email confirmation flow
+        const { data, error } = await supabase.auth.getSession();
+        console.log("Get session result:", !!data.session, error);
+        
+        if (error) {
+          console.error("Error getting session:", error);
+          setError(error.message);
+          setLoading(false);
+          return;
+        }
+        
+        if (data.session) {
+          console.log("Session found, authentication successful");
+          toast.success("Email verified successfully!");
           setTimeout(() => {
             navigate("/dashboard", { replace: true });
           }, 300);
-        } else {
-          console.log("No session or error returned");
+          return;
+        }
+
+        // Try exchanging the auth code for a session if present
+        const code = query.get("code");
+        if (code) {
+          console.log("Found auth code, exchanging for session");
           
-          // Try to recover by refreshing the session
-          const { data } = await supabase.auth.refreshSession();
-          if (data.session) {
-            console.log("Successfully refreshed session, redirecting");
-            toast.success("Authentication successful!");
-            setTimeout(() => {
+          try {
+            // Exchange code for session
+            const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+            
+            if (error) {
+              console.error("Error exchanging code for session:", error);
+              setError(error.message);
+              setLoading(false);
+              return;
+            }
+            
+            if (data.session) {
+              console.log("Session established from code");
+              toast.success("Authentication successful!");
               navigate("/dashboard", { replace: true });
-            }, 300);
+              return;
+            }
+          } catch (err) {
+            console.error("Error in code exchange:", err);
+            setError("Failed to exchange code for session.");
+            setLoading(false);
             return;
           }
-          
-          setError("Authentication failed. No session was created.");
-          setDebugInfo("No session object returned and no error was thrown. This might indicate an issue with the authentication flow.");
         }
+        
+        // If we reach here, no session was established
+        console.log("No session established");
+        setError("Authentication failed. Please try signing in again.");
+        setLoading(false);
       } catch (err: any) {
         console.error("Unhandled error in auth callback:", err);
         setError(err.message || "An error occurred during authentication");
         setDebugInfo(JSON.stringify(err, null, 2));
-        
-        // Last resort recovery attempt
-        try {
-          const { data } = await supabase.auth.getSession();
-          if (data.session) {
-            console.log("Found existing session despite error, redirecting to dashboard");
-            toast.success("Authentication successful!");
-            navigate("/dashboard", { replace: true });
-            return;
-          }
-        } catch (sessionErr) {
-          console.error("Failed to check session in recovery:", sessionErr);
-        }
-      } finally {
         setLoading(false);
       }
     };
 
     processAuthRedirect();
-  }, [navigate]);
+  }, [navigate, location]);
 
   if (loading) {
     return (
