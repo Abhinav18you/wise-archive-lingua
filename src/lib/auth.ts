@@ -12,6 +12,10 @@ export const signUpWithEmail = async (email: string, password: string, username?
   console.log("Signing up with email:", email);
   
   try {
+    // Get the current origin dynamically
+    const callbackUrl = `${window.location.origin}/auth/callback`;
+    console.log("Using callback URL:", callbackUrl);
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -19,7 +23,7 @@ export const signUpWithEmail = async (email: string, password: string, username?
         // Add metadata if username is provided
         data: username ? { username } : undefined,
         // Set the redirect URL for email confirmation
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: callbackUrl,
       },
     });
     
