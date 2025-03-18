@@ -65,8 +65,6 @@ export const useAuth = () => {
       setIsAuthenticated(true);
       
       toast.success("Signed in successfully!");
-      
-      // Navigate immediately rather than using setTimeout
       navigate("/dashboard", { replace: true });
     } catch (error: any) {
       console.error("Auth error:", error);

@@ -8,8 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangleIcon, CheckCircleIcon, ArrowLeftIcon, RefreshCwIcon } from "lucide-react";
-
-const SESSION_STORAGE_KEY = 'supabase.auth.session';
+import { SESSION_STORAGE_KEY } from "@/lib/auth";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -62,8 +61,10 @@ const AuthCallback = () => {
               setStatus("success");
               toast.success("Authentication successful!");
               
-              // Redirect to dashboard
-              navigate("/dashboard", { replace: true });
+              // Wait a bit before redirecting to ensure state is updated
+              setTimeout(() => {
+                navigate("/dashboard", { replace: true });
+              }, 500);
               return;
             } else {
               console.error("No session established from code");
@@ -100,8 +101,10 @@ const AuthCallback = () => {
           setStatus("success");
           toast.success("Email verified successfully!");
           
-          // Redirect to dashboard
-          navigate("/dashboard", { replace: true });
+          // Wait a bit before redirecting to ensure state is updated
+          setTimeout(() => {
+            navigate("/dashboard", { replace: true });
+          }, 500);
           return;
         }
         

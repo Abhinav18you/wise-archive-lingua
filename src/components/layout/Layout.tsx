@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
-import { getSession } from "@/lib/auth";
+import { getSession, SESSION_STORAGE_KEY } from "@/lib/auth";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -57,14 +57,23 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
         console.log("User signed in", session?.user?.id);
         setIsAuthenticated(true);
         
-        // Provide immediate feedback and redirect
+        // Store session in localStorage consistently
+        if (session) {
+          localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+        }
+        
+        // Provide immediate feedback
         if (location.pathname === '/auth') {
           toast.success("Signed in successfully!");
+          // Use navigate here directly to avoid potential race conditions
           navigate('/dashboard', { replace: true });
         }
       } else if (event === 'SIGNED_OUT') {
         console.log("User signed out");
         setIsAuthenticated(false);
+        
+        // Clear session from localStorage
+        localStorage.removeItem(SESSION_STORAGE_KEY);
         
         if (requireAuth) {
           navigate('/auth', { replace: true });

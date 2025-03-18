@@ -5,7 +5,7 @@ import { toast } from "@/lib/toast";
 // Default redirect URL
 const DEFAULT_REDIRECT = "/dashboard";
 
-// Consistent session storage key
+// Consistent session storage key - must match across all files
 export const SESSION_STORAGE_KEY = 'supabase.auth.token';
 
 /**
@@ -142,6 +142,9 @@ export const signOut = async () => {
   console.log("Signing out user");
   
   try {
+    // First clear localStorage to prevent any stale session data
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+    
     const { error } = await supabase.auth.signOut();
     
     if (error) {
@@ -149,9 +152,6 @@ export const signOut = async () => {
       toast.error("Failed to sign out. Please try again.");
       return { error };
     }
-    
-    // Clear localStorage
-    localStorage.removeItem(SESSION_STORAGE_KEY);
     
     toast.success("Signed out successfully");
     return { error: null };

@@ -1,9 +1,11 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
 import { supabase } from "@/integrations/supabase/client";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import { getSession } from "@/lib/auth";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ const Auth = () => {
     const checkSession = async () => {
       try {
         console.log("Auth page: checking session");
-        const { data, error } = await supabase.auth.getSession();
+        const { session, error } = await getSession();
         
         if (error) {
           console.error("Error checking session:", error);
@@ -23,9 +25,9 @@ const Auth = () => {
           return;
         }
         
-        console.log("Auth page session check result:", !!data.session);
+        console.log("Auth page session check result:", !!session);
         
-        if (data.session) {
+        if (session) {
           console.log("User already has session, redirecting to dashboard");
           navigate("/dashboard", { replace: true });
         } else {
