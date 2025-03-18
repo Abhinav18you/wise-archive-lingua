@@ -53,11 +53,17 @@ const AuthCallback = () => {
             
             if (data.session) {
               console.log("Session established from code:", data.session.user.id);
+              
+              // Store session in localStorage for persistence
+              localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+              
               setStatus("success");
               toast.success("Authentication successful!");
               
-              // Redirect immediately to dashboard
-              navigate("/dashboard", { replace: true });
+              // Redirect after a short delay to ensure state is updated
+              setTimeout(() => {
+                navigate("/dashboard", { replace: true });
+              }, 100);
               return;
             } else {
               console.error("No session established from code");
@@ -88,11 +94,16 @@ const AuthCallback = () => {
         
         if (data.session) {
           console.log("Session found, authentication successful", data.session.user.id);
+          // Store session in localStorage for persistence
+          localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+          
           setStatus("success");
           toast.success("Email verified successfully!");
           
-          // Redirect immediately to dashboard
-          navigate("/dashboard", { replace: true });
+          // Redirect after a short delay to ensure state is updated
+          setTimeout(() => {
+            navigate("/dashboard", { replace: true });
+          }, 100);
           return;
         }
         

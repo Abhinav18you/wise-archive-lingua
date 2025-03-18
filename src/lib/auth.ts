@@ -61,7 +61,8 @@ export const signInWithEmail = async (email: string, password: string) => {
     }
 
     console.log("Sign in successful:", data.user?.id);
-    // Store session info in localStorage for persistence
+    
+    // Store session info in localStorage for better persistence
     if (data.session) {
       localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
     }
@@ -83,6 +84,22 @@ export const getSession = async () => {
   console.log("Getting user session");
   
   try {
+    // First check localStorage for a session
+    const storedSession = localStorage.getItem('supabase.auth.token');
+    if (storedSession) {
+      console.log("Found stored session in localStorage");
+      try {
+        // Try to validate the stored session
+        const parsedSession = JSON.parse(storedSession);
+        if (parsedSession && new Date(parsedSession.expires_at * 1000) > new Date()) {
+          console.log("Using stored session");
+        }
+      } catch (e) {
+        console.error("Error parsing stored session:", e);
+        // Continue to check with Supabase
+      }
+    }
+    
     const { data, error } = await supabase.auth.getSession();
     
     if (error) {
@@ -92,6 +109,8 @@ export const getSession = async () => {
     
     if (data.session) {
       console.log("Session found for user:", data.session.user.id);
+      // Update localStorage with the latest session
+      localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
       return { session: data.session, error: null };
     }
     
@@ -123,6 +142,7 @@ export const signOut = async () => {
     
     // Clear any local storage items related to auth
     localStorage.removeItem('supabase.auth.token');
+    localStorage.removeItem('supabase.auth.session');
     
     toast.success("Signed out successfully");
     return { error: null };

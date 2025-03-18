@@ -25,21 +25,48 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
       try {
         setIsLoading(true);
         console.log("Layout: checking auth session");
-        const { data, error } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error("Error checking auth session:", error);
-          setError(error.message);
-          setIsAuthenticated(false);
-        } else {
-          console.log("Session check result:", !!data.session, data.session?.user?.id);
-          setIsAuthenticated(!!data.session);
+        // First check localStorage for a session
+        const storedSession = localStorage.getItem('supabase.auth.token');
+        let sessionFound = false;
+        
+        if (storedSession) {
+          try {
+            const parsedSession = JSON.parse(storedSession);
+            if (parsedSession && new Date(parsedSession.expires_at * 1000) > new Date()) {
+              console.log("Using cached session from localStorage");
+              setIsAuthenticated(true);
+              sessionFound = true;
+              setIsLoading(false);
+            }
+          } catch (e) {
+            console.error("Error parsing stored session:", e);
+          }
+        }
+        
+        if (!sessionFound) {
+          // If no valid session in localStorage, check with Supabase
+          const { data, error } = await supabase.auth.getSession();
+          
+          if (error) {
+            console.error("Error checking auth session:", error);
+            setError(error.message);
+            setIsAuthenticated(false);
+          } else {
+            console.log("Session check result:", !!data.session, data.session?.user?.id);
+            
+            if (data.session) {
+              localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+            }
+            
+            setIsAuthenticated(!!data.session);
+          }
+          setIsLoading(false);
         }
       } catch (err) {
         console.error("Unexpected error checking session:", err);
         setError(`Error loading session: ${err instanceof Error ? err.message : String(err)}`);
         setIsAuthenticated(false);
-      } finally {
         setIsLoading(false);
       }
     };
@@ -53,11 +80,24 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
       
       // Handle sign-in and sign-out events
       if (event === 'SIGNED_IN') {
-        console.log("User signed in, redirecting to dashboard");
-        navigate('/dashboard', { replace: true });
+        console.log("User signed in, redirecting to dashboard", session?.user?.id);
+        
+        if (session) {
+          localStorage.setItem('supabase.auth.token', JSON.stringify(session));
+        }
+        
         toast.success("Signed in successfully!");
+        
+        // Use setTimeout to ensure state is updated before navigation
+        setTimeout(() => {
+          if (location.pathname !== '/dashboard') {
+            navigate('/dashboard', { replace: true });
+          }
+        }, 100);
       } else if (event === 'SIGNED_OUT' && requireAuth) {
         console.log("User signed out, redirecting to auth");
+        localStorage.removeItem('supabase.auth.token');
+        localStorage.removeItem('supabase.auth.session');
         navigate('/auth', { replace: true });
         toast.info("Signed out");
       }
@@ -66,10 +106,11 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
     return () => {
       authListener?.subscription.unsubscribe();
     };
-  }, [navigate, requireAuth]);
+  }, [navigate, requireAuth, location.pathname]);
 
   // Handle protected routes
   useEffect(() => {
+    // Only redirect if we're not currently loading and we know the auth state
     if (!isLoading && requireAuth && isAuthenticated === false) {
       console.log("Redirecting to auth page - not authenticated. Current path:", location.pathname);
       navigate('/auth', { replace: true, state: { from: location.pathname } });

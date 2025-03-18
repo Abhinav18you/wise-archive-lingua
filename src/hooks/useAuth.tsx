@@ -61,10 +61,18 @@ export const useAuth = () => {
       if (error) throw error;
       
       console.log("Sign in successful, data:", data);
+      
+      // Store session info in localStorage for better persistence
+      if (data?.session) {
+        localStorage.setItem('supabase.auth.session', JSON.stringify(data.session));
+      }
+      
       toast.success("Signed in successfully!");
       
-      // Redirect to dashboard immediately
-      navigate("/dashboard", { replace: true });
+      // Wait a moment before redirecting
+      setTimeout(() => {
+        navigate("/dashboard", { replace: true });
+      }, 100);
     } catch (error: any) {
       console.error("Auth error:", error);
       setAuthError(error.message || "Sign in failed. Please try again.");
@@ -80,15 +88,19 @@ export const useAuth = () => {
       try {
         console.log("useAuth: checking session");
         const { session, error } = await getSession();
-        console.log("useAuth: session check result", !!session);
         
         if (error) {
           console.error("Session check error:", error);
-        }
-        
-        if (session) {
-          console.log("Found existing session, user is authenticated");
-          navigate("/dashboard", { replace: true });
+          setIsAuthenticated(false);
+        } else {
+          console.log("useAuth: session check result", !!session, session?.user?.id);
+          
+          if (session) {
+            console.log("Found existing session, user is authenticated");
+            // Store session in localStorage for persistence
+            localStorage.setItem('supabase.auth.session', JSON.stringify(session));
+            // Don't navigate here to avoid infinite redirects
+          }
         }
       } catch (err) {
         console.error("Error checking session in useAuth:", err);
