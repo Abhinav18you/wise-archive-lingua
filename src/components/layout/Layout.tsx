@@ -54,11 +54,11 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
       // Handle sign-in and sign-out events
       if (event === 'SIGNED_IN') {
         console.log("User signed in, redirecting to dashboard");
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
         toast.success("Signed in successfully!");
       } else if (event === 'SIGNED_OUT' && requireAuth) {
         console.log("User signed out, redirecting to auth");
-        navigate('/auth');
+        navigate('/auth', { replace: true });
         toast.info("Signed out");
       }
     });
@@ -72,7 +72,7 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
   useEffect(() => {
     if (!isLoading && requireAuth && isAuthenticated === false) {
       console.log("Redirecting to auth page - not authenticated. Current path:", location.pathname);
-      navigate('/auth', { replace: true });
+      navigate('/auth', { replace: true, state: { from: location.pathname } });
     }
   }, [isAuthenticated, isLoading, navigate, requireAuth, location.pathname]);
 

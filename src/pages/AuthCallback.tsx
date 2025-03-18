@@ -52,14 +52,18 @@ const AuthCallback = () => {
             }
             
             if (data.session) {
-              console.log("Session established from code");
+              console.log("Session established from code:", data.session.user.id);
               setStatus("success");
               toast.success("Authentication successful!");
               
-              // Wait a moment before redirecting
-              setTimeout(() => {
-                navigate("/dashboard", { replace: true });
-              }, 1500);
+              // Redirect immediately to dashboard
+              navigate("/dashboard", { replace: true });
+              return;
+            } else {
+              console.error("No session established from code");
+              setError("Failed to establish a session. Please try signing in again.");
+              setStatus("error");
+              setLoading(false);
               return;
             }
           } catch (err) {
@@ -83,14 +87,12 @@ const AuthCallback = () => {
         }
         
         if (data.session) {
-          console.log("Session found, authentication successful");
+          console.log("Session found, authentication successful", data.session.user.id);
           setStatus("success");
           toast.success("Email verified successfully!");
           
-          // Wait a moment before redirecting
-          setTimeout(() => {
-            navigate("/dashboard", { replace: true });
-          }, 1500);
+          // Redirect immediately to dashboard
+          navigate("/dashboard", { replace: true });
           return;
         }
         
@@ -109,22 +111,6 @@ const AuthCallback = () => {
 
     processAuthRedirect();
   }, [navigate, location]);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-semibold">Verifying your account...</CardTitle>
-            <CardDescription>This may take a few moments</CardDescription>
-          </CardHeader>
-          <CardContent className="flex justify-center py-6">
-            <Spinner size="lg" />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   if (status === "success") {
     return (
@@ -203,7 +189,19 @@ const AuthCallback = () => {
     );
   }
 
-  return null;
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-semibold">Verifying your account...</CardTitle>
+          <CardDescription>This may take a few moments</CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center py-6">
+          <Spinner size="lg" />
+        </CardContent>
+      </Card>
+    </div>
+  );
 };
 
 export default AuthCallback;

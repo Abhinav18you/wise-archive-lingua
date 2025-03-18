@@ -63,10 +63,8 @@ export const useAuth = () => {
       console.log("Sign in successful, data:", data);
       toast.success("Signed in successfully!");
       
-      // Force a small delay before navigation
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 300);
+      // Redirect to dashboard immediately
+      navigate("/dashboard", { replace: true });
     } catch (error: any) {
       console.error("Auth error:", error);
       setAuthError(error.message || "Sign in failed. Please try again.");
@@ -90,6 +88,7 @@ export const useAuth = () => {
         
         if (session) {
           console.log("Found existing session, user is authenticated");
+          navigate("/dashboard", { replace: true });
         }
       } catch (err) {
         console.error("Error checking session in useAuth:", err);

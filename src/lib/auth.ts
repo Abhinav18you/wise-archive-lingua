@@ -61,6 +61,11 @@ export const signInWithEmail = async (email: string, password: string) => {
     }
 
     console.log("Sign in successful:", data.user?.id);
+    // Store session info in localStorage for persistence
+    if (data.session) {
+      localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+    }
+    
     return { data, error: null };
   } catch (err) {
     console.error("Unexpected error during signin:", err);
@@ -115,6 +120,9 @@ export const signOut = async () => {
       toast.error("Failed to sign out. Please try again.");
       return { error };
     }
+    
+    // Clear any local storage items related to auth
+    localStorage.removeItem('supabase.auth.token');
     
     toast.success("Signed out successfully");
     return { error: null };
