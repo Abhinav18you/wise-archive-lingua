@@ -11,6 +11,7 @@ export const useAuth = () => {
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   
   const [formData, setFormData] = useState<AuthFormData>({
     email: "",
@@ -68,6 +69,7 @@ export const useAuth = () => {
       }
       
       toast.success("Signed in successfully!");
+      setIsAuthenticated(true);
       
       // Wait a moment before redirecting
       setTimeout(() => {
@@ -99,11 +101,15 @@ export const useAuth = () => {
             console.log("Found existing session, user is authenticated");
             // Store session in localStorage for persistence
             localStorage.setItem('supabase.auth.session', JSON.stringify(session));
+            setIsAuthenticated(true);
             // Don't navigate here to avoid infinite redirects
+          } else {
+            setIsAuthenticated(false);
           }
         }
       } catch (err) {
         console.error("Error checking session in useAuth:", err);
+        setIsAuthenticated(false);
       } finally {
         setCheckingSession(false);
       }
@@ -118,6 +124,7 @@ export const useAuth = () => {
     authError,
     checkingSession,
     confirmationSent,
+    isAuthenticated,
     setConfirmationSent,
     handleChange,
     handleSignUp,
