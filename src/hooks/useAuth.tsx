@@ -62,22 +62,16 @@ export const useAuth = () => {
       if (error) throw error;
       
       console.log("Sign in successful, data:", data);
-      
-      // Store session info in localStorage for better persistence
-      if (data?.session) {
-        localStorage.setItem('supabase.auth.session', JSON.stringify(data.session));
-      }
-      
-      toast.success("Signed in successfully!");
       setIsAuthenticated(true);
       
-      // Wait a moment before redirecting
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 100);
+      toast.success("Signed in successfully!");
+      
+      // Navigate immediately rather than using setTimeout
+      navigate("/dashboard", { replace: true });
     } catch (error: any) {
       console.error("Auth error:", error);
       setAuthError(error.message || "Sign in failed. Please try again.");
+      setIsAuthenticated(false);
     } finally {
       setLoading(false);
     }
@@ -94,18 +88,12 @@ export const useAuth = () => {
         if (error) {
           console.error("Session check error:", error);
           setIsAuthenticated(false);
+        } else if (session) {
+          console.log("Found existing session, user is authenticated");
+          setIsAuthenticated(true);
         } else {
-          console.log("useAuth: session check result", !!session, session?.user?.id);
-          
-          if (session) {
-            console.log("Found existing session, user is authenticated");
-            // Store session in localStorage for persistence
-            localStorage.setItem('supabase.auth.session', JSON.stringify(session));
-            setIsAuthenticated(true);
-            // Don't navigate here to avoid infinite redirects
-          } else {
-            setIsAuthenticated(false);
-          }
+          console.log("No session found, user is not authenticated");
+          setIsAuthenticated(false);
         }
       } catch (err) {
         console.error("Error checking session in useAuth:", err);
@@ -116,7 +104,7 @@ export const useAuth = () => {
     };
     
     checkAuthSession();
-  }, [navigate]);
+  }, []);
 
   return {
     formData,

@@ -9,6 +9,8 @@ import { toast } from "@/lib/toast";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangleIcon, CheckCircleIcon, ArrowLeftIcon, RefreshCwIcon } from "lucide-react";
 
+const SESSION_STORAGE_KEY = 'supabase.auth.session';
+
 const AuthCallback = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,15 +57,13 @@ const AuthCallback = () => {
               console.log("Session established from code:", data.session.user.id);
               
               // Store session in localStorage for persistence
-              localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+              localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data.session));
               
               setStatus("success");
               toast.success("Authentication successful!");
               
-              // Redirect after a short delay to ensure state is updated
-              setTimeout(() => {
-                navigate("/dashboard", { replace: true });
-              }, 100);
+              // Redirect to dashboard
+              navigate("/dashboard", { replace: true });
               return;
             } else {
               console.error("No session established from code");
@@ -95,15 +95,13 @@ const AuthCallback = () => {
         if (data.session) {
           console.log("Session found, authentication successful", data.session.user.id);
           // Store session in localStorage for persistence
-          localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+          localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data.session));
           
           setStatus("success");
           toast.success("Email verified successfully!");
           
-          // Redirect after a short delay to ensure state is updated
-          setTimeout(() => {
-            navigate("/dashboard", { replace: true });
-          }, 100);
+          // Redirect to dashboard
+          navigate("/dashboard", { replace: true });
           return;
         }
         

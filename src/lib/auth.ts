@@ -5,6 +5,9 @@ import { toast } from "@/lib/toast";
 // Default redirect URL
 const DEFAULT_REDIRECT = "/dashboard";
 
+// Consistent session storage key
+const SESSION_STORAGE_KEY = 'supabase.auth.session';
+
 /**
  * Sign up a user with email and password
  */
@@ -62,9 +65,9 @@ export const signInWithEmail = async (email: string, password: string) => {
 
     console.log("Sign in successful:", data.user?.id);
     
-    // Store session info in localStorage for better persistence
+    // Store session info in localStorage consistently
     if (data.session) {
-      localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data.session));
     }
     
     return { data, error: null };
@@ -85,14 +88,16 @@ export const getSession = async () => {
   
   try {
     // First check localStorage for a session
-    const storedSession = localStorage.getItem('supabase.auth.token');
+    const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
     if (storedSession) {
       console.log("Found stored session in localStorage");
       try {
         // Try to validate the stored session
         const parsedSession = JSON.parse(storedSession);
-        if (parsedSession && new Date(parsedSession.expires_at * 1000) > new Date()) {
+        if (parsedSession && parsedSession.expires_at && new Date(parsedSession.expires_at * 1000) > new Date()) {
           console.log("Using stored session");
+          // Return early with the stored session
+          return { session: parsedSession, error: null };
         }
       } catch (e) {
         console.error("Error parsing stored session:", e);
@@ -100,6 +105,7 @@ export const getSession = async () => {
       }
     }
     
+    // If no valid cached session, fetch from Supabase
     const { data, error } = await supabase.auth.getSession();
     
     if (error) {
@@ -110,7 +116,7 @@ export const getSession = async () => {
     if (data.session) {
       console.log("Session found for user:", data.session.user.id);
       // Update localStorage with the latest session
-      localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data.session));
       return { session: data.session, error: null };
     }
     
@@ -140,9 +146,8 @@ export const signOut = async () => {
       return { error };
     }
     
-    // Clear any local storage items related to auth
-    localStorage.removeItem('supabase.auth.token');
-    localStorage.removeItem('supabase.auth.session');
+    // Clear localStorage
+    localStorage.removeItem(SESSION_STORAGE_KEY);
     
     toast.success("Signed out successfully");
     return { error: null };

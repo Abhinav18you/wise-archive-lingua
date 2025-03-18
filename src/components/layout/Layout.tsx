@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
+import { getSession } from "@/lib/auth";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -26,43 +27,17 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
         setIsLoading(true);
         console.log("Layout: checking auth session");
         
-        // First check localStorage for a session
-        const storedSession = localStorage.getItem('supabase.auth.token');
-        let sessionFound = false;
+        const { session, error } = await getSession();
         
-        if (storedSession) {
-          try {
-            const parsedSession = JSON.parse(storedSession);
-            if (parsedSession && new Date(parsedSession.expires_at * 1000) > new Date()) {
-              console.log("Using cached session from localStorage");
-              setIsAuthenticated(true);
-              sessionFound = true;
-              setIsLoading(false);
-            }
-          } catch (e) {
-            console.error("Error parsing stored session:", e);
-          }
+        if (error) {
+          console.error("Error checking auth session:", error);
+          setError(error.message);
+          setIsAuthenticated(false);
+        } else {
+          console.log("Session check result:", !!session, session?.user?.id);
+          setIsAuthenticated(!!session);
         }
-        
-        if (!sessionFound) {
-          // If no valid session in localStorage, check with Supabase
-          const { data, error } = await supabase.auth.getSession();
-          
-          if (error) {
-            console.error("Error checking auth session:", error);
-            setError(error.message);
-            setIsAuthenticated(false);
-          } else {
-            console.log("Session check result:", !!data.session, data.session?.user?.id);
-            
-            if (data.session) {
-              localStorage.setItem('supabase.auth.token', JSON.stringify(data.session));
-            }
-            
-            setIsAuthenticated(!!data.session);
-          }
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       } catch (err) {
         console.error("Unexpected error checking session:", err);
         setError(`Error loading session: ${err instanceof Error ? err.message : String(err)}`);
@@ -76,30 +51,25 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
     // Subscribe to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, !!session);
-      setIsAuthenticated(!!session);
       
       // Handle sign-in and sign-out events
       if (event === 'SIGNED_IN') {
-        console.log("User signed in, redirecting to dashboard", session?.user?.id);
+        console.log("User signed in", session?.user?.id);
+        setIsAuthenticated(true);
         
-        if (session) {
-          localStorage.setItem('supabase.auth.token', JSON.stringify(session));
+        // Provide immediate feedback and redirect
+        if (location.pathname === '/auth') {
+          toast.success("Signed in successfully!");
+          navigate('/dashboard', { replace: true });
         }
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out");
+        setIsAuthenticated(false);
         
-        toast.success("Signed in successfully!");
-        
-        // Use setTimeout to ensure state is updated before navigation
-        setTimeout(() => {
-          if (location.pathname !== '/dashboard') {
-            navigate('/dashboard', { replace: true });
-          }
-        }, 100);
-      } else if (event === 'SIGNED_OUT' && requireAuth) {
-        console.log("User signed out, redirecting to auth");
-        localStorage.removeItem('supabase.auth.token');
-        localStorage.removeItem('supabase.auth.session');
-        navigate('/auth', { replace: true });
-        toast.info("Signed out");
+        if (requireAuth) {
+          navigate('/auth', { replace: true });
+          toast.info("Signed out");
+        }
       }
     });
     
