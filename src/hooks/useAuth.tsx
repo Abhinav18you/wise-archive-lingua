@@ -113,6 +113,7 @@ export const useAuth = () => {
     checkingSession,
     confirmationSent,
     isAuthenticated,
+    setIsAuthenticated,
     setConfirmationSent,
     handleChange,
     handleSignUp,

@@ -6,7 +6,7 @@ import { toast } from "@/lib/toast";
 const DEFAULT_REDIRECT = "/dashboard";
 
 // Consistent session storage key
-const SESSION_STORAGE_KEY = 'supabase.auth.session';
+export const SESSION_STORAGE_KEY = 'supabase.auth.token';
 
 /**
  * Sign up a user with email and password
@@ -98,9 +98,13 @@ export const getSession = async () => {
           console.log("Using stored session");
           // Return early with the stored session
           return { session: parsedSession, error: null };
+        } else {
+          console.log("Stored session is expired or invalid, fetching new session");
+          localStorage.removeItem(SESSION_STORAGE_KEY);
         }
       } catch (e) {
         console.error("Error parsing stored session:", e);
+        localStorage.removeItem(SESSION_STORAGE_KEY);
         // Continue to check with Supabase
       }
     }
