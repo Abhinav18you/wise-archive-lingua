@@ -165,14 +165,14 @@ const Dashboard = () => {
           </DropdownMenuContent>
         </DropdownMenu>
         <Select
-          value={filter || ""}
-          onValueChange={(value) => setFilter(value || null)}
+          value={filter || "most-recent"}
+          onValueChange={(value) => setFilter(value === "most-recent" ? null : value)}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Most Recent</SelectItem>
+            <SelectItem value="most-recent">Most Recent</SelectItem>
             <SelectItem value="oldest">Oldest First</SelectItem>
             <SelectItem value="a-z">A-Z</SelectItem>
             <SelectItem value="z-a">Z-A</SelectItem>
