@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Plus, Search, Filter } from "lucide-react";
@@ -32,11 +33,13 @@ const Dashboard = () => {
   const [keyword, setKeyword] = useState("");
   const [showTypes, setShowTypes] = useState<ContentType[]>(["link", "text", "image", "video", "file"]);
 
-  const fetchContents = async () => {
+  const fetchContents = useCallback(async () => {
     try {
       setLoading(true);
+      console.log("Fetching contents...");
       const { contents, error } = await api.content.getAll();
       if (error) throw error;
+      console.log("Fetched contents:", contents);
       setContents(contents);
     } catch (error) {
       console.error("Error fetching contents:", error);
@@ -44,11 +47,11 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchContents();
-  }, []);
+  }, [fetchContents]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -59,9 +62,10 @@ const Dashboard = () => {
       fetchContents();
       toast.success("Your content has been added successfully!");
     }
-  }, [location.search, navigate]);
+  }, [location.search, navigate, fetchContents]);
 
   const handleDelete = (id: string) => {
+    console.log("Deleting content with ID:", id);
     setContents(contents.filter((content) => content.id !== id));
   };
 
@@ -81,6 +85,20 @@ const Dashboard = () => {
     }
     
     return true;
+  });
+
+  // Sort contents if needed
+  const sortedContents = [...filteredContents].sort((a, b) => {
+    if (filter === "oldest") {
+      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    } else if (filter === "a-z") {
+      return (a.title || "").localeCompare(b.title || "");
+    } else if (filter === "z-a") {
+      return (b.title || "").localeCompare(a.title || "");
+    } else {
+      // Default to most recent
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    }
   });
 
   const toggleContentType = (type: ContentType) => {
@@ -194,9 +212,9 @@ const Dashboard = () => {
             Loading your content...
           </div>
         </div>
-      ) : filteredContents.length > 0 ? (
+      ) : sortedContents.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredContents.map((content) => (
+          {sortedContents.map((content) => (
             <ContentCard
               key={content.id}
               content={content}

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,11 +55,14 @@ const ContentForm = () => {
         tags,
       };
       
+      console.log("Submitting content:", contentData);
       const { content, error } = await api.content.create(contentData);
       
       if (error) throw error;
       
       toast.success("Content saved successfully!");
+      
+      // Force a redirect to dashboard with a parameter to trigger refresh
       navigate("/dashboard?added=true");
     } catch (error) {
       console.error("Error saving content:", error);

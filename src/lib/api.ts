@@ -45,66 +45,83 @@ export const api = {
   
   content: {
     create: async (data: Omit<Content, "id" | "user_id" | "created_at" | "updated_at">): Promise<{ content: Content | null; error: any }> => {
-      // Mock content creation
       console.log("Create content:", data);
       
-      // Simulate successful content creation
+      const { session } = await getSession();
+      const userId = session?.user?.id || "user-id";
+      
+      const now = new Date().toISOString();
       const content = {
         ...data,
         id: "content-" + Math.random().toString(36).substring(2, 9),
-        user_id: "user-id",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        user_id: userId,
+        created_at: now,
+        updated_at: now,
       };
+      
+      try {
+        const existingContents = JSON.parse(localStorage.getItem('userContents') || '[]');
+        localStorage.setItem('userContents', JSON.stringify([content, ...existingContents]));
+      } catch (err) {
+        console.error("Error saving to localStorage:", err);
+      }
       
       return { content, error: null };
     },
     
     getAll: async (): Promise<{ contents: Content[]; error: any }> => {
-      // Mock getting all content for user
-      const mockContents: Content[] = [
-        {
-          id: "content-1",
-          user_id: "user-id",
-          type: "link",
-          content: "https://example.com",
-          title: "Example Website",
-          description: "This is an example website",
-          tags: ["example", "website"],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: "content-2",
-          user_id: "user-id",
-          type: "text",
-          content: "This is some example text content.",
-          title: "Example Text",
-          tags: ["example", "text"],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: "content-3",
-          user_id: "user-id",
-          type: "image",
-          content: "https://via.placeholder.com/300",
-          title: "Example Image",
-          description: "This is an example image",
-          thumbnail_url: "https://via.placeholder.com/150",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
-      
-      return { contents: mockContents, error: null };
+      try {
+        const storedContents = localStorage.getItem('userContents');
+        const userContents: Content[] = storedContents ? JSON.parse(storedContents) : [];
+        
+        if (userContents.length === 0) {
+          const mockContents: Content[] = [
+            {
+              id: "content-1",
+              user_id: "user-id",
+              type: "link",
+              content: "https://example.com",
+              title: "Example Website",
+              description: "This is an example website",
+              tags: ["example", "website"],
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+            {
+              id: "content-2",
+              user_id: "user-id",
+              type: "text",
+              content: "This is some example text content.",
+              title: "Example Text",
+              tags: ["example", "text"],
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+            {
+              id: "content-3",
+              user_id: "user-id",
+              type: "image",
+              content: "https://via.placeholder.com/300",
+              title: "Example Image",
+              description: "This is an example image",
+              thumbnail_url: "https://via.placeholder.com/150",
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+          ];
+          return { contents: mockContents, error: null };
+        }
+        
+        return { contents: userContents, error: null };
+      } catch (err) {
+        console.error("Error retrieving from localStorage:", err);
+        return { contents: [], error: err };
+      }
     },
     
     search: async (query: string): Promise<{ results: Content[]; error: any }> => {
-      // Mock search functionality
       console.log("Searching for:", query);
       
-      // Mock search results
       const mockResults: Content[] = [
         {
           id: "content-1",
@@ -123,16 +140,22 @@ export const api = {
     },
     
     delete: async (id: string): Promise<{ error: any }> => {
-      // Mock delete
       console.log("Delete content:", id);
+      
+      try {
+        const existingContents = JSON.parse(localStorage.getItem('userContents') || '[]');
+        const updatedContents = existingContents.filter((item: Content) => item.id !== id);
+        localStorage.setItem('userContents', JSON.stringify(updatedContents));
+      } catch (err) {
+        console.error("Error removing from localStorage:", err);
+      }
+      
       return { error: null };
     },
     
     update: async (id: string, data: Partial<Content>): Promise<{ content: Content | null; error: any }> => {
-      // Mock update
       console.log("Update content:", id, data);
       
-      // Simulate successful update
       const content = {
         ...data,
         id,
@@ -148,7 +171,6 @@ export const api = {
   }
 };
 
-// Helper function to handle API errors
 export const handleApiError = (error: any): string => {
   console.error("API Error:", error);
   const errorMessage = error?.message || "An unexpected error occurred";
