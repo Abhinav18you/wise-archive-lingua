@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Search, Filter } from "lucide-react";
 import { Content, ContentType } from "@/types";
 import { api } from "@/lib/api";
@@ -27,38 +25,49 @@ import {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [contents, setContents] = useState<Content[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string | null>(null);
   const [keyword, setKeyword] = useState("");
   const [showTypes, setShowTypes] = useState<ContentType[]>(["link", "text", "image", "video", "file"]);
 
-  useEffect(() => {
-    const fetchContents = async () => {
-      try {
-        const { contents, error } = await api.content.getAll();
-        if (error) throw error;
-        setContents(contents);
-      } catch (error) {
-        console.error("Error fetching contents:", error);
-        toast.error("Failed to load your content");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchContents = async () => {
+    try {
+      setLoading(true);
+      const { contents, error } = await api.content.getAll();
+      if (error) throw error;
+      setContents(contents);
+    } catch (error) {
+      console.error("Error fetching contents:", error);
+      toast.error("Failed to load your content");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchContents();
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const justAdded = params.get('added') === 'true';
+    
+    if (justAdded) {
+      navigate('/dashboard', { replace: true });
+      fetchContents();
+      toast.success("Your content has been added successfully!");
+    }
+  }, [location.search, navigate]);
 
   const handleDelete = (id: string) => {
     setContents(contents.filter((content) => content.id !== id));
   };
 
   const filteredContents = contents.filter((content) => {
-    // Filter by content type
     if (!showTypes.includes(content.type)) return false;
     
-    // Filter by keyword
     if (keyword) {
       const searchLower = keyword.toLowerCase();
       const titleMatch = content.title?.toLowerCase().includes(searchLower);
@@ -71,7 +80,6 @@ const Dashboard = () => {
       }
     }
     
-    // All filters passed
     return true;
   });
 

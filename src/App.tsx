@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import Search from "./pages/Search";
 import Add from "./pages/Add";
 import NotFound from "./pages/NotFound";
@@ -36,6 +37,14 @@ const App = () => (
             element={
               <Layout requireAuth={true}>
                 <Dashboard />
+              </Layout>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <Layout requireAuth={true}>
+                <Profile />
               </Layout>
             } 
           />

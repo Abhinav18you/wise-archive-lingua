@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,7 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { api } from "@/lib/api";
 import { toast } from "@/lib/toast";
 import { ContentType } from "@/types";
-import { Link, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 const formSchema = z.object({
   type: z.enum(["link", "text", "image", "video", "file"] as const),
@@ -60,7 +59,7 @@ const ContentForm = () => {
       if (error) throw error;
       
       toast.success("Content saved successfully!");
-      navigate("/dashboard");
+      navigate("/dashboard?added=true");
     } catch (error) {
       console.error("Error saving content:", error);
       toast.error("Failed to save content");
