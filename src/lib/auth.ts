@@ -6,7 +6,7 @@ import { toast } from "@/lib/toast";
 const DEFAULT_REDIRECT = "/dashboard";
 
 // Consistent session storage key - must match across all files
-export const SESSION_STORAGE_KEY = 'supabase.auth.token';
+export const SESSION_STORAGE_KEY = 'memoria.session';
 
 /**
  * Sign up a user with email and password
@@ -87,41 +87,39 @@ export const getSession = async () => {
   console.log("Getting user session");
   
   try {
-    // First check localStorage for a session
+    // First try to get the session from Supabase
+    const { data: supabaseData, error: supabaseError } = await supabase.auth.getSession();
+    
+    if (supabaseError) {
+      console.error("Get session error from Supabase:", supabaseError);
+      return { session: null, error: supabaseError };
+    }
+    
+    if (supabaseData.session) {
+      console.log("Active Supabase session found for user:", supabaseData.session.user.id);
+      // Update localStorage with the latest session
+      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(supabaseData.session));
+      return { session: supabaseData.session, error: null };
+    }
+    
+    // If no Supabase session, check localStorage as a fallback
     const storedSession = localStorage.getItem(SESSION_STORAGE_KEY);
     if (storedSession) {
       console.log("Found stored session in localStorage");
       try {
-        // Try to validate the stored session
+        // Try to parse the stored session
         const parsedSession = JSON.parse(storedSession);
         if (parsedSession && parsedSession.expires_at && new Date(parsedSession.expires_at * 1000) > new Date()) {
-          console.log("Using stored session");
-          // Return early with the stored session
+          console.log("Using stored session from localStorage");
           return { session: parsedSession, error: null };
         } else {
-          console.log("Stored session is expired or invalid, fetching new session");
+          console.log("Stored session is expired or invalid");
           localStorage.removeItem(SESSION_STORAGE_KEY);
         }
       } catch (e) {
         console.error("Error parsing stored session:", e);
         localStorage.removeItem(SESSION_STORAGE_KEY);
-        // Continue to check with Supabase
       }
-    }
-    
-    // If no valid cached session, fetch from Supabase
-    const { data, error } = await supabase.auth.getSession();
-    
-    if (error) {
-      console.error("Get session error:", error);
-      return { session: null, error };
-    }
-    
-    if (data.session) {
-      console.log("Session found for user:", data.session.user.id);
-      // Update localStorage with the latest session
-      localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data.session));
-      return { session: data.session, error: null };
     }
     
     console.log("No active session found");

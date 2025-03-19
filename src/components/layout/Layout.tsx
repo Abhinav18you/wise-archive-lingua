@@ -27,6 +27,27 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
         setIsLoading(true);
         console.log("Layout: checking auth session");
         
+        // First check Supabase session directly
+        const { data: supabaseData, error: supabaseError } = await supabase.auth.getSession();
+        
+        if (supabaseError) {
+          console.error("Error checking Supabase session:", supabaseError);
+          setError(supabaseError.message);
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        if (supabaseData.session) {
+          console.log("Active Supabase session found:", supabaseData.session.user.id);
+          // Store in localStorage for consistency
+          localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(supabaseData.session));
+          setIsAuthenticated(true);
+          setIsLoading(false);
+          return;
+        }
+        
+        // If no Supabase session, fall back to our helper
         const { session, error } = await getSession();
         
         if (error) {
@@ -50,7 +71,7 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
     
     // Subscribe to auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event, !!session);
+      console.log("Auth state changed in Layout:", event, !!session);
       
       // Handle sign-in and sign-out events
       if (event === 'SIGNED_IN') {
@@ -65,7 +86,6 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
         // Provide immediate feedback
         if (location.pathname === '/auth') {
           toast.success("Signed in successfully!");
-          // Use navigate here directly to avoid potential race conditions
           navigate('/dashboard', { replace: true });
         }
       } else if (event === 'SIGNED_OUT') {

@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/lib/toast";
-import { signUpWithEmail, signInWithEmail, getSession } from "@/lib/auth";
+import { signUpWithEmail, signInWithEmail, getSession, SESSION_STORAGE_KEY } from "@/lib/auth";
 import { AuthFormData } from "@/types";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAuth = () => {
   const navigate = useNavigate();
@@ -62,9 +63,16 @@ export const useAuth = () => {
       if (error) throw error;
       
       console.log("Sign in successful, data:", data);
-      setIsAuthenticated(true);
       
+      // Store session immediately
+      if (data.session) {
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data.session));
+      }
+      
+      setIsAuthenticated(true);
       toast.success("Signed in successfully!");
+      
+      // Navigate immediately, don't wait
       navigate("/dashboard", { replace: true });
     } catch (error: any) {
       console.error("Auth error:", error);
@@ -89,6 +97,10 @@ export const useAuth = () => {
         } else if (session) {
           console.log("Found existing session, user is authenticated");
           setIsAuthenticated(true);
+          // If on auth page, redirect
+          if (window.location.pathname === '/auth') {
+            navigate("/dashboard", { replace: true });
+          }
         } else {
           console.log("No session found, user is not authenticated");
           setIsAuthenticated(false);
@@ -102,7 +114,26 @@ export const useAuth = () => {
     };
     
     checkAuthSession();
-  }, []);
+    
+    // Also set up auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed in useAuth:", event, session?.user?.id);
+      
+      if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in via state change", session.user.id);
+        setIsAuthenticated(true);
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+      } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out via state change");
+        setIsAuthenticated(false);
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+      }
+    });
+    
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   return {
     formData,

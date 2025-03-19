@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthForm from "@/components/auth/AuthForm";
-import { supabase } from "@/integrations/supabase/client";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -16,6 +16,24 @@ const Auth = () => {
     const checkSession = async () => {
       try {
         console.log("Auth page: checking session");
+        
+        // First check if Supabase has a session directly
+        const { data, error: supabaseError } = await supabase.auth.getSession();
+        
+        if (supabaseError) {
+          console.error("Error checking Supabase session:", supabaseError);
+          setError(supabaseError.message);
+          setIsLoading(false);
+          return;
+        }
+        
+        if (data.session) {
+          console.log("User already has session in Supabase, redirecting to dashboard");
+          navigate("/dashboard", { replace: true });
+          return;
+        }
+        
+        // If no Supabase session, fall back to our getSession helper
         const { session, error } = await getSession();
         
         if (error) {
@@ -41,6 +59,19 @@ const Auth = () => {
     };
     
     checkSession();
+    
+    // Also listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed in Auth page:", event);
+      if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in, redirecting to dashboard");
+        navigate("/dashboard", { replace: true });
+      }
+    });
+    
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   if (isLoading) {

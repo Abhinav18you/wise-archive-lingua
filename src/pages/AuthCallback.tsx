@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,10 +60,8 @@ const AuthCallback = () => {
               setStatus("success");
               toast.success("Authentication successful!");
               
-              // Wait a bit before redirecting to ensure state is updated
-              setTimeout(() => {
-                navigate("/dashboard", { replace: true });
-              }, 500);
+              // Navigate immediately without delay
+              navigate("/dashboard", { replace: true });
               return;
             } else {
               console.error("No session established from code");
@@ -101,10 +98,8 @@ const AuthCallback = () => {
           setStatus("success");
           toast.success("Email verified successfully!");
           
-          // Wait a bit before redirecting to ensure state is updated
-          setTimeout(() => {
-            navigate("/dashboard", { replace: true });
-          }, 500);
+          // Navigate immediately without delay
+          navigate("/dashboard", { replace: true });
           return;
         }
         
