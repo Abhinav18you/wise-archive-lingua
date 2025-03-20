@@ -65,6 +65,8 @@ export const api = {
           user_id: userId // Add user_id field explicitly for RLS policy to work
         };
         
+        console.log("Prepared content data:", contentData);
+        
         // Insert into Supabase
         const { data: insertedContent, error } = await supabase
           .from('user_materials')
@@ -72,7 +74,12 @@ export const api = {
           .select('*')
           .single();
         
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase insert error:", error);
+          throw error;
+        }
+        
+        console.log("Successfully inserted content:", insertedContent);
         
         // Also save to localStorage as a fallback
         try {

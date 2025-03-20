@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { api } from "@/lib/api";
+import { api, handleApiError } from "@/lib/api";
 import { toast } from "@/lib/toast";
 import { ContentType } from "@/types";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const formSchema = z.object({
   type: z.enum(["link", "text", "image", "video", "file"] as const),
@@ -26,6 +27,7 @@ const formSchema = z.object({
 const ContentForm = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,6 +44,7 @@ const ContentForm = () => {
   
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
+    setSubmitError(null);
     
     try {
       // Process tags
@@ -58,7 +61,10 @@ const ContentForm = () => {
       console.log("Submitting content:", contentData);
       const { content, error } = await api.content.create(contentData);
       
-      if (error) throw error;
+      if (error) {
+        setSubmitError(handleApiError(error));
+        return;
+      }
       
       toast.success("Content saved successfully!");
       
@@ -66,6 +72,7 @@ const ContentForm = () => {
       navigate("/dashboard?added=true");
     } catch (error) {
       console.error("Error saving content:", error);
+      setSubmitError("Failed to save content. Please try again.");
       toast.error("Failed to save content");
     } finally {
       setIsSubmitting(false);
@@ -126,6 +133,15 @@ const ContentForm = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {submitError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {submitError}
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
