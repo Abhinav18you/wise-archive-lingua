@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +33,9 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
       onResults(results);
       
       if (results.length === 0) {
-        toast.info("No results found for your query");
+        toast.info(`No results found for "${query}". Try a different search term.`);
+      } else {
+        toast.success(`Found ${results.length} result${results.length === 1 ? '' : 's'}`);
       }
     } catch (error) {
       console.error("Error searching:", error);
@@ -69,7 +72,7 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 ml-1">
-            Try natural language queries like "websites about design" or "notes from last week"
+            Try searching your saved content with terms like "text about" or specific keywords
           </p>
         </form>
       </div>

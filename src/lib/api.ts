@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
@@ -122,21 +123,35 @@ export const api = {
     search: async (query: string): Promise<{ results: Content[]; error: any }> => {
       console.log("Searching for:", query);
       
-      const mockResults: Content[] = [
-        {
-          id: "content-1",
-          user_id: "user-id",
-          type: "link",
-          content: "https://example.com",
-          title: "Example Website",
-          description: "This is an example website",
-          tags: ["example", "website"],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
-      
-      return { results: mockResults, error: null };
+      try {
+        // Get stored content from localStorage
+        const storedContents = localStorage.getItem('userContents');
+        const userContents: Content[] = storedContents ? JSON.parse(storedContents) : [];
+        
+        if (userContents.length === 0) {
+          // If no user content exists, don't return any results
+          return { results: [], error: null };
+        }
+        
+        // Normalize the query for case-insensitive search
+        const normalizedQuery = query.toLowerCase().trim();
+        
+        // Filter content based on the search query
+        const results = userContents.filter(content => {
+          const titleMatch = content.title?.toLowerCase().includes(normalizedQuery) || false;
+          const contentMatch = content.content.toLowerCase().includes(normalizedQuery);
+          const descriptionMatch = content.description?.toLowerCase().includes(normalizedQuery) || false;
+          const tagMatch = content.tags?.some(tag => tag.toLowerCase().includes(normalizedQuery)) || false;
+          
+          return titleMatch || contentMatch || descriptionMatch || tagMatch;
+        });
+        
+        console.log("Search results:", results);
+        return { results, error: null };
+      } catch (err) {
+        console.error("Error searching content:", err);
+        return { results: [], error: err };
+      }
     },
     
     delete: async (id: string): Promise<{ error: any }> => {
