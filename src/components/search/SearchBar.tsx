@@ -40,6 +40,10 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
     } catch (error) {
       console.error("Error searching:", error);
       toast.error("Search failed. Please try again.");
+      // If user is not authenticated, suggest logging in
+      if (error instanceof Error && error.message.includes("not authenticated")) {
+        toast.error("Please sign in to search your content across devices");
+      }
     } finally {
       setIsSearching(false);
     }
@@ -72,7 +76,7 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 ml-1">
-            Try searching your saved content with terms like "text about" or specific keywords
+            Search your content across all your devices (requires sign in)
           </p>
         </form>
       </div>
