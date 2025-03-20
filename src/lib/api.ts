@@ -55,26 +55,18 @@ export const api = {
         
         const userId = session.user.id;
         
-        // Prepare the data for insertion
+        // Prepare the data for insertion - mapping to user_materials table structure
         const contentData = {
-          user_id: userId,
           type: data.type,
-          content: data.content,
-          title: data.title || null,
-          description: data.description || null,
-          tags: data.tags || null,
-          thumbnail_url: data.thumbnail_url || null,
+          data: data.content, // content field is stored as data in user_materials
+          title: data.title || '',
+          description: data.description || '',
         };
         
         // Insert into Supabase
         const { data: insertedContent, error } = await supabase
           .from('user_materials')
-          .insert({
-            title: data.title || '',
-            description: data.description || '',
-            type: data.type,
-            data: data.content,
-          })
+          .insert(contentData)
           .select('*')
           .single();
         
@@ -175,7 +167,7 @@ export const api = {
         
         if (error) throw error;
         
-        // Map Supabase data to Content type
+        // Map Supabase data to Content type - matching the user_materials schema
         const mappedContents: Content[] = materials.map(item => ({
           id: item.id,
           user_id: session.user.id,
@@ -241,7 +233,7 @@ export const api = {
         // Normalize query for search
         const normalizedQuery = query.toLowerCase().trim();
         
-        // Search in Supabase using ILIKE for text search
+        // Search in Supabase using ILIKE for text search - adjusted for user_materials structure
         const { data: materials, error } = await supabase
           .from('user_materials')
           .select('*')
@@ -250,7 +242,7 @@ export const api = {
         
         if (error) throw error;
         
-        // Map Supabase data to Content type
+        // Map Supabase data to Content type - matching the user_materials schema
         const mappedResults: Content[] = materials.map(item => ({
           id: item.id,
           user_id: session.user.id,
@@ -281,7 +273,7 @@ export const api = {
           throw new Error("User is not authenticated");
         }
         
-        // Delete from Supabase
+        // Delete from Supabase - using user_materials table
         const { error } = await supabase
           .from('user_materials')
           .delete()
@@ -315,10 +307,10 @@ export const api = {
           throw new Error("User is not authenticated");
         }
         
-        // Prepare the data for update
+        // Prepare the data for update - mapping to user_materials table structure
         const updateData: any = {};
         if (data.type) updateData.type = data.type;
-        if (data.content) updateData.data = data.content;
+        if (data.content) updateData.data = data.content; // content maps to data
         if (data.title !== undefined) updateData.title = data.title;
         if (data.description !== undefined) updateData.description = data.description;
         
