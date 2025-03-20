@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
@@ -61,6 +62,7 @@ export const api = {
           data: data.content, // content field is stored as data in user_materials
           title: data.title || '',
           description: data.description || '',
+          user_id: userId // Add user_id field explicitly for RLS policy to work
         };
         
         // Insert into Supabase
