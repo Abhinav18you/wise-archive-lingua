@@ -57,7 +57,7 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by natural language (e.g., 'that article about AI ethics')"
+              placeholder="Search your saved content..."
               className="flex-1 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
             />
             <Button 

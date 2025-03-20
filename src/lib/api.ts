@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
@@ -56,20 +55,26 @@ export const api = {
         
         const userId = session.user.id;
         
+        // Prepare the data for insertion
+        const contentData = {
+          user_id: userId,
+          type: data.type,
+          content: data.content,
+          title: data.title || null,
+          description: data.description || null,
+          tags: data.tags || null,
+          thumbnail_url: data.thumbnail_url || null,
+        };
+        
         // Insert into Supabase
         const { data: insertedContent, error } = await supabase
-          .from('user_content')
-          .insert([
-            {
-              user_id: userId,
-              type: data.type,
-              content: data.content,
-              title: data.title || null,
-              description: data.description || null,
-              tags: data.tags || null,
-              thumbnail_url: data.thumbnail_url || null,
-            }
-          ])
+          .from('user_materials')
+          .insert({
+            title: data.title || '',
+            description: data.description || '',
+            type: data.type,
+            data: data.content,
+          })
           .select('*')
           .single();
         
@@ -83,7 +88,7 @@ export const api = {
             id: insertedContent.id,
             user_id: userId,
             created_at: insertedContent.created_at,
-            updated_at: insertedContent.updated_at,
+            updated_at: insertedContent.created_at,
           };
           localStorage.setItem('userContents', JSON.stringify([localContent, ...existingContents]));
         } catch (err) {
@@ -91,21 +96,21 @@ export const api = {
           // Continue anyway since we have Supabase storage
         }
         
-        return { 
-          content: {
-            id: insertedContent.id,
-            user_id: userId,
-            type: insertedContent.type as ContentType,
-            content: insertedContent.content,
-            title: insertedContent.title || undefined,
-            description: insertedContent.description || undefined,
-            tags: insertedContent.tags || undefined,
-            thumbnail_url: insertedContent.thumbnail_url || undefined,
-            created_at: insertedContent.created_at,
-            updated_at: insertedContent.updated_at,
-          }, 
-          error: null 
+        // Map the database content structure to our application Content type
+        const mappedContent: Content = {
+          id: insertedContent.id,
+          user_id: userId,
+          type: insertedContent.type as ContentType,
+          content: insertedContent.data,
+          title: insertedContent.title || undefined,
+          description: insertedContent.description || undefined,
+          tags: [],
+          thumbnail_url: undefined,
+          created_at: insertedContent.created_at,
+          updated_at: insertedContent.created_at,
         };
+        
+        return { content: mappedContent, error: null };
       } catch (err) {
         console.error("Error creating content:", err);
         return { content: null, error: err };
@@ -163,25 +168,25 @@ export const api = {
         }
         
         // Fetch from Supabase
-        const { data: contents, error } = await supabase
-          .from('user_content')
+        const { data: materials, error } = await supabase
+          .from('user_materials')
           .select('*')
           .order('created_at', { ascending: false });
         
         if (error) throw error;
         
         // Map Supabase data to Content type
-        const mappedContents: Content[] = contents.map(item => ({
+        const mappedContents: Content[] = materials.map(item => ({
           id: item.id,
-          user_id: item.user_id,
+          user_id: session.user.id,
           type: item.type as ContentType,
-          content: item.content,
+          content: item.data,
           title: item.title || undefined,
           description: item.description || undefined,
-          tags: item.tags || undefined,
-          thumbnail_url: item.thumbnail_url || undefined,
+          tags: [],
+          thumbnail_url: undefined,
           created_at: item.created_at,
-          updated_at: item.updated_at,
+          updated_at: item.created_at,
         }));
         
         // Sync with localStorage for offline capability
@@ -237,26 +242,26 @@ export const api = {
         const normalizedQuery = query.toLowerCase().trim();
         
         // Search in Supabase using ILIKE for text search
-        const { data: results, error } = await supabase
-          .from('user_content')
+        const { data: materials, error } = await supabase
+          .from('user_materials')
           .select('*')
-          .or(`content.ilike.%${normalizedQuery}%,title.ilike.%${normalizedQuery}%,description.ilike.%${normalizedQuery}%`)
+          .or(`data.ilike.%${normalizedQuery}%,title.ilike.%${normalizedQuery}%,description.ilike.%${normalizedQuery}%`)
           .order('created_at', { ascending: false });
         
         if (error) throw error;
         
         // Map Supabase data to Content type
-        const mappedResults: Content[] = results.map(item => ({
+        const mappedResults: Content[] = materials.map(item => ({
           id: item.id,
-          user_id: item.user_id,
+          user_id: session.user.id,
           type: item.type as ContentType,
-          content: item.content,
+          content: item.data,
           title: item.title || undefined,
           description: item.description || undefined,
-          tags: item.tags || undefined,
-          thumbnail_url: item.thumbnail_url || undefined,
+          tags: [],
+          thumbnail_url: undefined,
           created_at: item.created_at,
-          updated_at: item.updated_at,
+          updated_at: item.created_at,
         }));
         
         console.log("Search results from Supabase:", mappedResults);
@@ -278,7 +283,7 @@ export const api = {
         
         // Delete from Supabase
         const { error } = await supabase
-          .from('user_content')
+          .from('user_materials')
           .delete()
           .eq('id', id);
         
@@ -310,18 +315,17 @@ export const api = {
           throw new Error("User is not authenticated");
         }
         
+        // Prepare the data for update
+        const updateData: any = {};
+        if (data.type) updateData.type = data.type;
+        if (data.content) updateData.data = data.content;
+        if (data.title !== undefined) updateData.title = data.title;
+        if (data.description !== undefined) updateData.description = data.description;
+        
         // Update in Supabase
         const { data: updatedContent, error } = await supabase
-          .from('user_content')
-          .update({
-            type: data.type,
-            content: data.content,
-            title: data.title,
-            description: data.description,
-            tags: data.tags,
-            thumbnail_url: data.thumbnail_url,
-            updated_at: new Date().toISOString()
-          })
+          .from('user_materials')
+          .update(updateData)
           .eq('id', id)
           .select('*')
           .single();
@@ -347,21 +351,21 @@ export const api = {
           // Continue anyway since we updated Supabase
         }
         
-        return { 
-          content: {
-            id: updatedContent.id,
-            user_id: updatedContent.user_id,
-            type: updatedContent.type as ContentType,
-            content: updatedContent.content,
-            title: updatedContent.title || undefined,
-            description: updatedContent.description || undefined,
-            tags: updatedContent.tags || undefined,
-            thumbnail_url: updatedContent.thumbnail_url || undefined,
-            created_at: updatedContent.created_at,
-            updated_at: updatedContent.updated_at,
-          }, 
-          error: null 
+        // Map the database content structure to our application Content type
+        const mappedContent: Content = {
+          id: updatedContent.id,
+          user_id: session.user.id,
+          type: updatedContent.type as ContentType,
+          content: updatedContent.data,
+          title: updatedContent.title || undefined,
+          description: updatedContent.description || undefined,
+          tags: [],
+          thumbnail_url: undefined,
+          created_at: updatedContent.created_at,
+          updated_at: updatedContent.created_at,
         };
+        
+        return { content: mappedContent, error: null };
       } catch (err) {
         console.error("Error updating content:", err);
         return { content: null, error: err };
