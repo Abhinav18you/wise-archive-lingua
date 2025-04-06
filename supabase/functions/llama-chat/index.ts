@@ -17,17 +17,19 @@ serve(async (req) => {
     
     if (!LLAMA_API_KEY) {
       console.error('LLAMA_API_KEY is not set');
-      throw new Error('LLAMA_API_KEY is not set');
+      throw new Error('LLAMA_API_KEY is not set in environment variables');
     }
 
     // Parse request body
-    const { message, conversation } = await req.json();
+    const body = await req.json();
+    const { message, conversation } = body;
     
     if (!message) {
       throw new Error('Message parameter is required');
     }
 
     console.log('Received chat message:', message);
+    console.log('Conversation history length:', conversation?.length || 0);
 
     // Format conversation history
     const messages = [
@@ -77,8 +79,8 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Perplexity API error:', errorText);
-      throw new Error(`Perplexity API error: ${response.status}`);
+      console.error(`Perplexity API error (${response.status}):`, errorText);
+      throw new Error(`Perplexity API error: ${response.status} - ${errorText}`);
     }
 
     // Parse response
@@ -86,11 +88,11 @@ serve(async (req) => {
     
     if (!data.choices || !data.choices[0]) {
       console.error('Invalid response from Perplexity API:', data);
-      throw new Error('Invalid response from Perplexity API');
+      throw new Error('Invalid response structure from Perplexity API');
     }
 
     const aiResponse = data.choices[0].message.content;
-    console.log('Received response from AI:', aiResponse.substring(0, 50) + '...');
+    console.log('Received response from AI:', aiResponse.substring(0, 100) + '...');
 
     // Return the AI response
     return new Response(

@@ -1,9 +1,9 @@
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Bot, User, Loader2 } from "lucide-react";
 import ChatInput from "@/components/chat/ChatInput";
-import ChatMessage from "@/components/chat/ChatMessage";
+import ChatMessage, { ChatMessageType } from "@/components/chat/ChatMessage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 
@@ -23,6 +23,16 @@ const ChatBot = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom of messages when they change
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -42,17 +52,23 @@ const ChatBot = () => {
       // Get conversation history (excluding system messages)
       const conversationHistory = messages.filter(m => m.role !== 'system');
       
+      console.log("Calling llama-chat function with message:", message);
+      
       // Call the Llama chat edge function
-      const { data, error } = await supabase.functions.invoke('llama-chat', {
+      const { data, error: funcError } = await supabase.functions.invoke('llama-chat', {
         body: { 
           message,
           conversation: conversationHistory
         }
       });
       
-      if (error) throw error;
+      if (funcError) {
+        console.error("Edge function error:", funcError);
+        throw new Error(funcError.message);
+      }
       
-      if (data.error) {
+      if (data?.error) {
+        console.error("Data error:", data.error);
         throw new Error(data.error);
       }
       
@@ -74,6 +90,16 @@ const ChatBot = () => {
     }
   };
   
+  // Map our Message type to ChatMessageType for the ChatMessage component
+  const mapToChatMessageType = (message: Message, index: number): ChatMessageType => {
+    return {
+      id: index.toString(),
+      role: message.role === 'user' ? 'user' : 'assistant',
+      content: message.content,
+      createdAt: message.timestamp ? new Date(message.timestamp) : undefined
+    };
+  };
+  
   return (
     <div className="rounded-lg border bg-card shadow-sm overflow-hidden flex flex-col h-[70vh]">
       <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
@@ -91,12 +117,7 @@ const ChatBot = () => {
         {messages.map((message, index) => (
           <ChatMessage 
             key={index} 
-            message={{
-              id: index.toString(),
-              role: message.role === 'user' ? 'user' : 'assistant',
-              content: message.content,
-              createdAt: message.timestamp ? new Date(message.timestamp) : undefined
-            }} 
+            message={mapToChatMessageType(message, index)} 
           />
         ))}
         
@@ -112,6 +133,8 @@ const ChatBot = () => {
             Error: {error}. Please try again.
           </div>
         )}
+        
+        <div ref={messagesEndRef} />
       </div>
       
       <div className="border-t p-4">
