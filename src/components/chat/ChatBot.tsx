@@ -1,159 +1,124 @@
 
-import React, { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import ChatMessage, { ChatMessageType } from "./ChatMessage";
-import ChatInput from "./ChatInput";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { getSession } from "@/lib/auth";
-import { toast } from "@/lib/toast";
-import { Sparkles } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Sparkles, Bot, User, Loader2 } from "lucide-react";
+import ChatInput from "@/components/chat/ChatInput";
+import ChatMessage from "@/components/chat/ChatMessage";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/lib/toast";
 
-const ChatBot: React.FC = () => {
-  const [messages, setMessages] = useState<ChatMessageType[]>([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "Hello! I'm powered by Llama 4 Maverick. How can I help you today?",
-      createdAt: new Date(),
-    },
+interface Message {
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  timestamp?: string;
+}
+
+const ChatBot = () => {
+  const [messages, setMessages] = useState<Message[]>([
+    { 
+      role: 'assistant', 
+      content: "Hello! I'm Llama 4 Maverick, an AI assistant. How can I help you today?",
+      timestamp: new Date().toISOString()
+    }
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { session } = await getSession();
-        setIsAuthenticated(!!session?.user);
-      } catch (error) {
-        console.error("Error checking auth status:", error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim() || isLoading) return;
-
-    // Add user message to chat
-    const userMessage: ChatMessageType = {
-      id: uuidv4(),
-      role: "user",
-      content,
-      createdAt: new Date(),
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim()) return;
+    
+    // Add user message to the chat
+    const userMessage: Message = {
+      role: 'user',
+      content: message,
+      timestamp: new Date().toISOString()
     };
     
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
-
+    setError(null);
+    
     try {
-      // Prepare messages for API (include previous conversation for context)
-      const apiMessages = messages
-        .slice(-5) // Only include last 5 messages for context
-        .concat(userMessage)
-        .map(msg => ({
-          role: msg.role,
-          content: msg.content
-        }));
-
-      // Send to Llama API
+      // Get conversation history (excluding system messages)
+      const conversationHistory = messages.filter(m => m.role !== 'system');
+      
+      // Call the Llama chat edge function
       const { data, error } = await supabase.functions.invoke('llama-chat', {
-        body: { messages: apiMessages }
+        body: { 
+          message,
+          conversation: conversationHistory
+        }
       });
-
+      
       if (error) throw error;
-
-      // Extract response from Llama
-      const responseContent = data.choices[0].message.content;
-
-      // Add assistant message
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: uuidv4(),
-          role: "assistant",
-          content: responseContent,
-          createdAt: new Date(),
-        },
-      ]);
-    } catch (error) {
-      console.error("Error sending message:", error);
-      toast.error("Failed to get a response. Please try again.");
+      
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Add AI response to the chat
+      const aiMessage: Message = {
+        role: 'assistant',
+        content: data.message,
+        timestamp: new Date().toISOString()
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (err) {
+      console.error('Error calling Llama chat:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to get response from AI';
+      setError(errorMessage);
+      toast.error('Failed to get response from Llama 4. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleRedirectToLogin = () => {
-    window.location.href = "/auth?redirect=/chat";
-  };
-
-  if (isAuthenticated === null) {
-    return (
-      <div className="flex items-center justify-center min-h-[300px]">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    );
-  }
-
-  if (isAuthenticated === false) {
-    return (
-      <Alert className="max-w-2xl mx-auto my-8">
-        <Sparkles className="h-4 w-4" />
-        <AlertTitle>Authentication Required</AlertTitle>
-        <AlertDescription>
-          <p className="mb-4">You need to be signed in to use the chatbot.</p>
-          <Button onClick={handleRedirectToLogin}>Sign In</Button>
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
+  
   return (
-    <Card className="max-w-3xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Sparkles className="h-5 w-5 mr-2 text-primary" />
-          Llama 4 Maverick Chat
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0 min-h-[400px] max-h-[500px] overflow-y-auto">
-        <div className="px-4 space-y-4">
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
-          <div ref={messagesEndRef} />
-          {isLoading && (
-            <div className="flex justify-center py-2">
-              <div className="animate-pulse text-sm text-muted-foreground">
-                Llama is thinking...
-              </div>
-            </div>
-          )}
+    <div className="rounded-lg border bg-card shadow-sm overflow-hidden flex flex-col h-[70vh]">
+      <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bot className="h-5 w-5" />
+          <h3 className="font-semibold">Llama 4 Maverick</h3>
         </div>
-      </CardContent>
-      <CardFooter className="p-4 pt-2 border-t">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Sparkles className="h-3 w-3" />
+          <span>Powered by Perplexity API</span>
+        </div>
+      </div>
+      
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollBehavior: 'smooth' }}>
+        {messages.map((message, index) => (
+          <ChatMessage 
+            key={index} 
+            message={message.content} 
+            isUser={message.role === 'user'}
+            timestamp={message.timestamp}
+          />
+        ))}
+        
+        {isLoading && (
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 animate-pulse">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <p className="text-sm text-muted-foreground">Llama 4 is thinking...</p>
+          </div>
+        )}
+        
+        {error && (
+          <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+            Error: {error}. Please try again.
+          </div>
+        )}
+      </div>
+      
+      <div className="border-t p-4">
         <ChatInput 
-          onSend={handleSendMessage} 
+          onSendMessage={handleSendMessage} 
           isLoading={isLoading} 
-          disabled={!isAuthenticated} 
+          placeholder="Send a message to Llama 4 Maverick..." 
         />
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
 

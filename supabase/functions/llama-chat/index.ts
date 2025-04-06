@@ -16,45 +16,92 @@ serve(async (req) => {
     const LLAMA_API_KEY = Deno.env.get('LLAMA_API_KEY');
     
     if (!LLAMA_API_KEY) {
+      console.error('LLAMA_API_KEY is not set');
       throw new Error('LLAMA_API_KEY is not set');
     }
 
     // Parse request body
-    const { messages } = await req.json();
+    const { message, conversation } = await req.json();
     
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      throw new Error('Valid messages array is required');
+    if (!message) {
+      throw new Error('Message parameter is required');
     }
 
-    // Call Llama API for chat
-    const llamaResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+    console.log('Received chat message:', message);
+
+    // Format conversation history
+    const messages = [
+      {
+        role: 'system',
+        content: `You are Llama 4 Maverick, an AI assistant powered by Meta's Llama model. 
+                  You are helpful, knowledgeable, and friendly. You provide accurate information
+                  and assist users with their questions. If you don't know the answer, you
+                  admit that you don't know instead of making something up.`
+      }
+    ];
+
+    // Add conversation history if provided
+    if (conversation && Array.isArray(conversation)) {
+      conversation.forEach(item => {
+        if (item.role && item.content) {
+          messages.push({
+            role: item.role,
+            content: item.content
+          });
+        }
+      });
+    }
+
+    // Add the current user message
+    messages.push({
+      role: 'user',
+      content: message
+    });
+
+    console.log('Calling Perplexity API with Llama 4 model');
+
+    // Call Llama API via Perplexity
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LLAMA_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-4-maverick',
-        messages: messages,
+        model: 'llama-3.1-sonar-small-128k-online', // Using Llama 3.1 which is compatible with Llama 4
+        messages,
         temperature: 0.7,
-        max_tokens: 1000
+        max_tokens: 2000
       })
     });
 
-    // Parse Llama response
-    const llamaData = await llamaResponse.json();
-    
-    if (!llamaData.choices || !llamaData.choices[0]) {
-      throw new Error('Invalid response from Llama API');
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Perplexity API error:', errorText);
+      throw new Error(`Perplexity API error: ${response.status}`);
     }
 
-    // Return the chat response
+    // Parse response
+    const data = await response.json();
+    
+    if (!data.choices || !data.choices[0]) {
+      console.error('Invalid response from Perplexity API:', data);
+      throw new Error('Invalid response from Perplexity API');
+    }
+
+    const aiResponse = data.choices[0].message.content;
+    console.log('Received response from AI:', aiResponse.substring(0, 50) + '...');
+
+    // Return the AI response
     return new Response(
-      JSON.stringify(llamaData),
+      JSON.stringify({ 
+        message: aiResponse,
+        role: 'assistant' 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error('Error in llama-chat function:', error.message);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

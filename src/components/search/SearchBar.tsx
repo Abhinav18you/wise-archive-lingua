@@ -43,6 +43,22 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
     } catch (error) {
       console.error("Error searching:", error);
       toast.error("Search failed. Please try again.");
+      
+      // If Llama search failed, suggest falling back to regular search
+      if (useLlama) {
+        toast.error("Llama search failed. Falling back to regular search.");
+        setUseLlama(false);
+        // Retry without Llama
+        try {
+          const { results, error } = await api.content.search(query, false);
+          if (!error) {
+            onResults(results);
+          }
+        } catch (fallbackError) {
+          console.error("Fallback search also failed:", fallbackError);
+        }
+      }
+      
       // If user is not authenticated, suggest logging in
       if (error instanceof Error && error.message.includes("not authenticated")) {
         toast.error("Please sign in to search your content across devices");
