@@ -11,6 +11,7 @@ import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Search from "./pages/Search";
+import Chat from "./pages/Chat";
 import Add from "./pages/Add";
 import NotFound from "./pages/NotFound";
 
@@ -53,6 +54,14 @@ const App = () => (
             element={
               <Layout requireAuth={true}>
                 <Search />
+              </Layout>
+            } 
+          />
+          <Route 
+            path="/chat" 
+            element={
+              <Layout requireAuth={true}>
+                <Chat />
               </Layout>
             } 
           />

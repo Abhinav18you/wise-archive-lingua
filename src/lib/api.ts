@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
@@ -208,8 +207,8 @@ export const api = {
       }
     },
     
-    search: async (query: string): Promise<{ results: Content[]; error: any }> => {
-      console.log("Searching for:", query);
+    search: async (query: string, useLlama: boolean = false): Promise<{ results: Content[]; error: any }> => {
+      console.log("Searching for:", query, "Using Llama:", useLlama);
       
       try {
         const { session } = await getSession();
@@ -237,6 +236,25 @@ export const api = {
           
           console.log("Search results from localStorage:", results);
           return { results, error: null };
+        }
+        
+        // If Llama is enabled, use the searchWithLlama edge function instead
+        if (useLlama) {
+          console.log("Using Llama for semantic search");
+          try {
+            const { data, error } = await supabase.functions.invoke('llama-search', {
+              body: { query }
+            });
+            
+            if (error) throw error;
+            
+            console.log("Llama search results:", data);
+            return { results: data.results || [], error: null };
+          } catch (err) {
+            console.error("Error with Llama search:", err);
+            toast.error("Llama search failed. Falling back to regular search.");
+            // Fall back to regular search
+          }
         }
         
         // Normalize query for search

@@ -2,10 +2,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search as SearchIcon, Loader2 } from "lucide-react";
+import { Search as SearchIcon, Loader2, Sparkles } from "lucide-react";
 import { api } from "@/lib/api";
 import { Content } from "@/types";
 import { toast } from "@/lib/toast";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface SearchBarProps {
   onResults: (results: Content[]) => void;
@@ -14,6 +16,7 @@ interface SearchBarProps {
 const SearchBar = ({ onResults }: SearchBarProps) => {
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [useLlama, setUseLlama] = useState(false);
   
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +29,7 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
     setIsSearching(true);
     
     try {
-      const { results, error } = await api.content.search(query);
+      const { results, error } = await api.content.search(query, useLlama);
       
       if (error) throw error;
       
@@ -75,9 +78,23 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
               )}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2 ml-1">
-            Search your content across all your devices (requires sign in)
-          </p>
+          <div className="flex items-center justify-between mt-2 ml-1">
+            <p className="text-xs text-muted-foreground">
+              Search your content across all your devices (requires sign in)
+            </p>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="use-llama" className="text-xs cursor-pointer">
+                <Sparkles className="h-3 w-3 inline mr-1" />
+                Llama 4
+              </Label>
+              <Switch
+                id="use-llama"
+                checked={useLlama}
+                onCheckedChange={setUseLlama}
+                size="sm"
+              />
+            </div>
+          </div>
         </form>
       </div>
     </div>
