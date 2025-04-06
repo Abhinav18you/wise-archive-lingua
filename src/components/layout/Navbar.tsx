@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { toast } from "@/lib/toast";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, Bot, Search as SearchIcon } from "lucide-react";
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -65,9 +65,17 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
                 </Link>
                 <Link 
                   to="/search" 
-                  className={`transition-colors hover:text-foreground/80 ${isActive("/search") ? "text-foreground font-medium" : "text-foreground/60"}`}
+                  className={`flex items-center gap-1 transition-colors hover:text-foreground/80 ${isActive("/search") ? "text-foreground font-medium" : "text-foreground/60"}`}
                 >
+                  <SearchIcon className="h-3.5 w-3.5" />
                   Search
+                </Link>
+                <Link 
+                  to="/chat" 
+                  className={`flex items-center gap-1 transition-colors hover:text-foreground/80 ${isActive("/chat") ? "text-foreground font-medium" : "text-foreground/60"}`}
+                >
+                  <Bot className="h-3.5 w-3.5" />
+                  AI Chat
                 </Link>
               </>
             )}
@@ -141,7 +149,19 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
                     setMobileMenuOpen(false);
                   }}
                 >
+                  <SearchIcon className="h-4 w-4 mr-2" />
                   Search
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    navigate("/chat");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <Bot className="h-4 w-4 mr-2" />
+                  AI Chat
                 </Button>
                 <Button 
                   variant="ghost" 
