@@ -91,7 +91,6 @@ const SearchBar = ({ onResults }: SearchBarProps) => {
                 id="use-llama"
                 checked={useLlama}
                 onCheckedChange={setUseLlama}
-                size="sm"
               />
             </div>
           </div>
