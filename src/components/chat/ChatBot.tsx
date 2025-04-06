@@ -91,9 +91,12 @@ const ChatBot = () => {
         {messages.map((message, index) => (
           <ChatMessage 
             key={index} 
-            message={message.content} 
-            isUser={message.role === 'user'}
-            timestamp={message.timestamp}
+            message={{
+              id: index.toString(),
+              role: message.role === 'user' ? 'user' : 'assistant',
+              content: message.content,
+              createdAt: message.timestamp ? new Date(message.timestamp) : undefined
+            }} 
           />
         ))}
         
@@ -113,9 +116,9 @@ const ChatBot = () => {
       
       <div className="border-t p-4">
         <ChatInput 
-          onSendMessage={handleSendMessage} 
+          onSend={handleSendMessage} 
           isLoading={isLoading} 
-          placeholder="Send a message to Llama 4 Maverick..." 
+          disabled={isLoading} 
         />
       </div>
     </div>
