@@ -24,7 +24,7 @@ serve(async (req) => {
       console.error('LLAMA_API_KEY is not set or provided');
       return new Response(
         JSON.stringify({ error: 'OpenRouter API key is not configured' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -46,7 +46,7 @@ serve(async (req) => {
           console.error('API key validation failed:', testResponse.status);
           return new Response(
             JSON.stringify({ error: `OpenRouter API key validation failed: ${testResponse.status}` }),
-            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
         
@@ -59,7 +59,7 @@ serve(async (req) => {
         console.error('API key validation error:', err);
         return new Response(
           JSON.stringify({ error: `Error validating OpenRouter API key: ${err.message}` }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
     }
@@ -67,7 +67,7 @@ serve(async (req) => {
     if (!message) {
       return new Response(
         JSON.stringify({ error: 'Message parameter is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -103,7 +103,7 @@ serve(async (req) => {
       content: message
     });
 
-    console.log('Calling OpenRouter API with Llama 4 model');
+    console.log('Calling OpenRouter API with Llama 4 Maverick model');
     
     // Call OpenRouter API to access Llama 4 Maverick
     try {
@@ -112,10 +112,11 @@ serve(async (req) => {
         headers: {
           'Authorization': `Bearer ${LLAMA_API_KEY}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://lovable.dev' // Replace with your actual domain
+          'HTTP-Referer': 'https://lovable.dev', // Replace with your actual domain
+          'X-Title': 'Lovable Chat App'  // Optional title for rankings
         },
         body: JSON.stringify({
-          model: 'meta/llama-4-8b-instruct', // Using Llama 4 Maverick via OpenRouter
+          model: 'meta-llama/llama-4-maverick:free', // Updated to the correct model string
           messages,
           temperature: 0.7,
           max_tokens: 2000
