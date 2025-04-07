@@ -25,7 +25,16 @@ serve(async (req) => {
 
     // Parse request body
     const body = await req.json();
-    const { message, conversation } = body;
+    const { message, conversation, checkOnly } = body;
+    
+    // If this is just a check to see if the API key exists
+    if (checkOnly === true) {
+      console.log('API key check successful');
+      return new Response(
+        JSON.stringify({ success: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     if (!message) {
       return new Response(
@@ -66,32 +75,33 @@ serve(async (req) => {
       content: message
     });
 
-    console.log('Calling Perplexity API with Llama 4 model');
+    console.log('Calling OpenRouter API with Llama 4 model');
     console.log('Using API key:', LLAMA_API_KEY.substring(0, 3) + '...' + LLAMA_API_KEY.substring(LLAMA_API_KEY.length - 3));
 
-    // Call Llama API via Perplexity
+    // Call OpenRouter API to access Llama 4 Maverick
     try {
-      const response = await fetch('https://api.perplexity.ai/chat/completions', {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${LLAMA_API_KEY}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://lovable.dev' // Replace with your actual domain
         },
         body: JSON.stringify({
-          model: 'llama-3.1-sonar-small-128k-online', // Using Llama 3.1 which is compatible with Llama 4
+          model: 'meta/llama-4-8b-instruct', // Using Llama 4 Maverick via OpenRouter
           messages,
           temperature: 0.7,
           max_tokens: 2000
         })
       });
 
-      console.log('Perplexity API response status:', response.status);
+      console.log('OpenRouter API response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`Perplexity API error (${response.status}):`, errorText);
+        console.error(`OpenRouter API error (${response.status}):`, errorText);
         return new Response(
-          JSON.stringify({ error: `Perplexity API error: ${response.status}` }),
+          JSON.stringify({ error: `OpenRouter API error: ${response.status}` }),
           { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -100,15 +110,15 @@ serve(async (req) => {
       const data = await response.json();
       
       if (!data.choices || !data.choices[0]) {
-        console.error('Invalid response from Perplexity API:', data);
+        console.error('Invalid response from OpenRouter API:', data);
         return new Response(
-          JSON.stringify({ error: 'Invalid response structure from Perplexity API' }),
+          JSON.stringify({ error: 'Invalid response structure from OpenRouter API' }),
           { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       const aiResponse = data.choices[0].message.content;
-      console.log('Received response from AI:', aiResponse.substring(0, 100) + '...');
+      console.log('Received response from Llama 4 via OpenRouter:', aiResponse.substring(0, 100) + '...');
 
       // Return the AI response
       return new Response(
@@ -121,7 +131,7 @@ serve(async (req) => {
     } catch (fetchError) {
       console.error('Fetch error:', fetchError.message);
       return new Response(
-        JSON.stringify({ error: `Error calling Perplexity API: ${fetchError.message}` }),
+        JSON.stringify({ error: `Error calling OpenRouter API: ${fetchError.message}` }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

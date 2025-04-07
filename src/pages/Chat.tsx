@@ -50,7 +50,7 @@ const Chat = () => {
           AI Chat Assistant
         </h1>
         <p className="text-muted-foreground text-center mb-8 animate-fade-in" style={{ animationDelay: "100ms" }}>
-          Chat with Llama 4 Maverick, an advanced AI assistant powered by the Perplexity API
+          Chat with Llama 4 Maverick, an advanced AI assistant powered by Meta via OpenRouter API
         </p>
       </div>
       
@@ -69,16 +69,16 @@ const Chat = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-destructive">
                     <AlertCircle className="h-5 w-5" />
-                    <CardTitle>Llama API Configuration Issue</CardTitle>
+                    <CardTitle>OpenRouter API Configuration Issue</CardTitle>
                   </div>
                   <CardDescription>
-                    There appears to be an issue with the Llama API key configuration. The API key may be missing or invalid.
+                    There appears to be an issue with the OpenRouter API key configuration. The API key may be missing or invalid.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
                     Please make sure the LLAMA_API_KEY is properly set in the Supabase Edge Function Secrets. 
-                    This key is required to connect to the Perplexity API which powers the Llama 4 Maverick assistant.
+                    This key is required to connect to the OpenRouter API which provides access to Meta's Llama 4 Maverick assistant.
                   </p>
                 </CardContent>
               </Card>

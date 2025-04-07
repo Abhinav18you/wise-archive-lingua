@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SendHorizonal } from "lucide-react";
-import React, { FormEvent, useRef, useState } from "react";
+import React, { FormEvent, useRef, useState, useEffect } from "react";
 
 export interface ChatInputProps {
   onSend: (message: string) => void;
@@ -20,12 +20,26 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Auto-resize textarea as user types
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+  }, [message]);
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!message.trim() || isLoading) return;
     
     onSend(message);
     setMessage("");
+    
+    // Reset textarea height
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

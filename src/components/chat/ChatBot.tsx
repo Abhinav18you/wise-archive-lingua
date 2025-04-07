@@ -17,7 +17,7 @@ const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
-      content: "Hello! I'm Llama 4 Maverick, an AI assistant. How can I help you today?",
+      content: "Hello! I'm Llama 4 Maverick, an AI assistant powered by Meta. How can I help you today?",
       timestamp: new Date().toISOString()
     }
   ]);
@@ -126,7 +126,7 @@ const ChatBot = () => {
         </div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
           <Sparkles className="h-3 w-3" />
-          <span>Powered by Perplexity API</span>
+          <span>Powered by OpenRouter API</span>
         </div>
       </div>
       
