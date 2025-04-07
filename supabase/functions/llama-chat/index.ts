@@ -13,27 +13,55 @@ serve(async (req) => {
   }
 
   try {
-    const LLAMA_API_KEY = Deno.env.get('LLAMA_API_KEY');
+    // Parse request body
+    const body = await req.json();
+    const { message, conversation, checkOnly, customApiKey } = body;
+    
+    // Use custom API key if provided, otherwise fall back to environment variable
+    const LLAMA_API_KEY = customApiKey || Deno.env.get('LLAMA_API_KEY');
     
     if (!LLAMA_API_KEY) {
-      console.error('LLAMA_API_KEY is not set');
+      console.error('LLAMA_API_KEY is not set or provided');
       return new Response(
-        JSON.stringify({ error: 'LLAMA_API_KEY is not set in environment variables' }),
+        JSON.stringify({ error: 'OpenRouter API key is not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Parse request body
-    const body = await req.json();
-    const { message, conversation, checkOnly } = body;
-    
     // If this is just a check to see if the API key exists
     if (checkOnly === true) {
-      console.log('API key check successful');
-      return new Response(
-        JSON.stringify({ success: true }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.log('API key check initiated');
+      
+      try {
+        // Make a minimal API call to verify the key works
+        const testResponse = await fetch('https://openrouter.ai/api/v1/auth/key', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${LLAMA_API_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!testResponse.ok) {
+          console.error('API key validation failed:', testResponse.status);
+          return new Response(
+            JSON.stringify({ error: `OpenRouter API key validation failed: ${testResponse.status}` }),
+            { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
+        console.log('API key check successful');
+        return new Response(
+          JSON.stringify({ success: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error('API key validation error:', err);
+        return new Response(
+          JSON.stringify({ error: `Error validating OpenRouter API key: ${err.message}` }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
     
     if (!message) {

@@ -13,7 +13,11 @@ interface Message {
   timestamp?: string;
 }
 
-const ChatBot = () => {
+interface ChatBotProps {
+  customApiKey?: string;
+}
+
+const ChatBot = ({ customApiKey }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
@@ -54,11 +58,12 @@ const ChatBot = () => {
       
       console.log("Calling llama-chat function with message:", message);
       
-      // Call the Llama chat edge function
+      // Call the Llama chat edge function with optional custom API key
       const { data, error: funcError } = await supabase.functions.invoke('llama-chat', {
         body: { 
           message,
-          conversation: conversationHistory
+          conversation: conversationHistory,
+          customApiKey: customApiKey
         }
       });
       
