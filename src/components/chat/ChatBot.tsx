@@ -56,14 +56,15 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
       // Get conversation history (excluding system messages)
       const conversationHistory = messages.filter(m => m.role !== 'system');
       
-      console.log("Calling llama-chat function with message:", message);
+      const apiKeyToUse = customApiKey || localStorage.getItem('llamaApiKey');
+      console.log("Using API key:", apiKeyToUse ? "API key provided" : "No API key");
       
-      // Call the Llama chat edge function with optional custom API key
+      // Call the Llama chat edge function with custom API key
       const { data, error: funcError } = await supabase.functions.invoke('llama-chat', {
         body: { 
           message,
           conversation: conversationHistory,
-          customApiKey: customApiKey
+          customApiKey: apiKeyToUse
         }
       });
       

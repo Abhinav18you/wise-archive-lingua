@@ -18,35 +18,44 @@ const Chat = () => {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
   
-  // Check if the Llama API key is configured
+  // Check if the API key is in localStorage first
   useEffect(() => {
-    const checkApiKey = async () => {
-      try {
-        setChecking(true);
-        const { data, error } = await supabase.functions.invoke('llama-chat', {
-          body: { 
-            message: "API key check",
-            checkOnly: true
-          }
-        });
-        
-        if (error || data?.error) {
-          console.error("API key check failed:", error || data?.error);
-          setLlamaAPIKeyValid(false);
-        } else {
-          setLlamaAPIKeyValid(true);
-          setApiKeyConfigured(true);
-        }
-      } catch (err) {
-        console.error("Error checking API key:", err);
-        setLlamaAPIKeyValid(false);
-      } finally {
-        setChecking(false);
-      }
-    };
-    
-    checkApiKey();
+    const storedApiKey = localStorage.getItem('llamaApiKey');
+    if (storedApiKey) {
+      setApiKeyConfigured(true);
+      checkApiKey(storedApiKey);
+    } else {
+      // If no stored API key, check if there's a server-side one
+      checkApiKey();
+    }
   }, []);
+
+  const checkApiKey = async (keyToCheck?: string) => {
+    try {
+      setChecking(true);
+      const { data, error } = await supabase.functions.invoke('llama-chat', {
+        body: { 
+          message: "API key check",
+          checkOnly: true,
+          customApiKey: keyToCheck
+        }
+      });
+      
+      if (error || data?.error) {
+        console.error("API key check failed:", error || data?.error);
+        setLlamaAPIKeyValid(false);
+      } else {
+        console.log("API key check successful");
+        setLlamaAPIKeyValid(true);
+        setApiKeyConfigured(true);
+      }
+    } catch (err) {
+      console.error("Error checking API key:", err);
+      setLlamaAPIKeyValid(false);
+    } finally {
+      setChecking(false);
+    }
+  };
 
   const handleApiKeySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,12 +159,12 @@ const Chat = () => {
           </TabsList>
           
           <TabsContent value="llama4">
-            {llamaAPIKeyValid === false && !apiKeyConfigured && (
-              <Card className="mb-6 border-destructive">
+            {!apiKeyConfigured && (
+              <Card className="mb-6 border-amber-500">
                 <CardHeader className="pb-3">
-                  <div className="flex items-center gap-2 text-destructive">
+                  <div className="flex items-center gap-2 text-amber-500">
                     <AlertCircle className="h-5 w-5" />
-                    <CardTitle>OpenRouter API Configuration Required</CardTitle>
+                    <CardTitle>OpenRouter API Key Required</CardTitle>
                   </div>
                   <CardDescription>
                     An OpenRouter API key is required to access Llama 4 Maverick.
