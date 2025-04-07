@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Bot, User, Loader2 } from "lucide-react";
+import { Sparkles, Bot, User, Loader2, RefreshCw } from "lucide-react";
 import ChatInput from "@/components/chat/ChatInput";
 import ChatMessage, { ChatMessageType } from "@/components/chat/ChatMessage";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,14 +62,20 @@ const ChatBot = () => {
         }
       });
       
+      console.log("Response from Llama chat function:", data);
+      
       if (funcError) {
         console.error("Edge function error:", funcError);
-        throw new Error(funcError.message);
+        throw new Error(`Edge function error: ${funcError.message || 'Unknown error'}`);
       }
       
       if (data?.error) {
         console.error("Data error:", data.error);
         throw new Error(data.error);
+      }
+      
+      if (!data?.message) {
+        throw new Error("No response received from AI");
       }
       
       // Add AI response to the chat
@@ -87,6 +93,17 @@ const ChatBot = () => {
       toast.error('Failed to get response from Llama 4. Please try again.');
     } finally {
       setIsLoading(false);
+      // Ensure we scroll to bottom after loading is complete
+      setTimeout(scrollToBottom, 100);
+    }
+  };
+  
+  const handleRetry = () => {
+    setError(null);
+    // Check if the last message was from a user to retry that message
+    const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
+    if (lastUserMessage) {
+      handleSendMessage(lastUserMessage.content);
     }
   };
   
@@ -94,9 +111,9 @@ const ChatBot = () => {
   const mapToChatMessageType = (message: Message, index: number): ChatMessageType => {
     return {
       id: index.toString(),
-      role: message.role === 'user' ? 'user' : 'assistant',
+      role: message.role as 'user' | 'assistant',
       content: message.content,
-      createdAt: message.timestamp ? new Date(message.timestamp) : undefined
+      createdAt: message.timestamp ? new Date(message.timestamp) : new Date()
     };
   };
   
@@ -129,8 +146,16 @@ const ChatBot = () => {
         )}
         
         {error && (
-          <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-            Error: {error}. Please try again.
+          <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive space-y-2">
+            <p className="text-sm font-medium">Error: {error}</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRetry}
+              className="flex items-center gap-1"
+            >
+              <RefreshCw className="h-3 w-3" /> Try Again
+            </Button>
           </div>
         )}
         
@@ -142,6 +167,7 @@ const ChatBot = () => {
           onSend={handleSendMessage} 
           isLoading={isLoading} 
           disabled={isLoading} 
+          placeholder="Type your message to Llama 4..."
         />
       </div>
     </div>

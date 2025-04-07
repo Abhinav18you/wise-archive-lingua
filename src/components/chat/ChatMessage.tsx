@@ -1,14 +1,14 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { Sparkles } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import React from "react";
 
 export type ChatMessageType = {
   id: string;
   role: "user" | "assistant";
   content: string;
-  createdAt?: Date;
+  createdAt: Date;
 };
 
 interface ChatMessageProps {
@@ -28,11 +28,11 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       <Avatar className={cn("mt-1", isUser ? "" : "bg-primary/10")}>
         {isUser ? (
           <AvatarFallback className="bg-primary text-primary-foreground">
-            U
+            <User className="h-4 w-4" />
           </AvatarFallback>
         ) : (
           <>
-            <AvatarImage src="/placeholder.svg" />
+            <AvatarImage src="/placeholder.svg" alt="AI" />
             <AvatarFallback className="bg-primary/10 text-primary dark:text-primary-foreground">
               <Sparkles className="h-4 w-4" />
             </AvatarFallback>
@@ -48,6 +48,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         )}
       >
         <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+        {message.createdAt && (
+          <div className="text-xs opacity-70 mt-1">
+            {new Intl.DateTimeFormat('en-US', { 
+              hour: '2-digit', 
+              minute: '2-digit',
+              hour12: true 
+            }).format(message.createdAt)}
+          </div>
+        )}
       </div>
     </div>
   );

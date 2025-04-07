@@ -4,13 +4,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { SendHorizonal } from "lucide-react";
 import React, { FormEvent, useRef, useState } from "react";
 
-interface ChatInputProps {
+export interface ChatInputProps {
   onSend: (message: string) => void;
   isLoading: boolean;
   disabled?: boolean;
+  placeholder?: string;
 }
 
-const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled = false }) => {
+const ChatInput: React.FC<ChatInputProps> = ({ 
+  onSend, 
+  isLoading, 
+  disabled = false,
+  placeholder = "Type your message..." 
+}) => {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -34,7 +40,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled = fal
       <div className="relative flex-1">
         <Textarea
           ref={textareaRef}
-          placeholder="Type your message..."
+          placeholder={placeholder}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}

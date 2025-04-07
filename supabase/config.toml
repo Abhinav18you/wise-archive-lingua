@@ -30,4 +30,3 @@ verify_jwt = true
 
 [functions.llama-chat]
 verify_jwt = true
-

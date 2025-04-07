@@ -1,12 +1,46 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChatBot from "@/components/chat/ChatBot";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Bot, MessagesSquare } from "lucide-react";
+import { Sparkles, Bot, MessagesSquare, AlertCircle } from "lucide-react";
+import { toast } from "@/lib/toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 
 const Chat = () => {
   const [activeTab, setActiveTab] = useState("llama4");
+  const [llamaAPIKeyValid, setLlamaAPIKeyValid] = useState<boolean | null>(null);
+  const [checking, setChecking] = useState(false);
+  
+  // Check if the Llama API key is configured
+  useEffect(() => {
+    const checkApiKey = async () => {
+      try {
+        setChecking(true);
+        const { data, error } = await supabase.functions.invoke('llama-chat', {
+          body: { 
+            message: "API key check",
+            checkOnly: true
+          }
+        });
+        
+        if (error || data?.error) {
+          console.error("API key check failed:", error || data?.error);
+          setLlamaAPIKeyValid(false);
+        } else {
+          setLlamaAPIKeyValid(true);
+        }
+      } catch (err) {
+        console.error("Error checking API key:", err);
+        setLlamaAPIKeyValid(false);
+      } finally {
+        setChecking(false);
+      }
+    };
+    
+    checkApiKey();
+  }, []);
   
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -30,6 +64,26 @@ const Chat = () => {
           </TabsList>
           
           <TabsContent value="llama4">
+            {llamaAPIKeyValid === false && (
+              <Card className="mb-6 border-destructive">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-2 text-destructive">
+                    <AlertCircle className="h-5 w-5" />
+                    <CardTitle>Llama API Configuration Issue</CardTitle>
+                  </div>
+                  <CardDescription>
+                    There appears to be an issue with the Llama API key configuration. The API key may be missing or invalid.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Please make sure the LLAMA_API_KEY is properly set in the Supabase Edge Function Secrets. 
+                    This key is required to connect to the Perplexity API which powers the Llama 4 Maverick assistant.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+            
             <ChatBot />
           </TabsContent>
         </Tabs>
