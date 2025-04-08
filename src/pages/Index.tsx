@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, Search, FileText, Link, Image } from "lucide-react";
+import { ArrowRight, Database, Search, FileText, Link, Image, Sparkles } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -42,11 +42,13 @@ const Index = () => {
               variant="outline" 
               size="lg" 
               onClick={() => {
-                const featuresSection = document.getElementById("features");
-                featuresSection?.scrollIntoView({ behavior: "smooth" });
+                // Changed to navigate to the Chat page when Learn More is clicked
+                navigate("/chat");
               }}
+              className="gap-2"
             >
-              Learn More
+              <Sparkles className="h-4 w-4" />
+              Try AI Chat
             </Button>
           </div>
         </div>

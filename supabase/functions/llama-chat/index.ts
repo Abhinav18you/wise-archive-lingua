@@ -113,7 +113,7 @@ serve(async (req) => {
           'Authorization': `Bearer ${LLAMA_API_KEY}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': 'https://lovable.dev', // Replace with your actual domain
-          'X-Title': 'Lovable Chat App'  // Optional title for rankings
+          'X-Title': 'Memoria Chat App'  // Optional title for rankings
         },
         body: JSON.stringify({
           model: 'meta-llama/llama-4-maverick:free', // Updated to the correct model string
