@@ -3,12 +3,13 @@ import { useState, useEffect } from "react";
 import ChatBot from "@/components/chat/ChatBot";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Bot, MessagesSquare, AlertCircle, Key, Settings, Check } from "lucide-react";
+import { Sparkles, Bot, MessagesSquare, AlertCircle, Key, Settings, Check, ExternalLink } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import ApiKeyInstructionsDialog from "@/components/chat/ApiKeyInstructionsDialog";
 
 const Chat = () => {
   const [activeTab, setActiveTab] = useState("llama4");
@@ -17,10 +18,17 @@ const Chat = () => {
   const [apiKey, setApiKey] = useState("");
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
   
-  // Check if the API key is in localStorage first
+  // Check if user has seen instructions and if API key exists
   useEffect(() => {
+    const hasSeenInstructions = localStorage.getItem('has-seen-api-instructions');
     const storedApiKey = localStorage.getItem('llamaApiKey');
+    
+    if (!hasSeenInstructions && !storedApiKey) {
+      setShowInstructions(true);
+    }
+    
     if (storedApiKey) {
       setApiKeyConfigured(true);
       checkApiKey(storedApiKey);
@@ -98,6 +106,12 @@ const Chat = () => {
   
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
+      {/* Instructions Dialog */}
+      <ApiKeyInstructionsDialog 
+        open={showInstructions} 
+        onOpenChange={setShowInstructions} 
+      />
+      
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2 text-center animate-fade-in flex items-center justify-center gap-2">
           <MessagesSquare className="h-8 w-8" />
@@ -110,40 +124,69 @@ const Chat = () => {
         <div className="flex justify-center mb-4 animate-fade-in" style={{ animationDelay: "150ms" }}>
           <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
-                <Key className="h-4 w-4" />
-                {apiKeyConfigured ? "Change API Key" : "Configure API Key"}
+              <Button size="lg" className="flex items-center gap-2 text-base font-medium px-5 py-6">
+                <Key className="h-5 w-5" />
+                {apiKeyConfigured ? "Change OpenRouter API Key" : "Configure OpenRouter API Key"}
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Configure OpenRouter API Key</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="text-xl">Configure OpenRouter API Key</DialogTitle>
+                <DialogDescription className="text-base">
                   Enter your OpenRouter API key to use Llama 4 Maverick.
-                  You can get an API key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener noreferrer" className="text-primary underline">openrouter.ai/keys</a>.
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleApiKeySubmit} className="space-y-4">
-                <Input
-                  placeholder="OpenRouter API Key"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  type="password"
-                />
-                <Button type="submit" className="w-full" disabled={checking}>
-                  {checking ? (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                      Verifying...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Save API Key
-                    </>
-                  )}
-                </Button>
-              </form>
+              
+              <div className="space-y-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex items-center gap-1"
+                    onClick={() => setShowInstructions(true)}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    View Setup Instructions
+                  </Button>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open("https://openrouter.ai/keys", "_blank")}
+                    className="flex items-center gap-1"
+                  >
+                    <Key className="h-3.5 w-3.5" />
+                    Get Free API Key
+                  </Button>
+                </div>
+                
+                <form onSubmit={handleApiKeySubmit} className="space-y-4">
+                  <Input
+                    placeholder="Paste your OpenRouter API Key here"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    type="password"
+                    className="text-base py-6"
+                  />
+                  <Button 
+                    type="submit" 
+                    className="w-full py-6 text-base font-medium" 
+                    disabled={checking}
+                  >
+                    {checking ? (
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4 animate-spin" />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="mr-2 h-4 w-4" />
+                        Save API Key
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </div>
             </DialogContent>
           </Dialog>
         </div>
@@ -176,9 +219,10 @@ const Chat = () => {
                   </p>
                   <Button 
                     onClick={() => setShowApiKeyDialog(true)} 
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 font-medium text-base py-6"
+                    size="lg"
                   >
-                    <Key className="h-4 w-4" />
+                    <Key className="h-5 w-5" />
                     Configure API Key
                   </Button>
                 </CardContent>
