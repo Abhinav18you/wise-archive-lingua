@@ -1,11 +1,8 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Database, Search, FileText, Link, Image, Sparkles } from "lucide-react";
-
 const Index = () => {
   const navigate = useNavigate();
-
   const handleGetStarted = () => {
     console.log("Get Started button clicked, attempting navigation to /auth");
     try {
@@ -15,38 +12,33 @@ const Index = () => {
       console.error("Navigation error:", error);
     }
   };
-
-  return (
-    <div className="flex flex-col items-center">
+  return <div className="flex flex-col items-center">
       <section className="py-10 md:py-16 w-full max-w-5xl mx-auto text-center animate-fade-in">
         <div className="space-y-4">
           <div className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium mb-4 animate-slide-up">
             Your Personal Content Repository
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight animate-slide-up" style={{ animationDelay: "100ms" }}>
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight animate-slide-up" style={{
+          animationDelay: "100ms"
+        }}>
             Store anything,<br />find it naturally
           </h1>
-          <p className="mt-6 text-xl text-muted-foreground max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: "200ms" }}>
+          <p className="mt-6 text-xl text-muted-foreground max-w-3xl mx-auto animate-slide-up" style={{
+          animationDelay: "200ms"
+        }}>
             Save links, notes, images, and files. Then find them using natural language instead of rigid keywords.
           </p>
-          <div className="flex flex-wrap justify-center gap-4 mt-10 animate-slide-up" style={{ animationDelay: "300ms" }}>
-            <Button 
-              size="lg" 
-              onClick={handleGetStarted}
-              className="gap-2"
-            >
+          <div className="flex flex-wrap justify-center gap-4 mt-10 animate-slide-up" style={{
+          animationDelay: "300ms"
+        }}>
+            <Button size="lg" onClick={handleGetStarted} className="gap-2 text-3xl">
               Get Started
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <Button 
-              variant="outline" 
-              size="lg" 
-              onClick={() => {
-                // Changed to navigate to the Chat page when Learn More is clicked
-                navigate("/chat");
-              }}
-              className="gap-2"
-            >
+            <Button variant="outline" size="lg" onClick={() => {
+            // Changed to navigate to the Chat page when Learn More is clicked
+            navigate("/chat");
+          }} className="gap-2 text-3xl bg-slate-50 rounded-3xl">
               <Sparkles className="h-4 w-4" />
               Try AI Chat
             </Button>
@@ -67,10 +59,7 @@ const Index = () => {
               <p className="text-muted-foreground mb-6">
                 Memoria uses advanced AI to understand the content you save and match it with your natural language searches, so you can find exactly what you're looking for without remembering exact keywords.
               </p>
-              <Button 
-                onClick={() => navigate("/auth")}
-                className="gap-2"
-              >
+              <Button onClick={() => navigate("/auth")} className="gap-2">
                 Try It Now
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -107,7 +96,9 @@ const Index = () => {
           </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="glassmorphism rounded-xl p-6 flex flex-col h-full animate-scale-in" style={{ animationDelay: "100ms" }}>
+            <div className="glassmorphism rounded-xl p-6 flex flex-col h-full animate-scale-in" style={{
+            animationDelay: "100ms"
+          }}>
               <div className="bg-primary/10 p-3 rounded-lg w-fit mb-4">
                 <Database className="h-6 w-6 text-primary" />
               </div>
@@ -117,7 +108,9 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="glassmorphism rounded-xl p-6 flex flex-col h-full animate-scale-in" style={{ animationDelay: "200ms" }}>
+            <div className="glassmorphism rounded-xl p-6 flex flex-col h-full animate-scale-in" style={{
+            animationDelay: "200ms"
+          }}>
               <div className="bg-primary/10 p-3 rounded-lg w-fit mb-4">
                 <Search className="h-6 w-6 text-primary" />
               </div>
@@ -127,7 +120,9 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="glassmorphism rounded-xl p-6 flex flex-col h-full animate-scale-in" style={{ animationDelay: "300ms" }}>
+            <div className="glassmorphism rounded-xl p-6 flex flex-col h-full animate-scale-in" style={{
+            animationDelay: "300ms"
+          }}>
               <div className="bg-primary/10 p-3 rounded-lg w-fit mb-4">
                 <FileText className="h-6 w-6 text-primary" />
               </div>
@@ -152,28 +147,36 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{ animationDelay: "100ms" }}>
+            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{
+            animationDelay: "100ms"
+          }}>
               <div className="bg-primary/10 p-4 rounded-full w-fit mx-auto mb-4">
                 <Link className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-medium">Links</h3>
             </div>
             
-            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{ animationDelay: "200ms" }}>
+            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{
+            animationDelay: "200ms"
+          }}>
               <div className="bg-primary/10 p-4 rounded-full w-fit mx-auto mb-4">
                 <FileText className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-medium">Notes</h3>
             </div>
             
-            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{ animationDelay: "300ms" }}>
+            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{
+            animationDelay: "300ms"
+          }}>
               <div className="bg-primary/10 p-4 rounded-full w-fit mx-auto mb-4">
                 <Image className="h-6 w-6 text-primary" />
               </div>
               <h3 className="font-medium">Images</h3>
             </div>
             
-            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{ animationDelay: "400ms" }}>
+            <div className="bg-background rounded-xl p-6 text-center shadow-sm animate-scale-in" style={{
+            animationDelay: "400ms"
+          }}>
               <div className="bg-primary/10 p-4 rounded-full w-fit mx-auto mb-4">
                 <Database className="h-6 w-6 text-primary" />
               </div>
@@ -188,21 +191,18 @@ const Index = () => {
           <h2 className="text-3xl font-bold tracking-tight mb-6 animate-fade-in">
             Ready to organize your digital life?
           </h2>
-          <p className="text-xl text-muted-foreground mb-10 animate-fade-in" style={{ animationDelay: "100ms" }}>
+          <p className="text-xl text-muted-foreground mb-10 animate-fade-in" style={{
+          animationDelay: "100ms"
+        }}>
             Join Memoria today and start saving your content with powerful natural language search.
           </p>
-          <Button 
-            size="lg" 
-            onClick={() => navigate("/auth")}
-            className="animate-scale-in"
-            style={{ animationDelay: "200ms" }}
-          >
+          <Button size="lg" onClick={() => navigate("/auth")} className="animate-scale-in" style={{
+          animationDelay: "200ms"
+        }}>
             Get Started for Free
           </Button>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
