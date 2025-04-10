@@ -1,11 +1,13 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 210 50% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -14,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 217 91% 60%;
+    --primary: 255 92% 76%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -23,7 +25,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 217 91% 60%;
+    --accent: 262 83% 76%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,7 +33,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 217 91% 60%;
+    --ring: 255 92% 76%;
 
     --radius: 0.75rem;
   }
@@ -50,6 +52,20 @@
 /* Glass morphism */
 .glassmorphism {
   @apply bg-glass shadow-glass backdrop-blur-md border border-white/20;
+}
+
+/* Custom card styles */
+.card-gradient {
+  @apply bg-gradient-to-br from-white to-secondary/50 shadow-soft;
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-glow hover:-translate-y-1;
+}
+
+/* Section styling */
+.section-padding {
+  @apply py-12 md:py-20;
 }
 
 /* Page transitions */
@@ -78,4 +94,22 @@
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Button hover effects */
+.btn-hover-effect {
+  @apply relative overflow-hidden transition-all duration-300 before:absolute before:inset-0 before:bg-white/10 before:opacity-0 before:transition-opacity hover:before:opacity-100;
+}
+
+/* Text effects */
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-primary;
+}
+
+/* Remove default App.css styling that conflicts with our design */
+#root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: inherit;
 }
