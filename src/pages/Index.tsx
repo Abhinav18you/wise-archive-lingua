@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, Search, FileText, Link as LinkIcon, Image, Sparkles, Check } from "lucide-react";
+import { ArrowRight, Database, Search, FileText, Link as LinkIcon, Image, Sparkles, Check, MessageSquareText, Bot, BrainCircuit } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const Index = () => {
@@ -85,6 +85,9 @@ const Index = () => {
           <div className="absolute top-40 right-20 p-3 glassmorphism rounded-lg animate-float" style={{ animationDelay: "1s" }}>
             <Database className="h-6 w-6 text-primary" />
           </div>
+          <div className="absolute bottom-40 left-20 p-3 glassmorphism rounded-lg animate-float" style={{ animationDelay: "1.3s" }}>
+            <Bot className="h-6 w-6 text-accent" />
+          </div>
         </div>
       </section>
       
@@ -120,6 +123,12 @@ const Index = () => {
                     <Check className="h-5 w-5 text-primary" />
                   </div>
                   <p>Automatic tagging and organization</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 p-1 rounded-full">
+                    <Check className="h-5 w-5 text-primary" />
+                  </div>
+                  <p>AI Chat assistance to help manage and explore your content</p>
                 </div>
               </div>
               <Button onClick={() => navigate("/auth")} className="gap-2 rounded-full button-shine">
@@ -169,14 +178,14 @@ const Index = () => {
             </h2>
           </div>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="feature-card" style={{ transitionDelay: "100ms" }}>
               <div className="feature-icon bg-primary/10 p-4 rounded-xl w-fit mb-6">
                 <Database className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-2xl font-semibold mb-3">Store Anything</h3>
               <p className="text-muted-foreground flex-grow">
-                Save links, text notes, images, videos, and files all in one secure place.
+                Save links, text notes, images, videos, and files all in one secure place with automated AI-powered organization.
               </p>
             </div>
             
@@ -186,7 +195,7 @@ const Index = () => {
               </div>
               <h3 className="text-2xl font-semibold mb-3">Natural Search</h3>
               <p className="text-muted-foreground flex-grow">
-                Find what you need using everyday language instead of exact keywords.
+                Find content using everyday language. Our AI understands your intent, not just keywords, for more accurate results.
               </p>
             </div>
             
@@ -196,7 +205,17 @@ const Index = () => {
               </div>
               <h3 className="text-2xl font-semibold mb-3">Organized Tags</h3>
               <p className="text-muted-foreground flex-grow">
-                Enhance searchability with custom tags and categories for your content.
+                AI-powered automatic tagging with custom categories keeps your content structured. Create your own tag system or let AI suggest tags.
+              </p>
+            </div>
+
+            <div className="feature-card" style={{ transitionDelay: "400ms" }}>
+              <div className="feature-icon bg-accent/10 p-4 rounded-xl w-fit mb-6">
+                <MessageSquareText className="h-8 w-8 text-accent" />
+              </div>
+              <h3 className="text-2xl font-semibold mb-3">AI Chat Assistant</h3>
+              <p className="text-muted-foreground flex-grow">
+                Interact with your stored content through natural conversation. Ask questions, generate summaries, and get insights from your data.
               </p>
             </div>
           </div>
@@ -247,6 +266,81 @@ const Index = () => {
         </div>
       </section>
       
+      {/* AI Chat Section (New) */}
+      <section className="w-full py-24 bg-gradient-to-b from-background to-muted/30" data-animate>
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="order-1 md:order-1">
+              <div className="glassmorphism p-8 rounded-xl relative overflow-hidden shadow-lg">
+                <div className="absolute h-40 w-40 bg-accent/20 rounded-full blur-3xl -right-10 -bottom-10"></div>
+                <div className="absolute h-40 w-40 bg-primary/20 rounded-full blur-3xl -left-10 -top-10"></div>
+                <div className="relative">
+                  <div className="absolute -top-6 -right-6 bg-accent text-accent-foreground p-4 rounded-2xl shadow-lg">
+                    <BrainCircuit className="h-7 w-7" />
+                  </div>
+                  <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 shadow-sm">
+                    <div className="text-xl font-semibold mb-4">AI Chat Assistant</div>
+                    <p className="text-muted-foreground mb-6">Ask your AI assistant:</p>
+                    <div className="space-y-4 text-sm">
+                      <div className="bg-primary/10 p-3 rounded-lg transform transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
+                        "Summarize that article about climate change"
+                      </div>
+                      <div className="bg-primary/10 p-3 rounded-lg transform transition-all duration-500 hover:-translate-y-1 hover:shadow-md" style={{ transitionDelay: "100ms" }}>
+                        "Find patterns in my saved research notes"
+                      </div>
+                      <div className="bg-primary/10 p-3 rounded-lg transform transition-all duration-500 hover:-translate-y-1 hover:shadow-md" style={{ transitionDelay: "200ms" }}>
+                        "What connections exist between my saved topics?"
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="order-2 md:order-2">
+              <div className="inline-block bg-accent/10 text-accent rounded-full px-4 py-2 text-sm font-medium mb-6">
+                AI-Powered Assistance
+              </div>
+              <h2 className="text-4xl font-bold tracking-tight mb-6">
+                Your personal <span className="text-gradient">AI research assistant</span>
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Our intelligent AI chat assistant helps you interact with your stored content in new ways. Ask questions about your notes, get summaries of articles, find connections between topics, and receive personalized insights.
+              </p>
+              <div className="space-y-4 mb-8">
+                <div className="flex items-start gap-3">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <Check className="h-5 w-5 text-accent" />
+                  </div>
+                  <p>Ask questions about your saved content in natural language</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <Check className="h-5 w-5 text-accent" />
+                  </div>
+                  <p>Generate summaries and insights from complex documents</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <Check className="h-5 w-5 text-accent" />
+                  </div>
+                  <p>Discover connections between different pieces of content</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-accent/10 p-1 rounded-full">
+                    <Check className="h-5 w-5 text-accent" />
+                  </div>
+                  <p>Get assistance organizing and categorizing your information</p>
+                </div>
+              </div>
+              <Button onClick={() => navigate("/chat")} variant="secondary" className="gap-2 rounded-full button-shine bg-accent hover:bg-accent/80 text-white">
+                Try AI Chat Now
+                <Bot className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
       {/* CTA Section */}
       <section className="w-full py-24 relative overflow-hidden" data-animate>
         <div className="absolute inset-0 bg-gradient-primary opacity-5 rounded-full blur-[100px] -z-10"></div>
@@ -255,7 +349,7 @@ const Index = () => {
             Ready to organize your <span className="text-gradient">digital life</span>?
           </h2>
           <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Join Memoria today and start saving your content with powerful natural language search.
+            Join Memoria today and start saving your content with powerful natural language search and AI assistance.
           </p>
           <Button 
             size="lg" 

@@ -261,3 +261,89 @@ html {
   padding: 0;
   text-align: inherit;
 }
+
+/* Staggered animations for features */
+.feature-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.feature-card:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.feature-card:nth-child(3) {
+  animation-delay: 0.5s;
+}
+.feature-card:nth-child(4) {
+  animation-delay: 0.7s;
+}
+
+/* Enhanced text animations */
+@keyframes text-shimmer {
+  0% {
+    background-position: -100% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--tw-gradient-stops)
+  );
+  background-size: 200% 100%;
+  animation: text-shimmer 2s ease-in-out infinite;
+  @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+}
+
+/* Chat message animation */
+@keyframes message-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  70% {
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.message-animation {
+  animation: message-pop 0.5s cubic-bezier(0.18, 1.25, 0.6, 1.09) forwards;
+}
+
+/* Customized scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(155, 135, 245, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 135, 245, 0.5);
+}
+
+/* AI chat specific styles */
+.ai-chat-container {
+  @apply bg-gradient-to-br from-accent/5 to-primary/5 rounded-xl p-4 shadow-inner;
+}
+
+.ai-message {
+  @apply bg-accent/10 text-foreground rounded-lg p-3 message-animation;
+}
+
+.user-message {
+  @apply bg-primary/10 text-foreground rounded-lg p-3 message-animation;
+}
