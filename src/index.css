@@ -39,13 +39,17 @@
   }
 
   * {
-    @apply border-border;
+    @apply border-border selection:bg-primary/10 selection:text-primary;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
   }
 }
 
@@ -103,7 +107,16 @@ html {
 
 /* Text effects */
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-primary;
+  @apply bg-clip-text text-transparent;
+}
+
+/* Enhanced 3D perspective */
+.perspective {
+  perspective: 1000px;
+}
+
+.rotate-y-5:hover {
+  transform: rotateY(5deg);
 }
 
 /* Enhanced animations */
@@ -346,4 +359,67 @@ html {
 
 .user-message {
   @apply bg-primary/10 text-foreground rounded-lg p-3 message-animation;
+}
+
+/* New professional effects */
+.gradient-border {
+  position: relative;
+  border-radius: 0.75rem;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent))) border-box;
+  border: 2px solid transparent;
+}
+
+/* Parallax effect */
+.parallax {
+  transform-style: preserve-3d;
+  transform: perspective(1000px);
+}
+
+.parallax > * {
+  transform: translateZ(0);
+}
+
+.parallax-layer-back {
+  transform: translateZ(-10px) scale(2);
+}
+
+.parallax-layer-base {
+  transform: translateZ(0);
+}
+
+.parallax-layer-front {
+  transform: translateZ(10px);
+}
+
+/* Enhanced card hover effects */
+.hover-card-rise {
+  transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.hover-card-rise:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -20px rgba(133, 89, 244, 0.4);
+}
+
+/* Additional text animations */
+.animated-gradient-text {
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--primary)));
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-text 5s linear infinite;
+}
+
+@keyframes gradient-text {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }

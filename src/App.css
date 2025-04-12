@@ -1,23 +1,30 @@
+
+/* Reset default styles */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: inherit;
+  width: 100%;
 }
 
+/* Enhanced logo animations */
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em hsl(var(--primary) / 0.7));
 }
 
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em hsl(var(--accent) / 0.7));
+}
+
+/* Enhanced animations */
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -33,10 +40,55 @@
   }
 }
 
+/* Modern card styling */
 .card {
   padding: 2em;
+  border-radius: var(--radius);
+  background-color: hsl(var(--card));
+  box-shadow: 0 4px 24px -8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
+.card:hover {
+  box-shadow: 0 8px 32px -12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+/* Documentation link styling */
 .read-the-docs {
-  color: #888;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
+}
+
+.read-the-docs:hover {
+  color: hsl(var(--accent));
+}
+
+/* Global link styling */
+a {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+a:hover {
+  color: hsl(var(--accent));
+  text-decoration: underline;
+}
+
+/* Smooth page transitions */
+.page-transition {
+  animation: fade-in 0.3s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
