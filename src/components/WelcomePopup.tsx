@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { X, Star, Sparkles, Search, Database } from 'lucide-react';
+import { X, Sparkles, Search, Database } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -10,17 +10,14 @@ export const WelcomePopup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the popup has been shown before
-    const hasShownWelcome = localStorage.getItem('hasShownWelcome');
+    // Always show the popup for testing
+    // Remove the localStorage check to ensure it shows
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+      console.log("Setting welcome popup to open");
+    }, 1000);
     
-    if (!hasShownWelcome) {
-      // Show popup after a small delay for better UX
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 1500);
-      
-      return () => clearTimeout(timer);
-    }
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
@@ -42,10 +39,7 @@ export const WelcomePopup = () => {
       <DialogContent className="sm:max-w-md glassmorphism border-primary/20 animate-scale-in">
         <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
           <div className="bg-gradient-primary text-primary-foreground h-16 w-16 rounded-full flex items-center justify-center shadow-glow animate-float">
-            <span className="font-bold text-2xl relative">
-              M
-              <Star className="absolute -top-2 -right-2 h-4 w-4 text-white fill-white animate-pulse" />
-            </span>
+            <span className="font-bold text-2xl relative">M</span>
           </div>
         </div>
         <DialogHeader className="pt-6">
