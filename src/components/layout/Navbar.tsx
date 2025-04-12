@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { toast } from "@/lib/toast";
 import { Menu, X, LogOut, User, Bot, Search as SearchIcon } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -61,18 +61,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
     >
       <div className="container flex h-16 items-center">
         {/* Logo and brand */}
-        <Link 
-          to="/" 
-          className="flex items-center gap-2 mr-4 transition-all hover:scale-105" 
-          onClick={() => setMobileMenuOpen(false)}
-        >
-          <div className="flex h-10 w-10 items-center justify-center bg-gradient-primary text-primary-foreground rounded-full shadow-glow">
-            <span className="font-bold text-lg">M</span>
-          </div>
-          <span className="font-heading font-semibold tracking-tight text-3xl">
-            <span className="text-gradient">Mem</span>oria
-          </span>
-        </Link>
+        <Logo />
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex md:flex-1 md:items-center md:justify-between">
@@ -154,7 +143,6 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
           </div>
         </div>
 
-        {/* Mobile menu button */}
         <div className="flex flex-1 items-center justify-end md:hidden">
           <Button 
             variant="ghost" 
@@ -172,7 +160,6 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="border-t md:hidden animate-slide-down">
           <div className="container py-4 space-y-3">
