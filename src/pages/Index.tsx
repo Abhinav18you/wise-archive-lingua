@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, Search, FileText, Link as LinkIcon, Image, Sparkles, Check, MessageSquareText, Bot, BrainCircuit, Zap, Star } from "lucide-react";
+import { ArrowRight, Database, Search, FileText, Link as LinkIcon, Image, Sparkles, Check, MessageSquareText, Bot, BrainCircuit, Zap, Star, ChevronRight, TrendingUp, Shield, Clock, BookOpen, Users } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { WelcomePopup } from "@/components/WelcomePopup";
 
@@ -10,6 +10,7 @@ const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
   
   useEffect(() => {
     setIsVisible(true);
@@ -46,9 +47,15 @@ const Index = () => {
 
     window.addEventListener('scroll', handleScroll);
     
+    // Auto rotate testimonials
+    const testimonialInterval = setInterval(() => {
+      setActiveTestimonial((prev) => (prev + 1) % 3);
+    }, 5000);
+    
     return () => {
       observer.disconnect();
       window.removeEventListener('scroll', handleScroll);
+      clearInterval(testimonialInterval);
     };
   }, []);
 
@@ -62,6 +69,25 @@ const Index = () => {
     }
   };
   
+  // Testimonial data
+  const testimonials = [
+    {
+      quote: "Memoria has completely transformed how I organize my research. I can find anything in seconds now.",
+      author: "Sarah K.",
+      role: "Academic Researcher"
+    },
+    {
+      quote: "The AI assistant feels like having a research partner. It understands context and helps me connect ideas.",
+      author: "Michael T.",
+      role: "Content Creator"
+    },
+    {
+      quote: "I've tried many note-taking apps but Memoria's natural language search is on another level.",
+      author: "Priya L.",
+      role: "Project Manager"
+    }
+  ];
+  
   return (
     <div className="flex flex-col items-center overflow-hidden">
       <WelcomePopup />
@@ -73,9 +99,9 @@ const Index = () => {
         <div className="absolute bottom-10 right-1/4 w-60 h-60 bg-primary/10 rounded-full blur-[100px] -z-10 animate-pulse" style={{ animationDuration: '8s', animationDelay: '1s' }}></div>
         
         <div className={`space-y-6 transition-all duration-1000 delay-300 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="inline-block bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium mb-6 animate-bounce-in" style={{ animationDelay: "100ms" }}>
+          <div className="inline-block bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium mb-6 floating-badge">
             <span className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+              <span className="flex h-2 w-2 rounded-full bg-primary radar-ping"></span>
               Your Personal Content Repository
             </span>
           </div>
@@ -89,13 +115,13 @@ const Index = () => {
           </p>
           
           <div className="flex flex-wrap justify-center gap-6 mt-12 animate-zoom" style={{ animationDelay: "700ms" }}>
-            <Button size="lg" onClick={handleGetStarted} className="gap-2 text-lg py-7 px-8 rounded-full button-shine bg-gradient-to-r from-primary to-primary/90 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20">
+            <Button size="lg" onClick={handleGetStarted} className="gap-2 text-lg py-7 px-8 rounded-full fancy-button bg-gradient-to-r from-primary to-primary/90 transition-all duration-300 hover:shadow-lg hover:shadow-primary/20">
               Get Started
               <ArrowRight className="h-5 w-5" />
             </Button>
             
             <Button variant="outline" size="lg" onClick={() => navigate("/chat")} 
-              className="gap-2 text-lg py-7 px-8 bg-white/80 backdrop-blur-sm border border-primary/20 hover:bg-primary/5 rounded-full button-shine">
+              className="gap-2 text-lg py-7 px-8 bg-white/80 backdrop-blur-sm border border-primary/20 hover:bg-primary/5 rounded-full fancy-button">
               <Sparkles className="h-5 w-5 text-primary" />
               Try AI Chat
             </Button>
@@ -118,6 +144,28 @@ const Index = () => {
           </div>
           <div className="absolute top-60 left-1/3 p-3 glassmorphism rounded-lg animate-float" style={{ animationDelay: "2s", animationDuration: "9s" }}>
             <Star className="h-6 w-6 text-accent" />
+          </div>
+        </div>
+      </section>
+      
+      {/* Stats Section (NEW) */}
+      <section className="w-full py-12 bg-primary/5">
+        <div className="container max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 px-4">
+          <div className="flex flex-col items-center text-center p-4 transition-all duration-300 hover:transform hover:scale-105">
+            <div className="text-4xl font-bold text-primary mb-2">2x</div>
+            <div className="text-sm text-muted-foreground">Faster Information Retrieval</div>
+          </div>
+          <div className="flex flex-col items-center text-center p-4 transition-all duration-300 hover:transform hover:scale-105">
+            <div className="text-4xl font-bold text-primary mb-2">95%</div>
+            <div className="text-sm text-muted-foreground">Search Accuracy</div>
+          </div>
+          <div className="flex flex-col items-center text-center p-4 transition-all duration-300 hover:transform hover:scale-105">
+            <div className="text-4xl font-bold text-primary mb-2">10k+</div>
+            <div className="text-sm text-muted-foreground">Active Users</div>
+          </div>
+          <div className="flex flex-col items-center text-center p-4 transition-all duration-300 hover:transform hover:scale-105">
+            <div className="text-4xl font-bold text-primary mb-2">4.8</div>
+            <div className="text-sm text-muted-foreground">Average Rating</div>
           </div>
         </div>
       </section>
@@ -162,17 +210,17 @@ const Index = () => {
                   <p>AI Chat assistance to help manage and explore your content</p>
                 </div>
               </div>
-              <Button onClick={() => navigate("/auth")} className="gap-2 rounded-full button-shine bg-gradient-to-r from-primary to-primary/90">
+              <Button onClick={() => navigate("/auth")} className="gap-2 rounded-full fancy-button bg-gradient-to-r from-primary to-primary/90">
                 Try It Now
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
             <div className="order-1 md:order-2">
-              <div className="glassmorphism p-8 rounded-xl relative overflow-hidden shadow-lg transform transition-all duration-700 hover:scale-105 hover:shadow-xl">
+              <div className="glassmorphism p-8 rounded-xl relative overflow-hidden shadow-lg transform transition-all duration-700 hover-3d">
                 <div className="absolute h-40 w-40 bg-primary/20 rounded-full blur-3xl -right-10 -top-10"></div>
                 <div className="absolute h-40 w-40 bg-accent/20 rounded-full blur-3xl -left-10 -bottom-10"></div>
                 <div className="relative">
-                  <div className="absolute -top-6 -left-6 bg-primary text-primary-foreground p-4 rounded-2xl shadow-lg animate-bounce" style={{ animationDuration: '5s' }}>
+                  <div className="absolute -top-6 -left-6 bg-primary text-primary-foreground p-4 rounded-2xl shadow-lg animate-float" style={{ animationDuration: '5s' }}>
                     <Search className="h-7 w-7" />
                   </div>
                   <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 shadow-sm">
@@ -210,7 +258,7 @@ const Index = () => {
           </div>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 perspective">
-            <div className="feature-card transform transition-all duration-800 hover:rotate-y-5" style={{ transitionDelay: "100ms" }}>
+            <div className="feature-card hover-3d" style={{ transitionDelay: "100ms" }}>
               <div className="feature-icon bg-primary/10 p-4 rounded-xl w-fit mb-6">
                 <Database className="h-8 w-8 text-primary" />
               </div>
@@ -220,7 +268,7 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="feature-card transform transition-all duration-800 hover:rotate-y-5" style={{ transitionDelay: "200ms" }}>
+            <div className="feature-card hover-3d" style={{ transitionDelay: "200ms" }}>
               <div className="feature-icon bg-accent/10 p-4 rounded-xl w-fit mb-6">
                 <Search className="h-8 w-8 text-accent" />
               </div>
@@ -230,7 +278,7 @@ const Index = () => {
               </p>
             </div>
             
-            <div className="feature-card transform transition-all duration-800 hover:rotate-y-5" style={{ transitionDelay: "300ms" }}>
+            <div className="feature-card hover-3d" style={{ transitionDelay: "300ms" }}>
               <div className="feature-icon bg-primary/10 p-4 rounded-xl w-fit mb-6">
                 <FileText className="h-8 w-8 text-primary" />
               </div>
@@ -240,7 +288,7 @@ const Index = () => {
               </p>
             </div>
 
-            <div className="feature-card transform transition-all duration-800 hover:rotate-y-5" style={{ transitionDelay: "400ms" }}>
+            <div className="feature-card hover-3d" style={{ transitionDelay: "400ms" }}>
               <div className="feature-icon bg-accent/10 p-4 rounded-xl w-fit mb-6">
                 <MessageSquareText className="h-8 w-8 text-accent" />
               </div>
@@ -248,6 +296,33 @@ const Index = () => {
               <p className="text-muted-foreground flex-grow">
                 Interact with your stored content through natural conversation. Ask questions, generate summaries, and get insights from your data.
               </p>
+            </div>
+          </div>
+          
+          {/* Additional Features (NEW) */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
+            <div className="p-6 rounded-xl border border-primary/10 bg-white shadow-soft transition-all duration-300 hover:-translate-y-2 hover:shadow-md">
+              <div className="bg-primary/10 p-3 rounded-full w-fit mb-4">
+                <Clock className="h-5 w-5 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2">Time-saving Automation</h4>
+              <p className="text-sm text-muted-foreground">Automatic content categorization and smart suggestions save you hours of manual organization.</p>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-accent/10 bg-white shadow-soft transition-all duration-300 hover:-translate-y-2 hover:shadow-md">
+              <div className="bg-accent/10 p-3 rounded-full w-fit mb-4">
+                <Shield className="h-5 w-5 text-accent" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2">Enhanced Privacy</h4>
+              <p className="text-sm text-muted-foreground">Advanced encryption and security measures keep your personal data and documents safe.</p>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-primary/10 bg-white shadow-soft transition-all duration-300 hover:-translate-y-2 hover:shadow-md">
+              <div className="bg-primary/10 p-3 rounded-full w-fit mb-4">
+                <TrendingUp className="h-5 w-5 text-primary" />
+              </div>
+              <h4 className="text-lg font-semibold mb-2">Personal Analytics</h4>
+              <p className="text-sm text-muted-foreground">Gain insights into your content consumption and productivity patterns over time.</p>
             </div>
           </div>
         </div>
@@ -266,32 +341,36 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover:shadow-glow transition-all duration-500 hover:-translate-y-2" style={{ transitionDelay: "100ms" }}>
+            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover-3d transition-all duration-500" style={{ transitionDelay: "100ms" }}>
               <div className="bg-primary/10 p-5 rounded-2xl w-fit mx-auto mb-6 animate-pulse" style={{ animationDuration: '3s' }}>
                 <LinkIcon className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-medium">Links</h3>
+              <p className="text-sm text-muted-foreground mt-2">Save web articles and resources with automatic previews</p>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover:shadow-glow transition-all duration-500 hover:-translate-y-2" style={{ transitionDelay: "200ms" }}>
+            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover-3d transition-all duration-500" style={{ transitionDelay: "200ms" }}>
               <div className="bg-accent/10 p-5 rounded-2xl w-fit mx-auto mb-6 animate-pulse" style={{ animationDuration: '4s' }}>
                 <FileText className="h-8 w-8 text-accent" />
               </div>
               <h3 className="text-xl font-medium">Notes</h3>
+              <p className="text-sm text-muted-foreground mt-2">Create rich text notes with formatting and embedded content</p>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover:shadow-glow transition-all duration-500 hover:-translate-y-2" style={{ transitionDelay: "300ms" }}>
+            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover-3d transition-all duration-500" style={{ transitionDelay: "300ms" }}>
               <div className="bg-primary/10 p-5 rounded-2xl w-fit mx-auto mb-6 animate-pulse" style={{ animationDuration: '5s' }}>
                 <Image className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-medium">Images</h3>
+              <p className="text-sm text-muted-foreground mt-2">Store and categorize images with AI-powered recognition</p>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover:shadow-glow transition-all duration-500 hover:-translate-y-2" style={{ transitionDelay: "400ms" }}>
+            <div className="bg-white rounded-2xl p-8 text-center shadow-soft hover-3d transition-all duration-500" style={{ transitionDelay: "400ms" }}>
               <div className="bg-accent/10 p-5 rounded-2xl w-fit mx-auto mb-6 animate-pulse" style={{ animationDuration: '6s' }}>
                 <Database className="h-8 w-8 text-accent" />
               </div>
               <h3 className="text-xl font-medium">Files</h3>
+              <p className="text-sm text-muted-foreground mt-2">Upload and manage documents, PDFs and more</p>
             </div>
           </div>
         </div>
@@ -363,9 +442,92 @@ const Index = () => {
                   <p>Get assistance organizing and categorizing your information</p>
                 </div>
               </div>
-              <Button onClick={() => navigate("/chat")} variant="secondary" className="gap-2 rounded-full button-shine bg-accent hover:bg-accent/80 text-white">
+              <Button onClick={() => navigate("/chat")} variant="secondary" className="gap-2 rounded-full fancy-button bg-accent hover:bg-accent/80 text-white">
                 Try AI Chat Now
                 <Bot className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Testimonials Section (NEW) */}
+      <section className="w-full py-24 bg-primary/5" data-animate>
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-block bg-accent/10 text-accent rounded-full px-4 py-2 text-sm font-medium mb-6">
+              <Users className="h-4 w-4 inline mr-2" /> User Stories
+            </div>
+            <h2 className="text-4xl font-bold tracking-tight">
+              What our users <span className="text-gradient bg-gradient-to-r from-primary to-accent">are saying</span>
+            </h2>
+          </div>
+          
+          <div className="relative h-64 md:h-48">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index} 
+                className={`absolute inset-0 transition-all duration-500 flex flex-col items-center text-center p-8 rounded-2xl glassmorphism ${
+                  index === activeTestimonial 
+                    ? 'opacity-100 translate-y-0 z-10' 
+                    : 'opacity-0 translate-y-8 -z-10'
+                }`}
+              >
+                <p className="text-lg mb-6 italic">&ldquo;{testimonial.quote}&rdquo;</p>
+                <div className="font-semibold">{testimonial.author}</div>
+                <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+              </div>
+            ))}
+            
+            <div className="absolute -bottom-12 left-0 right-0 flex justify-center gap-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveTestimonial(index)}
+                  className={`w-3 h-3 rounded-full transition-all ${
+                    index === activeTestimonial 
+                      ? 'bg-primary scale-125' 
+                      : 'bg-primary/30'
+                  }`}
+                  aria-label={`View testimonial ${index + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* New Learn More Section */}
+      <section className="w-full py-24 bg-white" data-animate>
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="p-6 rounded-xl border border-primary/10 shadow-soft hover-3d">
+              <BookOpen className="h-10 w-10 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-3">Comprehensive Guides</h3>
+              <p className="text-muted-foreground mb-4">Explore our detailed documentation and tutorials to get the most out of Memoria.</p>
+              <Button variant="outline" className="gap-2 group">
+                View Documentation
+                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-accent/10 shadow-soft hover-3d">
+              <TrendingUp className="h-10 w-10 text-accent mb-4" />
+              <h3 className="text-xl font-semibold mb-3">Latest Updates</h3>
+              <p className="text-muted-foreground mb-4">Stay informed about the newest features and improvements to enhance your experience.</p>
+              <Button variant="outline" className="gap-2 group">
+                Read Changelog
+                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </div>
+            
+            <div className="p-6 rounded-xl border border-primary/10 shadow-soft hover-3d">
+              <Users className="h-10 w-10 text-primary mb-4" />
+              <h3 className="text-xl font-semibold mb-3">Community</h3>
+              <p className="text-muted-foreground mb-4">Join our community of users to share tips, ask questions, and connect with others.</p>
+              <Button variant="outline" className="gap-2 group">
+                Join Community
+                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
           </div>
@@ -400,7 +562,7 @@ const Index = () => {
             <Button 
               size="lg" 
               onClick={() => navigate("/auth")} 
-              className="text-lg py-7 px-12 rounded-full shadow-lg hover:shadow-primary/25 button-shine bg-gradient-to-r from-primary to-primary/90 transition-all duration-500 hover:scale-105">
+              className="text-lg py-7 px-12 rounded-full shadow-lg hover:shadow-primary/25 fancy-button bg-gradient-to-r from-primary to-primary/90 transition-all duration-500 hover:scale-105">
               Get Started for Free
             </Button>
           </div>

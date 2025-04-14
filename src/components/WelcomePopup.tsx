@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Search, Database } from 'lucide-react';
+import { X, Sparkles, Search, Database, BookOpen, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -10,8 +10,7 @@ export const WelcomePopup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Always show the popup for testing
-    // Remove the localStorage check to ensure it shows
+    // Show popup after a delay for better UX
     const timer = setTimeout(() => {
       setIsOpen(true);
       console.log("Setting welcome popup to open");
@@ -36,7 +35,7 @@ export const WelcomePopup = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md glassmorphism border-primary/20 animate-scale-in">
+      <DialogContent className="sm:max-w-md glassmorphism border-primary/20 animate-scale-in shadow-2xl">
         <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
           <div className="bg-gradient-primary text-primary-foreground h-16 w-16 rounded-full flex items-center justify-center shadow-glow animate-float">
             <span className="font-bold text-2xl relative">M</span>
@@ -77,6 +76,11 @@ export const WelcomePopup = () => {
               <div className="text-xs text-muted-foreground">Chat with your content using natural language</div>
             </div>
           </div>
+          
+          <div className="flex flex-col items-center text-center mt-2 py-2 px-3 bg-primary/5 rounded-lg">
+            <BookOpen className="h-5 w-5 text-primary mb-2" />
+            <p className="text-sm font-medium">Unlock a new way to manage your digital life</p>
+          </div>
         </div>
         <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
           <Button variant="outline" onClick={handleExplore} className="sm:flex-1 transition-all duration-300 hover:bg-primary/5">
@@ -84,9 +88,7 @@ export const WelcomePopup = () => {
           </Button>
           <Button onClick={handleGetStarted} className="sm:flex-1 gap-2 bg-gradient-to-r from-primary to-primary/90 hover:shadow-glow transition-all duration-300">
             Get Started
-            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="animate-slide-right" style={{ animationDuration: '1s', animationIterationCount: 'infinite', animationDirection: 'alternate' }}>
-              <path d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
-            </svg>
+            <ArrowRight className="h-4 w-4 animate-slide-right" style={{ animationDuration: '1s', animationIterationCount: 'infinite', animationDirection: 'alternate' }} />
           </Button>
         </div>
       </DialogContent>
