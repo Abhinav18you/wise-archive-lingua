@@ -15,6 +15,7 @@ import Search from "./pages/Search";
 import Chat from "./pages/Chat";
 import Add from "./pages/Add";
 import NotFound from "./pages/NotFound";
+import { WelcomePopup } from "./components/WelcomePopup";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,15 +28,17 @@ const queryClient = new QueryClient({
 
 const App = () => {
   // For testing purposes, uncomment this to reset the welcome popup state
-  // useEffect(() => {
-  //   localStorage.removeItem('hasShownWelcome');
-  // }, []);
+  useEffect(() => {
+    console.log("App component mounted - checking welcome popup state");
+    localStorage.removeItem('hasShownWelcome');
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner position="top-right" closeButton />
         <BrowserRouter>
+          <WelcomePopup />
           <Routes>
             <Route path="/" element={<Layout><Index /></Layout>} />
             <Route path="/auth" element={<Layout><Auth /></Layout>} />

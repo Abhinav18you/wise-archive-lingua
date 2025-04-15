@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { X, Sparkles, Search, Database, BookOpen, ArrowRight, MessageSquare, Star } from 'lucide-react';
+import { X, Sparkles, Search, Database, BookOpen, ArrowRight, MessageSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -10,20 +10,18 @@ export const WelcomePopup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Reset localStorage for testing purposes
-    // localStorage.removeItem('hasShownWelcome'); // Uncomment this line to always show the popup
-
+    // Reset localStorage to force popup to show (for testing purposes)
+    // Uncomment this line to reset the popup state and always show it
+    localStorage.removeItem('hasShownWelcome');
+    console.log("WelcomePopup component initialized");
+    
     // Check if the welcome popup has been shown before
     const hasShown = localStorage.getItem('hasShownWelcome');
     
     if (!hasShown) {
-      // Show popup after a delay for better UX
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        console.log("Setting welcome popup to open");
-      }, 1000);
-      
-      return () => clearTimeout(timer);
+      // Show popup immediately for better visibility
+      setIsOpen(true);
+      console.log("Setting welcome popup to open - no previous record found");
     } else {
       console.log("Welcome popup already shown before");
     }
@@ -45,11 +43,6 @@ export const WelcomePopup = () => {
     handleClose();
     console.log("Exploring from welcome popup");
   };
-
-  // Force the popup to be open for development/debugging
-  // useEffect(() => {
-  //   setIsOpen(true);
-  // }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
