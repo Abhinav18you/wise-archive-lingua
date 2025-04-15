@@ -27,7 +27,18 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					50: '#f2edff',
+					100: '#e5dbff',
+					200: '#cbb6ff',
+					300: '#b292ff',
+					400: '#9a6dff',
+					500: '#8149ff',
+					600: '#6b25ff',
+					700: '#5900ff',
+					800: '#4d00e6',
+					900: '#4000cc',
+					950: '#2e0099'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -43,7 +54,18 @@ export default {
 				},
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					foreground: 'hsl(var(--accent-foreground))',
+					50: '#f5edfd',
+					100: '#ebdbfb',
+					200: '#d7b7f6',
+					300: '#c393f2',
+					400: '#af6fed',
+					500: '#9b4be9',
+					600: '#8727e4',
+					700: '#7618d1',
+					800: '#6913ac',
+					900: '#590f89',
+					950: '#370a52'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
@@ -119,6 +141,32 @@ export default {
 				'ripple': {
 					'0%': { transform: 'scale(0)', opacity: '1' },
 					'100%': { transform: 'scale(4)', opacity: '0' }
+				},
+				'marquee': {
+					'0%': { transform: 'translateX(0)' },
+					'100%': { transform: 'translateX(-100%)' }
+				},
+				'scroll-x': {
+					'0%': { transform: 'translateX(0)' },
+					'100%': { transform: 'translateX(calc(-250px * 7))' }
+				},
+				'bounce-horizontal': {
+					'0%, 100%': { transform: 'translateX(0)' },
+					'50%': { transform: 'translateX(25px)' }
+				},
+				'flip': {
+					'0%': { transform: 'perspective(1000px) rotateY(0deg)' },
+					'100%': { transform: 'perspective(1000px) rotateY(360deg)' }
+				},
+				'wave': {
+					'0%': { transform: 'rotate(0deg)' },
+					'10%': { transform: 'rotate(14deg)' },
+					'20%': { transform: 'rotate(-8deg)' },
+					'30%': { transform: 'rotate(14deg)' },
+					'40%': { transform: 'rotate(-4deg)' },
+					'50%': { transform: 'rotate(10deg)' },
+					'60%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(0deg)' }
 				}
 			},
 			animation: {
@@ -136,7 +184,12 @@ export default {
 				'float': 'float 5s infinite ease-in-out',
 				'bounce': 'bounce 3s infinite ease-in-out',
 				'spin-slow': 'spin-slow 6s linear infinite',
-				'ripple': 'ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite'
+				'ripple': 'ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite',
+				'marquee': 'marquee 25s linear infinite',
+				'scroll-x': 'scroll-x 40s linear infinite',
+				'bounce-horizontal': 'bounce-horizontal 2s infinite ease-in-out',
+				'flip': 'flip 2.5s infinite ease-in-out',
+				'wave': 'wave 2.5s ease infinite'
 			},
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
@@ -145,6 +198,10 @@ export default {
 				'inner-glow': 'inset 0 0 15px rgba(133, 89, 244, 0.2)',
 				'highlight': '0 0px 30px -10px rgba(255, 255, 255, 0.4)',
 				'layered': '0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 20px -3px rgba(0, 0, 0, 0.1)',
+				'3d': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 -2px 4px -1px rgba(0, 0, 0, 0.02)',
+				'sharp': '5px 5px 0 0 rgba(0, 0, 0, 0.1)',
+				'neon': '0 0 5px rgba(155, 135, 245, 0.5), 0 0 20px rgba(155, 135, 245, 0.3)',
+				'inner-sharp': 'inset 3px 3px 0 0 rgba(0, 0, 0, 0.1)'
 			},
 			backgroundImage: {
 				'glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1))',
@@ -155,6 +212,9 @@ export default {
 				'gradient-radial': 'radial-gradient(circle, hsla(255, 92%, 76%, 0.5) 0%, transparent 70%)',
 				'gradient-shimmer': 'linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent)',
 				'noise': 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")',
+				'dots': 'radial-gradient(rgba(0, 0, 0, 0.1) 2px, transparent 2px)',
+				'grid': 'linear-gradient(rgba(200, 200, 200, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(200, 200, 200, 0.1) 1px, transparent 1px)',
+				'stripes': 'linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 25%, transparent 50%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.05) 75%, transparent 75%, transparent)'
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -163,7 +223,27 @@ export default {
 			transitionTimingFunction: {
 				'bounce': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
 				'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+				'spring': 'cubic-bezier(0.680, -0.550, 0.265, 1.550)'
 			},
+			backgroundSize: {
+				'200%': '200% 200%',
+				'16': '4rem 4rem'
+			},
+			backgroundPosition: {
+				'banner-position': '50% 30%'
+			},
+			textShadow: {
+				'sm': '0 1px 2px rgba(0, 0, 0, 0.1)',
+				'md': '0 2px 4px rgba(0, 0, 0, 0.1)',
+				'lg': '0 8px 16px rgba(0, 0, 0, 0.1)',
+				'glow': '0 0 5px rgba(155, 135, 245, 0.5)'
+			},
+			backdropFilter: {
+				'none': 'none',
+				'sm': 'blur(4px)',
+				'md': 'blur(8px)',
+				'lg': 'blur(16px)'
+			}
 		}
 	},
 	plugins: [require("tailwindcss-animate")],

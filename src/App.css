@@ -384,3 +384,180 @@ a:hover {
 .image-zoom:hover img {
   transform: scale(1.1);
 }
+
+/* Shine effect for cards and buttons */
+.shine-effect {
+  position: absolute;
+  top: -100%;
+  left: -200%;
+  width: 50%;
+  height: 300%;
+  opacity: 0;
+  transform: rotate(30deg);
+  background: rgba(255, 255, 255, 0.13);
+  background: linear-gradient(
+    to right, 
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.13) 77%,
+    rgba(255, 255, 255, 0.5) 92%,
+    rgba(255, 255, 255, 0.0) 100%
+  );
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  to {
+    opacity: 1;
+    top: -30%;
+    left: 100%;
+  }
+}
+
+/* Button shine effect */
+.button-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right, 
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(45deg);
+  z-index: 1;
+  animation: button-shine 3s forwards infinite;
+}
+
+@keyframes button-shine {
+  0% {
+    left: -100%;
+    top: -100%;
+  }
+  100% {
+    left: 100%;
+    top: 100%;
+  }
+}
+
+/* Liquid button effect */
+.liquid-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.liquid-button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transition: transform 0.5s;
+}
+
+.liquid-button:active::after {
+  transform: translate(-50%, -50%) scale(3);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+/* Card flip effect */
+.card-flip-container {
+  perspective: 1000px;
+}
+
+.card-flip {
+  position: relative;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.card-flip-container:hover .card-flip {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+/* Focus ring animation */
+.focus-ring-animation:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(155, 135, 245, 0.3);
+  animation: focus-ring 1.5s infinite;
+}
+
+@keyframes focus-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(155, 135, 245, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(155, 135, 245, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(155, 135, 245, 0);
+  }
+}
+
+/* Magnetic buttons effect preparations */
+.magnetic-btn {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Border animation */
+.border-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.border-animation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid transparent;
+  border-radius: inherit;
+}
+
+.border-animation:hover::before {
+  border-color: hsl(var(--primary));
+  animation: border-dance 1s linear infinite;
+}
+
+@keyframes border-dance {
+  0% {
+    clip-path: inset(0 0 95% 0);
+  }
+  25% {
+    clip-path: inset(0 95% 0 0);
+  }
+  50% {
+    clip-path: inset(95% 0 0 0);
+  }
+  75% {
+    clip-path: inset(0 0 0 95%);
+  }
+  100% {
+    clip-path: inset(0 0 95% 0);
+  }
+}
