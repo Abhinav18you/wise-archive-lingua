@@ -10,6 +10,9 @@ export const WelcomePopup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Reset localStorage for testing purposes
+    // localStorage.removeItem('hasShownWelcome'); // Uncomment this line to always show the popup
+
     // Check if the welcome popup has been shown before
     const hasShown = localStorage.getItem('hasShownWelcome');
     
@@ -21,22 +24,32 @@ export const WelcomePopup = () => {
       }, 1000);
       
       return () => clearTimeout(timer);
+    } else {
+      console.log("Welcome popup already shown before");
     }
   }, []);
 
   const handleClose = () => {
     setIsOpen(false);
     localStorage.setItem('hasShownWelcome', 'true');
+    console.log("Closing welcome popup and setting localStorage");
   };
 
   const handleGetStarted = () => {
     handleClose();
     navigate('/auth');
+    console.log("Navigating to auth page from welcome popup");
   };
 
   const handleExplore = () => {
     handleClose();
+    console.log("Exploring from welcome popup");
   };
+
+  // Force the popup to be open for development/debugging
+  // useEffect(() => {
+  //   setIsOpen(true);
+  // }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

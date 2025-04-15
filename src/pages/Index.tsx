@@ -14,6 +14,9 @@ const Index = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
+    // For testing purposes, uncomment to reset the welcome popup state
+    // localStorage.removeItem('hasShownWelcome');
+    
     // Initialize intersection observer for scroll animations
     const observerOptions = { 
       threshold: 0.15,
