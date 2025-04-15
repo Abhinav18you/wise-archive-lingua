@@ -27,10 +27,11 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  // For testing purposes, uncomment this to reset the welcome popup state
+  // For testing purposes - comment this out in production
   useEffect(() => {
     console.log("App component mounted - checking welcome popup state");
-    localStorage.removeItem('hasShownWelcome');
+    // Uncomment the following line to reset the welcome popup state for testing
+    // localStorage.removeItem('hasShownWelcome');
   }, []);
 
   return (

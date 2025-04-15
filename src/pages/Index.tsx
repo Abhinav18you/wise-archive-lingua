@@ -1,6 +1,4 @@
-
 import { useEffect } from "react";
-import { WelcomePopup } from "@/components/WelcomePopup";
 import HeroSection from "@/components/landing/HeroSection";
 import StatsSection from "@/components/landing/StatsSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
@@ -14,9 +12,6 @@ const Index = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    // For testing purposes, uncomment to reset the welcome popup state
-    // localStorage.removeItem('hasShownWelcome');
-    
     // Initialize intersection observer for scroll animations
     const observerOptions = { 
       threshold: 0.15,
@@ -46,8 +41,6 @@ const Index = () => {
 
   return (
     <div className="flex flex-col items-center overflow-hidden">
-      <WelcomePopup />
-      
       {/* Hero Section */}
       <HeroSection />
       
