@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 export const WelcomePopup = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,18 +16,19 @@ export const WelcomePopup = () => {
     // Check if the welcome popup has been shown before
     const hasShown = localStorage.getItem('hasShownWelcome');
     
-    // Use a short timeout to prevent the black screen flash
-    // This allows the app to render properly before showing the modal
-    const timer = setTimeout(() => {
-      if (!hasShown) {
-        console.log("Showing welcome popup - no previous record found");
-        setIsOpen(true);
-      } else {
-        console.log("Welcome popup already shown before");
-      }
-    }, 300);
+    // Set a flag that we've initialized the component
+    setIsInitialized(true);
     
-    return () => clearTimeout(timer);
+    if (!hasShown) {
+      console.log("Showing welcome popup - no previous record found");
+      // Use a very short timeout to ensure the app renders first before showing modal
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      console.log("Welcome popup already shown before");
+    }
   }, []);
 
   const handleClose = () => {
@@ -46,9 +48,12 @@ export const WelcomePopup = () => {
     console.log("Exploring from welcome popup");
   };
 
+  // Don't render anything until we've initialized
+  if (!isInitialized) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md bg-background border-primary/20 shadow-2xl animate-scale-in relative overflow-hidden">
+      <DialogContent className="sm:max-w-md bg-white border-primary/20 shadow-2xl relative overflow-hidden">
         {/* Enhanced background elements */}
         <div className="absolute -z-10 top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
@@ -57,8 +62,8 @@ export const WelcomePopup = () => {
         
         {/* Logo badge with improved visibility */}
         <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
-          <div className="bg-gradient-to-r from-primary to-accent text-background h-16 w-16 rounded-full flex items-center justify-center shadow-lg animate-float">
-            <span className="font-bold text-2xl relative z-10">M</span>
+          <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground h-16 w-16 rounded-full flex items-center justify-center shadow-lg animate-float">
+            <span className="font-bold text-2xl text-white relative z-10">M</span>
           </div>
         </div>
         
@@ -121,3 +126,4 @@ export const WelcomePopup = () => {
     </Dialog>
   );
 };
+

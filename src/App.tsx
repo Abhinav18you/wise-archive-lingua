@@ -37,9 +37,11 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Sonner position="top-right" closeButton />
         <BrowserRouter>
+          {/* Welcome popup positioned here to be available app-wide before any layout rendering */}
           <WelcomePopup />
+          
+          <Sonner position="top-right" closeButton />
           <Routes>
             <Route path="/" element={<Layout><Index /></Layout>} />
             <Route path="/auth" element={<Layout><Auth /></Layout>} />
