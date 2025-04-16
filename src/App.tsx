@@ -42,7 +42,6 @@ const App = () => {
             <Route path="/" element={
               <Layout>
                 <Index />
-                {/* The welcome popup is placed inside the Route to ensure it doesn't interfere with layout */}
                 <WelcomePopup />
               </Layout>
             } />

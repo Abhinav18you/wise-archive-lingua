@@ -24,7 +24,7 @@ export const WelcomePopup = () => {
       // Add a small delay to ensure the app is fully loaded before showing the popup
       const timer = setTimeout(() => {
         setIsOpen(true);
-      }, 100);
+      }, 300);
       return () => clearTimeout(timer);
     } else {
       console.log("Welcome popup already shown before");
