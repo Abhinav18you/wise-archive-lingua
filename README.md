@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/e8fb3cb5-8dc6-432f-9d61-3b4a4010da45
+**URL**: https://wise-archive-lingua.lovable.app
 
 ## How can I edit this code?
 
