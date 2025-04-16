@@ -38,11 +38,14 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <BrowserRouter>
-          {/* Welcome popup positioned here at the top level */}
-          <WelcomePopup />
-          <Sonner position="top-right" closeButton />
           <Routes>
-            <Route path="/" element={<Layout><Index /></Layout>} />
+            <Route path="/" element={
+              <Layout>
+                <Index />
+                {/* The welcome popup is placed inside the Route to ensure it doesn't interfere with layout */}
+                <WelcomePopup />
+              </Layout>
+            } />
             <Route path="/auth" element={<Layout><Auth /></Layout>} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route 
@@ -87,6 +90,7 @@ const App = () => {
             />
             <Route path="*" element={<Layout><NotFound /></Layout>} />
           </Routes>
+          <Sonner position="top-right" closeButton />
         </BrowserRouter>
         <Toaster />
       </TooltipProvider>

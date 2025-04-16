@@ -21,8 +21,11 @@ export const WelcomePopup = () => {
     
     if (!hasShown) {
       console.log("Showing welcome popup - no previous record found");
-      // Simply show the popup immediately without delay
-      setIsOpen(true);
+      // Add a small delay to ensure the app is fully loaded before showing the popup
+      const timer = setTimeout(() => {
+        setIsOpen(true);
+      }, 100);
+      return () => clearTimeout(timer);
     } else {
       console.log("Welcome popup already shown before");
     }
@@ -49,7 +52,10 @@ export const WelcomePopup = () => {
   if (!isInitialized) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) handleClose();
+      else setIsOpen(open);
+    }}>
       <DialogContent className="sm:max-w-md bg-white border-primary/20 shadow-xl relative overflow-hidden">
         {/* Subtle background elements - reduced blur to prevent performance issues */}
         <div className="absolute -z-10 top-0 left-0 w-full h-full overflow-hidden">
