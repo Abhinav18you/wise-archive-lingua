@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Sparkles, Search, Database, BookOpen, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -13,15 +12,12 @@ export const WelcomePopup = () => {
   useEffect(() => {
     console.log("WelcomePopup component initialized");
     
-    // Check if the welcome popup has been shown before
     const hasShown = localStorage.getItem('hasShownWelcome');
     
-    // Set a flag that we've initialized the component
     setIsInitialized(true);
     
     if (!hasShown) {
       console.log("Showing welcome popup - no previous record found");
-      // Add a small delay to ensure the app is fully loaded before showing the popup
       const timer = setTimeout(() => {
         setIsOpen(true);
       }, 300);
@@ -48,22 +44,24 @@ export const WelcomePopup = () => {
     console.log("Exploring from welcome popup");
   };
 
-  // Don't render anything until we've initialized
   if (!isInitialized) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-      if (!open) handleClose();
-      else setIsOpen(open);
-    }}>
-      <DialogContent className="sm:max-w-md bg-white border-primary/20 shadow-xl relative overflow-hidden">
-        {/* Subtle background elements - reduced blur to prevent performance issues */}
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        if (!open) handleClose();
+      }}
+    >
+      <DialogContent 
+        className="sm:max-w-md bg-white border-primary/20 shadow-xl relative overflow-hidden"
+        overlayClassName="bg-black/30"
+      >
         <div className="absolute -z-10 top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-10 left-10 w-32 h-32 bg-primary/5 rounded-full blur-xl" />
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/5 rounded-full blur-xl" />
         </div>
         
-        {/* Logo badge with improved visibility */}
         <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
           <div className="bg-gradient-to-r from-primary to-accent text-white h-16 w-16 rounded-full flex items-center justify-center shadow-lg">
             <span className="font-bold text-2xl relative z-10">M</span>
