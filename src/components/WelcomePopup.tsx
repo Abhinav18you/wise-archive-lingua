@@ -21,11 +21,8 @@ export const WelcomePopup = () => {
     
     if (!hasShown) {
       console.log("Showing welcome popup - no previous record found");
-      // Use a very short timeout to ensure the app renders first before showing modal
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 100);
-      return () => clearTimeout(timer);
+      // Simply show the popup immediately without delay
+      setIsOpen(true);
     } else {
       console.log("Welcome popup already shown before");
     }
@@ -53,17 +50,17 @@ export const WelcomePopup = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-md bg-white border-primary/20 shadow-2xl relative overflow-hidden">
-        {/* Enhanced background elements */}
+      <DialogContent className="sm:max-w-md bg-white border-primary/20 shadow-xl relative overflow-hidden">
+        {/* Subtle background elements - reduced blur to prevent performance issues */}
         <div className="absolute -z-10 top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
-          <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }}></div>
+          <div className="absolute top-10 left-10 w-32 h-32 bg-primary/5 rounded-full blur-xl" />
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-accent/5 rounded-full blur-xl" />
         </div>
         
         {/* Logo badge with improved visibility */}
         <div className="absolute -top-12 left-1/2 transform -translate-x-1/2">
-          <div className="bg-gradient-to-r from-primary to-accent text-primary-foreground h-16 w-16 rounded-full flex items-center justify-center shadow-lg animate-float">
-            <span className="font-bold text-2xl text-white relative z-10">M</span>
+          <div className="bg-gradient-to-r from-primary to-accent text-white h-16 w-16 rounded-full flex items-center justify-center shadow-lg">
+            <span className="font-bold text-2xl relative z-10">M</span>
           </div>
         </div>
         
@@ -94,8 +91,7 @@ export const WelcomePopup = () => {
             </div>
           </div>
           
-          <div className="p-3 rounded-lg border border-accent/10 flex items-center space-x-3 relative overflow-hidden group bg-gradient-to-r from-background to-accent/5">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent shine-effect"></div>
+          <div className="p-3 rounded-lg border border-accent/10 flex items-center space-x-3 relative bg-white">
             <div className="p-2 bg-accent/10 rounded-full">
               <Sparkles className="h-4 w-4 text-accent" />
             </div>
@@ -105,20 +101,20 @@ export const WelcomePopup = () => {
             </div>
           </div>
           
-          <div className="flex flex-col items-center text-center mt-2 py-2 px-3 bg-primary/5 rounded-lg transition-all duration-300 hover:bg-primary/10">
+          <div className="flex flex-col items-center text-center mt-2 py-2 px-3 bg-primary/5 rounded-lg">
             <BookOpen className="h-5 w-5 text-primary mb-2" />
             <p className="text-sm font-medium">Unlock a new way to manage your digital life</p>
           </div>
         </div>
         
         <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
-          <Button variant="outline" onClick={handleExplore} className="sm:flex-1 transition-all duration-300 hover:bg-primary/5 border-primary/20">
+          <Button variant="outline" onClick={handleExplore} className="sm:flex-1 border-primary/20">
             Explore First
           </Button>
-          <Button onClick={handleGetStarted} className="sm:flex-1 gap-2 bg-gradient-to-r from-primary to-accent hover:shadow-md transition-all duration-300 hover:scale-[1.02] relative overflow-hidden">
-            <span className="relative z-10 flex items-center gap-2">
+          <Button onClick={handleGetStarted} className="sm:flex-1 gap-2 bg-gradient-to-r from-primary to-accent">
+            <span className="flex items-center gap-2">
               Get Started
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-4 w-4" />
             </span>
           </Button>
         </div>
@@ -126,4 +122,3 @@ export const WelcomePopup = () => {
     </Dialog>
   );
 };
-
