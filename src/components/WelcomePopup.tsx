@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Sparkles, Search, Database, BookOpen, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -55,7 +56,6 @@ export const WelcomePopup = () => {
     >
       <DialogContent 
         className="sm:max-w-md bg-white border-primary/20 shadow-xl relative overflow-hidden"
-        overlayClassName="bg-black/30"
       >
         <div className="absolute -z-10 top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-10 left-10 w-32 h-32 bg-primary/5 rounded-full blur-xl" />
