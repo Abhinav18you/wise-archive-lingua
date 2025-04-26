@@ -56,7 +56,7 @@ export const WelcomePopup = () => {
       }}
     >
       <DialogContent 
-        className="sm:max-w-md bg-white border-primary/20 shadow-xl relative overflow-hidden transition-all duration-300"
+        className="sm:max-w-md bg-white border-primary/20 shadow-xl relative overflow-hidden transition-all duration-300 animate-fade-in"
       >
         <div className="absolute -z-10 top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute top-10 left-10 w-32 h-32 bg-primary/5 rounded-full blur-xl animate-pulse" />
@@ -83,7 +83,7 @@ export const WelcomePopup = () => {
             Memoria helps you save, organize, and find your digital content using natural language search and AI assistance.
           </p>
           
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="grid grid-cols-2 gap-3 pt-2 animate-fade-in" style={{ animationDelay: '0.1s' }}>
             <div className="flex flex-col items-center p-3 rounded-lg bg-primary/5 border border-primary/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow group cursor-pointer">
               <Database className="h-5 w-5 text-primary mb-2 transition-transform duration-300 group-hover:scale-110" />
               <div className="text-primary font-medium">Store Anything</div>
@@ -96,7 +96,7 @@ export const WelcomePopup = () => {
             </div>
           </div>
           
-          <div className="p-3 rounded-lg border border-accent/10 flex items-center space-x-3 relative bg-white hover-card-rise cursor-pointer">
+          <div className="p-3 rounded-lg border border-accent/10 flex items-center space-x-3 relative bg-white hover-card-rise cursor-pointer animate-fade-in" style={{ animationDelay: '0.2s' }}>
             <div className="p-2 bg-accent/10 rounded-full">
               <Sparkles className="h-4 w-4 text-accent animate-pulse" />
             </div>
@@ -106,13 +106,13 @@ export const WelcomePopup = () => {
             </div>
           </div>
           
-          <div className="flex flex-col items-center text-center mt-2 py-2 px-3 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg animate-scale-in">
+          <div className="flex flex-col items-center text-center mt-2 py-2 px-3 bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg animate-scale-in" style={{ animationDelay: '0.3s' }}>
             <Zap className="h-5 w-5 text-primary mb-2 animate-bounce-horizontal" />
             <p className="text-sm font-medium">Unlock a new way to manage your digital life</p>
           </div>
         </div>
         
-        <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-center gap-3 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <Button variant="outline" onClick={handleExplore} className="sm:flex-1 border-primary/20 hover:bg-primary/5 transition-all duration-300">
             Explore First
           </Button>

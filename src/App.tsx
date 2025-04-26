@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Layout from "./components/layout/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -27,11 +27,18 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   // For testing purposes - comment this out in production
   useEffect(() => {
     console.log("App component mounted - checking welcome popup state");
     // Uncomment the following line to reset the welcome popup state for testing
     // localStorage.removeItem('hasShownWelcome');
+    
+    // Set loaded state after a small delay to prevent initial flash
+    setTimeout(() => {
+      setIsLoaded(true);
+    }, 100);
   }, []);
 
   return (
@@ -42,7 +49,7 @@ const App = () => {
             <Route path="/" element={
               <Layout>
                 <Index />
-                <WelcomePopup />
+                {isLoaded && <WelcomePopup />}
               </Layout>
             } />
             <Route path="/auth" element={<Layout><Auth /></Layout>} />
