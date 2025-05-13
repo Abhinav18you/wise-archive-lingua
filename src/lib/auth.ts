@@ -81,6 +81,36 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 /**
+ * Reset password for a user
+ */
+export const resetPassword = async (email: string) => {
+  console.log("Resetting password for email:", email);
+  
+  try {
+    // Get the current origin dynamically for the reset password redirect
+    const redirectUrl = `${window.location.origin}/auth/callback`;
+    console.log("Using redirect URL for password reset:", redirectUrl);
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
+    });
+    
+    if (error) {
+      console.error("Password reset error:", error);
+      return { error };
+    }
+
+    console.log("Password reset email sent successfully");
+    return { error: null };
+  } catch (err) {
+    console.error("Unexpected error during password reset:", err);
+    return { 
+      error: err instanceof Error ? err : new Error('Unknown error during password reset') 
+    };
+  }
+};
+
+/**
  * Get the current user's session
  */
 export const getSession = async () => {

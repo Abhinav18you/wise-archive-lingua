@@ -9,6 +9,7 @@ import SignUpForm from "./SignUpForm";
 import ConfirmationSent from "./ConfirmationSent";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/lib/toast";
 
 const AuthForm = () => {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
@@ -24,6 +25,7 @@ const AuthForm = () => {
     handleChange,
     handleSignUp,
     handleSignIn,
+    handleForgotPassword,
     setAuthError
   } = useAuth();
 
@@ -103,6 +105,7 @@ const AuthForm = () => {
                 onChange={handleChange}
                 onSubmit={handleSubmit}
                 onSwitchMode={() => handleModeChange("signup")}
+                onForgotPassword={handleForgotPassword}
               />
             </TabsContent>
             

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/lib/toast";
-import { signUpWithEmail, signInWithEmail, getSession, SESSION_STORAGE_KEY } from "@/lib/auth";
+import { signUpWithEmail, signInWithEmail, resetPassword, getSession, SESSION_STORAGE_KEY } from "@/lib/auth";
 import { AuthFormData } from "@/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -83,6 +83,26 @@ export const useAuth = () => {
     }
   };
 
+  const handleForgotPassword = async (email: string) => {
+    setLoading(true);
+    setAuthError(null);
+
+    try {
+      console.log("Password reset requested for email:", email);
+      const { error } = await resetPassword(email);
+      
+      if (error) throw error;
+      
+      setConfirmationSent(true);
+      toast.success("Password reset link sent! Please check your inbox.");
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      setAuthError(error.message || "Password reset failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Check if user is already logged in
   useEffect(() => {
     const checkAuthSession = async () => {
@@ -147,6 +167,7 @@ export const useAuth = () => {
     handleChange,
     handleSignUp,
     handleSignIn,
+    handleForgotPassword,
     setAuthError
   };
 };
