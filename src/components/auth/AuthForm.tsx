@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 import ConfirmationSent from "./ConfirmationSent";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
@@ -21,7 +22,9 @@ const AuthForm = () => {
     authError,
     checkingSession,
     confirmationSent,
+    forgotPasswordMode,
     setConfirmationSent,
+    toggleForgotPassword,
     handleChange,
     handleSignUp,
     handleSignIn,
@@ -66,11 +69,24 @@ const AuthForm = () => {
     );
   }
 
+  // Show confirmation sent screen only when explicitly set
   if (confirmationSent) {
     return (
       <ConfirmationSent 
         email={formData.email}
         onReturn={() => setConfirmationSent(false)}
+      />
+    );
+  }
+  
+  // Show forgot password form
+  if (forgotPasswordMode) {
+    return (
+      <ForgotPasswordForm 
+        loading={loading}
+        authError={authError}
+        onSubmit={(email) => handleForgotPassword(email)}
+        onCancel={() => toggleForgotPassword(false)}
       />
     );
   }
@@ -105,7 +121,7 @@ const AuthForm = () => {
                 onChange={handleChange}
                 onSubmit={handleSubmit}
                 onSwitchMode={() => handleModeChange("signup")}
-                onForgotPassword={handleForgotPassword}
+                onForgotPassword={() => toggleForgotPassword(true)}
               />
             </TabsContent>
             

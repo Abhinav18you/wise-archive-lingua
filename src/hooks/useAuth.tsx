@@ -13,6 +13,7 @@ export const useAuth = () => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
   
   const [formData, setFormData] = useState<AuthFormData>({
     email: "",
@@ -31,6 +32,23 @@ export const useAuth = () => {
 
     try {
       console.log("Signing up user with email:", formData.email);
+      
+      // First check if user already exists
+      const { data: existingUserData, error: checkError } = await supabase.auth.signInWithOtp({
+        email: formData.email,
+        options: {
+          shouldCreateUser: false // Just check if user exists, don't create OTP
+        }
+      });
+      
+      // If no error from OTP check, user likely exists
+      if (!checkError && existingUserData) {
+        setAuthError("An account with this email already exists. Please sign in instead.");
+        setLoading(false);
+        return;
+      }
+      
+      // Proceed with sign up if user doesn't exist
       const { error } = await signUpWithEmail(
         formData.email,
         formData.password,
@@ -43,7 +61,13 @@ export const useAuth = () => {
       toast.success("Verification email sent! Please check your inbox.");
     } catch (error: any) {
       console.error("Auth error:", error);
-      setAuthError(error.message || "Sign up failed. Please try again.");
+      
+      // Handle specific error cases
+      if (error.message?.includes("already") || error.message?.includes("exists")) {
+        setAuthError("An account with this email already exists. Please sign in instead.");
+      } else {
+        setAuthError(error.message || "Sign up failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -76,8 +100,17 @@ export const useAuth = () => {
       navigate("/dashboard", { replace: true });
     } catch (error: any) {
       console.error("Auth error:", error);
-      setAuthError(error.message || "Sign in failed. Please try again.");
-      setIsAuthenticated(false);
+      
+      // Handle specific cases for better UX
+      if (error.message?.includes("Invalid login")) {
+        setAuthError("Invalid email or password. Please try again.");
+      } else if (error.message?.includes("Email not confirmed")) {
+        // If email not confirmed, show confirmation screen
+        setConfirmationSent(true);
+        setAuthError("Please verify your email before signing in.");
+      } else {
+        setAuthError(error.message || "Sign in failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -93,7 +126,7 @@ export const useAuth = () => {
       
       if (error) throw error;
       
-      setConfirmationSent(true);
+      setForgotPasswordMode(false);
       toast.success("Password reset link sent! Please check your inbox.");
     } catch (error: any) {
       console.error("Password reset error:", error);
@@ -101,6 +134,11 @@ export const useAuth = () => {
     } finally {
       setLoading(false);
     }
+  };
+  
+  const toggleForgotPassword = (value: boolean) => {
+    setForgotPasswordMode(value);
+    setAuthError(null);
   };
 
   // Check if user is already logged in
@@ -162,8 +200,10 @@ export const useAuth = () => {
     checkingSession,
     confirmationSent,
     isAuthenticated,
+    forgotPasswordMode,
     setIsAuthenticated,
     setConfirmationSent,
+    toggleForgotPassword,
     handleChange,
     handleSignUp,
     handleSignIn,

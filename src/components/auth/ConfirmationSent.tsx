@@ -2,9 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { InfoIcon, RefreshCwIcon, AlertTriangleIcon, LinkIcon, ClipboardCopyIcon } from "lucide-react";
+import { InfoIcon, RefreshCwIcon, AlertTriangleIcon, LinkIcon, ClipboardCopyIcon, ArrowLeftIcon } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ConfirmationSentProps {
   email: string;
@@ -16,6 +17,7 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
   const currentOrigin = window.location.origin;
   const callbackUrl = `${currentOrigin}/auth/callback`;
   const [copied, setCopied] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(callbackUrl);
@@ -23,11 +25,49 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
     toast.success("Callback URL copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
+  
+  const resendVerificationEmail = async () => {
+    if (!email) {
+      toast.error("Email address is missing. Please go back and try again.");
+      return;
+    }
+    
+    setResending(true);
+    
+    try {
+      // Use OTP as a way to resend verification
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: callbackUrl,
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast.success("Verification email resent successfully!");
+    } catch (error: any) {
+      console.error("Error resending verification:", error);
+      toast.error(error.message || "Failed to resend verification email");
+    } finally {
+      setResending(false);
+    }
+  };
 
   return (
     <Card className="w-full max-w-md glassmorphism animate-scale-in">
       <CardHeader>
-        <CardTitle className="text-2xl font-semibold text-center">Email Verification Sent</CardTitle>
+        <div className="flex items-center gap-2 mb-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onReturn} 
+            className="h-8 w-8 p-0"
+          >
+            <ArrowLeftIcon className="h-4 w-4" />
+          </Button>
+          <CardTitle className="text-2xl font-semibold">Email Verification</CardTitle>
+        </div>
         <CardDescription className="text-center pt-2">
           Please check your email to confirm your account
         </CardDescription>
@@ -77,32 +117,34 @@ const ConfirmationSent = ({ email, onReturn }: ConfirmationSentProps) => {
                   }
                 </Button>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Go to Supabase Dashboard → Authentication → URL Configuration → Add the URL above to the "Redirect URLs" section.
-              </p>
             </div>
           </div>
         </div>
-        
-        <div className="text-center mt-4">
-          <Button variant="outline" onClick={onReturn}>
-            Return to Login
-          </Button>
-        </div>
       </CardContent>
-      <CardFooter className="flex flex-col gap-2">
-        <p className="text-sm text-muted-foreground">
-          Didn't receive the email? Check your spam folder.
-        </p>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="gap-2" 
-          onClick={() => window.location.reload()}
-        >
-          <RefreshCwIcon className="h-4 w-4" />
-          <span>Refresh the page</span>
-        </Button>
+      <CardFooter className="flex flex-col gap-4 border-t pt-4">
+        <div className="flex flex-col w-full gap-2">
+          <p className="text-sm text-center text-muted-foreground">
+            Didn't receive the email?
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button 
+              variant="outline" 
+              onClick={onReturn}
+              className="flex-1"
+            >
+              Return to Login
+            </Button>
+            <Button 
+              variant="default" 
+              onClick={resendVerificationEmail}
+              disabled={resending}
+              className="flex-1 gap-2"
+            >
+              {resending ? "Sending..." : "Resend Email"}
+              {!resending && <RefreshCwIcon className="h-4 w-4" />}
+            </Button>
+          </div>
+        </div>
       </CardFooter>
     </Card>
   );

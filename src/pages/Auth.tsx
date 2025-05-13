@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/lib/toast";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const Auth = () => {
         
         if (data.session) {
           console.log("User already has session in Supabase, redirecting to dashboard");
+          toast.success("Already signed in!");
           navigate("/dashboard", { replace: true });
           return;
         }
@@ -47,6 +49,7 @@ const Auth = () => {
         
         if (session) {
           console.log("User already has session, redirecting to dashboard");
+          toast.success("Already signed in!");
           navigate("/dashboard", { replace: true });
         } else {
           setIsLoading(false);
@@ -65,6 +68,7 @@ const Auth = () => {
       console.log("Auth state changed in Auth page:", event);
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in, redirecting to dashboard");
+        toast.success("Signed in successfully!");
         navigate("/dashboard", { replace: true });
       }
     });
