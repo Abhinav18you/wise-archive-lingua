@@ -80,13 +80,21 @@ const ContentCollections = ({ onCollectionSelect }: ContentCollectionsProps) => 
     }
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('User not authenticated');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('collections')
         .insert([{
           name: newCollection.name,
           description: newCollection.description,
           color: newCollection.color,
-          is_public: newCollection.is_public
+          is_public: newCollection.is_public,
+          user_id: user.id
         }])
         .select()
         .single();

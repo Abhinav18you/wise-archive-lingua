@@ -15,19 +15,29 @@ class AIProcessorService {
     console.log('Processing content with AI:', { contentId, type });
     
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       // Create processing queue entry
       await supabase.from('ai_processing_queue').insert({
         content_id: contentId,
+        user_id: user.id,
         processing_type: 'auto_analyze',
         status: 'processing'
       });
 
+      // Get auth session for API calls
+      const { data: { session } } = await supabase.auth.getSession();
+      
       // Call Llama API for content analysis
       const response = await fetch(`https://lopilymjfynocjddhiig.supabase.co/functions/v1/llama-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.auth.session()?.access_token}`
+          'Authorization': `Bearer ${session?.access_token}`
         },
         body: JSON.stringify({
           message: `Analyze this ${type} content and provide:
@@ -77,7 +87,7 @@ Content: ${content.substring(0, 2000)}`,
       await supabase.from('ai_processing_queue')
         .update({
           status: 'completed',
-          result: aiResult
+          result: aiResult as any
         })
         .eq('content_id', contentId);
 
@@ -85,13 +95,18 @@ Content: ${content.substring(0, 2000)}`,
     } catch (error) {
       console.error('AI processing error:', error);
       
-      // Update processing queue with error
-      await supabase.from('ai_processing_queue')
-        .update({
-          status: 'failed',
-          error_message: error instanceof Error ? error.message : 'Unknown error'
-        })
-        .eq('content_id', contentId);
+      // Get user for error logging
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Update processing queue with error
+        await supabase.from('ai_processing_queue')
+          .update({
+            status: 'failed',
+            error_message: error instanceof Error ? error.message : 'Unknown error'
+          })
+          .eq('content_id', contentId);
+      }
 
       // Return basic fallback analysis
       return this.fallbackAnalysis(content, type);
@@ -126,8 +141,8 @@ Content: ${content.substring(0, 2000)}`,
 
   private fallbackAnalysis(content: string, type: string): AIProcessingResult {
     // Basic keyword extraction
-    const words = content.toLowerCase().match(/\b\w+\b/g) || [];
-    const wordFreq = words.reduce((acc, word) => {
+    const words: string[] = content.toLowerCase().match(/\b\w+\b/g) || [];
+    const wordFreq: Record<string, number> = words.reduce((acc, word) => {
       if (word.length > 3) acc[word] = (acc[word] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -148,11 +163,13 @@ Content: ${content.substring(0, 2000)}`,
 
   async generateSmartTags(content: string): Promise<string[]> {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const response = await fetch(`https://lopilymjfynocjddhiig.supabase.co/functions/v1/llama-chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.auth.session()?.access_token}`
+          'Authorization': `Bearer ${session?.access_token}`
         },
         body: JSON.stringify({
           message: `Generate 5-7 relevant tags for this content: ${content.substring(0, 500)}`,
