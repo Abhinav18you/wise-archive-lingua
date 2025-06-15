@@ -127,7 +127,7 @@ export const useAuth = () => {
       if (error) throw error;
       
       setForgotPasswordMode(false);
-      toast.success("Password reset link sent! Please check your inbox.");
+      toast.success("Password reset link sent! Please check your inbox and follow the instructions to reset your password.");
     } catch (error: any) {
       console.error("Password reset error:", error);
       setAuthError(error.message || "Password reset failed. Please try again.");

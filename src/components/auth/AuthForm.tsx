@@ -10,7 +10,6 @@ import ConfirmationSent from "./ConfirmationSent";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/lib/toast";
 
 const AuthForm = () => {
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
