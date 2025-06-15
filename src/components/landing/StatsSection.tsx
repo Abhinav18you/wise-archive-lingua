@@ -3,59 +3,64 @@ import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
 
 export const StatsSection = () => {
   return (
-    <section className="w-full py-12 bg-primary/5 relative overflow-hidden">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-dots bg-[size:20px_20px] opacity-20"></div>
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/50"></div>
-      
-      <div className="container max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 px-4 relative z-10">
-        <StatsCard 
-          value="2x" 
-          label="Faster Information Retrieval" 
-          icon={<Clock className="h-5 w-5 text-primary" />} 
-          delay={0.1}
-        />
-        <StatsCard 
-          value="95%" 
-          label="Search Accuracy" 
-          icon={<CheckCircle className="h-5 w-5 text-primary" />} 
-          delay={0.2}
-        />
-        <StatsCard 
-          value="10k+" 
-          label="Active Users" 
-          icon={<Users className="h-5 w-5 text-primary" />} 
-          delay={0.3}
-        />
-        <StatsCard 
-          value="4.8" 
-          label="Average Rating" 
-          icon={<TrendingUp className="h-5 w-5 text-primary" />} 
-          delay={0.4}
-        />
+    <section className="w-full py-20 bg-white border-t border-gray-100">
+      <div className="container max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <ModernStatsCard 
+            value="2x" 
+            label="Faster Retrieval" 
+            icon={<Clock className="h-6 w-6" />} 
+            delay={0.1}
+          />
+          <ModernStatsCard 
+            value="95%" 
+            label="Search Accuracy" 
+            icon={<CheckCircle className="h-6 w-6" />} 
+            delay={0.2}
+          />
+          <ModernStatsCard 
+            value="10k+" 
+            label="Active Users" 
+            icon={<Users className="h-6 w-6" />} 
+            delay={0.3}
+          />
+          <ModernStatsCard 
+            value="4.8★" 
+            label="User Rating" 
+            icon={<TrendingUp className="h-6 w-6" />} 
+            delay={0.4}
+          />
+        </div>
       </div>
     </section>
   );
 };
 
-interface StatsCardProps {
+interface ModernStatsCardProps {
   value: string;
   label: string;
   icon: React.ReactNode;
   delay: number;
 }
 
-const StatsCard = ({ value, label, icon, delay }: StatsCardProps) => {
+const ModernStatsCard = ({ value, label, icon, delay }: ModernStatsCardProps) => {
   return (
     <div 
-      className="flex flex-col items-center text-center p-4 transition-all duration-500 hover:transform hover:scale-105 opacity-0 translate-y-4"
-      style={{ animation: `fade-in 0.5s ease-out forwards ${delay}s` }}
+      className="text-center group opacity-0"
+      style={{ 
+        animation: `fade-in 0.6s ease-out forwards`,
+        animationDelay: `${delay}s`
+      }}
     >
-      <div className="bg-white rounded-full p-2 shadow-soft mb-3">
-        {icon}
+      <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+        <div className="text-primary">
+          {icon}
+        </div>
       </div>
-      <div className="text-4xl font-bold text-primary mb-2 animated-gradient-text">{value}</div>
-      <div className="text-sm text-muted-foreground">{label}</div>
+      <div className="text-4xl font-bold text-gray-900 mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        {value}
+      </div>
+      <div className="text-sm text-gray-600 font-medium">{label}</div>
     </div>
   );
 };

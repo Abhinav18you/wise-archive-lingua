@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import HeroSection from "@/components/landing/HeroSection";
 import StatsSection from "@/components/landing/StatsSection";
@@ -12,7 +13,6 @@ const Index = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Initialize intersection observer for scroll animations
     const observerOptions = { 
       threshold: 0.15,
       rootMargin: '0px 0px -10% 0px'
@@ -28,7 +28,6 @@ const Index = () => {
       });
     }, observerOptions);
     
-    // Observe all sections with the data-animate attribute
     document.querySelectorAll('[data-animate]').forEach(section => {
       section.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-1000');
       observer.observe(section);
@@ -41,191 +40,268 @@ const Index = () => {
 
   return (
     <div className="flex flex-col items-center overflow-hidden">
-      {/* Hero Section */}
       <HeroSection />
-      
-      {/* Stats Section */}
       <StatsSection />
       
-      {/* Content Types Section with enhanced animations */}
-      <section className="w-full py-24 bg-gradient-to-t from-background to-muted/30" data-animate>
-        <div className="container max-w-6xl mx-auto px-4">
+      {/* Modern Content Types Section */}
+      <section className="w-full py-32 bg-gradient-to-b from-white to-gray-50/50" data-animate>
+        <div className="container max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
-            <div className="inline-block bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium mb-6 shadow-soft border border-primary/10">
+            <div className="inline-flex items-center gap-2 bg-primary/5 border border-primary/10 text-primary rounded-full px-6 py-3 text-sm font-medium mb-8">
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
               Save Anything
             </div>
-            <h2 className="text-4xl font-bold tracking-tight">
-              Multiple content types for <span className="text-gradient bg-gradient-to-r from-primary to-accent">all your needs</span>
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+              One place for 
+              <span className="block bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+                everything you save
+              </span>
             </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              From web articles to personal notes, organize all your digital content with AI-powered intelligence
+            </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <ContentTypeCard 
-              icon={<LinkIcon className="h-8 w-8 text-primary" />} 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ModernContentCard 
+              icon={<LinkIcon className="h-7 w-7" />} 
               title="Links" 
-              description="Save web articles and resources with automatic previews"
-              bgClass="bg-primary/10"
+              description="Web articles with smart previews"
+              gradient="from-blue-500 to-cyan-500"
               delay={0.1}
             />
             
-            <ContentTypeCard 
-              icon={<FileText className="h-8 w-8 text-accent" />} 
+            <ModernContentCard 
+              icon={<FileText className="h-7 w-7" />} 
               title="Notes" 
-              description="Create rich text notes with formatting and embedded content"
-              bgClass="bg-accent/10"
+              description="Rich text with embedded content"
+              gradient="from-purple-500 to-pink-500"
               delay={0.2}
             />
             
-            <ContentTypeCard 
-              icon={<Image className="h-8 w-8 text-primary" />} 
+            <ModernContentCard 
+              icon={<Image className="h-7 w-7" />} 
               title="Images" 
-              description="Store and categorize images with AI-powered recognition"
-              bgClass="bg-primary/10"
+              description="Visual content with AI recognition"
+              gradient="from-emerald-500 to-teal-500"
               delay={0.3}
             />
             
-            <ContentTypeCard 
-              icon={<Database className="h-8 w-8 text-accent" />} 
+            <ModernContentCard 
+              icon={<Database className="h-7 w-7" />} 
               title="Files" 
-              description="Upload and manage documents, PDFs and more"
-              bgClass="bg-accent/10"
+              description="Documents and PDFs organized"
+              gradient="from-orange-500 to-red-500"
               delay={0.4}
             />
           </div>
         </div>
       </section>
       
-      {/* Features Section */}
       <FeaturesSection />
       
-      {/* How It Works Section - Visual Update */}
-      <section className="w-full py-24 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden" data-animate>
-        <div className="absolute inset-0 bg-dots bg-[size:20px_20px] opacity-10"></div>
-        
-        <div className="container max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1">
-              <div className="inline-block bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium mb-6 shadow-soft border border-primary/10">
+      {/* Modern How It Works Section */}
+      <section className="w-full py-32 bg-white relative" data-animate>
+        <div className="container max-w-7xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-accent/5 border border-accent/10 text-accent rounded-full px-6 py-3 text-sm font-medium mb-8">
+                <Clock className="h-4 w-4" />
                 How It Works
               </div>
-              <h2 className="text-4xl font-bold tracking-tight mb-6">
-                Save now, find later with <span className="text-gradient bg-gradient-to-r from-primary to-accent">AI-powered search</span>
+              <h2 className="text-5xl font-bold tracking-tight mb-6">
+                Search like you
+                <span className="block bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+                  think and speak
+                </span>
               </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                Memoria uses advanced AI to understand the content you save and match it with your natural language searches, so you can find exactly what you're looking for without remembering exact keywords.
+              <p className="text-xl text-gray-600 mb-10 leading-relaxed">
+                Stop struggling with keywords. Our AI understands context and finds exactly what you're looking for using natural language.
               </p>
-              <div className="space-y-4 mb-8">
-                <FeatureItem text="Natural language processing understands your intent" />
-                <FeatureItem text="Contextual search across all your content types" />
-                <FeatureItem text="Automatic tagging and organization" />
-                <FeatureItem text="AI Chat assistance to help manage and explore your content" />
+              
+              <div className="space-y-6 mb-10">
+                <FeaturePoint 
+                  text="AI understands your search intent naturally" 
+                  delay={0.1}
+                />
+                <FeaturePoint 
+                  text="Contextual search across all content types" 
+                  delay={0.2}
+                />
+                <FeaturePoint 
+                  text="Smart auto-tagging and organization" 
+                  delay={0.3}
+                />
+                <FeaturePoint 
+                  text="Chat with your content collection" 
+                  delay={0.4}
+                />
               </div>
-              <Button onClick={() => navigate("/auth")} className="gap-2 rounded-full fancy-button bg-gradient-to-r from-primary to-primary/90 hover:scale-105 transition-all duration-300">
-                Try It Now
-                <ChevronRight className="h-4 w-4" />
+              
+              <Button 
+                onClick={() => navigate("/auth")} 
+                size="lg"
+                className="group bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105 rounded-full px-8 py-6 text-lg"
+              >
+                Experience the Magic
+                <ChevronRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
             </div>
-            <div className="order-1 md:order-2">
-              <div className="glassmorphism p-8 rounded-xl relative overflow-hidden shadow-lg transform transition-all duration-700 hover-3d">
-                <div className="absolute h-40 w-40 bg-primary/20 rounded-full blur-3xl -right-10 -top-10 animate-pulse" style={{ animationDuration: '8s' }}></div>
-                <div className="absolute h-40 w-40 bg-accent/20 rounded-full blur-3xl -left-10 -bottom-10 animate-pulse" style={{ animationDuration: '10s', animationDelay: '1s' }}></div>
-                <div className="relative">
-                  <div className="absolute -top-6 -left-6 bg-primary text-primary-foreground p-4 rounded-2xl shadow-lg animate-float" style={{ animationDuration: '5s' }}>
-                    <Clock className="h-7 w-7" />
-                  </div>
-                  <div className="bg-background/80 backdrop-blur-sm rounded-xl p-6 shadow-sm">
-                    <div className="text-xl font-semibold mb-4">Natural Language Search</div>
-                    <p className="text-muted-foreground mb-6">Type searches the way you think:</p>
-                    <div className="space-y-4 text-sm">
-                      <SearchExample text="That article about AI ethics I saved" delay={0} />
-                      <SearchExample text="Photos from my trip to Japan" delay={0.2} />
-                      <SearchExample text="Research papers I saved last month" delay={0.4} />
+            
+            <div className="relative">
+              <div className="bg-gradient-to-br from-gray-50 to-white rounded-3xl p-8 shadow-2xl shadow-gray-900/10 border border-gray-100">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div className="flex-1 bg-gray-100 rounded-lg h-8 flex items-center px-4">
+                      <div className="text-sm text-gray-500">Natural Language Search</div>
                     </div>
                   </div>
+                  
+                  <SearchDemoItem 
+                    text="Show me that article about AI ethics I saved last week" 
+                    delay={0.5}
+                  />
+                  <SearchDemoItem 
+                    text="Find photos from my Japan trip" 
+                    delay={0.7}
+                  />
+                  <SearchDemoItem 
+                    text="Research papers about machine learning" 
+                    delay={0.9}
+                  />
                 </div>
+              </div>
+              
+              {/* Floating elements */}
+              <div className="absolute -top-6 -right-6 w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg animate-float">
+                <Database className="h-6 w-6 text-white" />
+              </div>
+              <div className="absolute -bottom-6 -left-6 w-12 h-12 bg-gradient-to-br from-accent to-pink-500 rounded-2xl flex items-center justify-center shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+                <FileText className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
         </div>
       </section>
       
-      {/* Testimonials Section */}
       <TestimonialsSection />
       
-      {/* Learn More Section */}
-      <section className="w-full py-24 bg-white" data-animate>
-        <div className="container max-w-6xl mx-auto px-4">
+      {/* Modern Resources Section */}
+      <section className="w-full py-32 bg-gradient-to-b from-gray-50 to-white" data-animate>
+        <div className="container max-w-7xl mx-auto px-6">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold tracking-tight mb-4">
+              Learn more about Memoria
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Explore our resources to get the most out of your content management experience
+            </p>
+          </div>
+          
           <div className="grid md:grid-cols-3 gap-8">
-            <ResourceCard 
-              icon={<BookOpen className="h-10 w-10 text-primary" />}
-              title="Comprehensive Guides"
-              description="Explore our detailed documentation and tutorials to get the most out of Memoria."
-              buttonText="View Documentation"
+            <ModernResourceCard 
+              icon={<BookOpen className="h-8 w-8" />}
+              title="Documentation"
+              description="Comprehensive guides and tutorials to master Memoria's features"
+              buttonText="Read Docs"
               delay={0.1}
             />
             
-            <ResourceCard 
-              icon={<TrendingUp className="h-10 w-10 text-accent" />}
-              title="Latest Updates"
-              description="Stay informed about the newest features and improvements to enhance your experience."
-              buttonText="Read Changelog"
+            <ModernResourceCard 
+              icon={<TrendingUp className="h-8 w-8" />}
+              title="What's New"
+              description="Latest features and improvements to enhance your workflow"
+              buttonText="View Updates"
               delay={0.3}
             />
             
-            <ResourceCard 
-              icon={<Users className="h-10 w-10 text-primary" />}
+            <ModernResourceCard 
+              icon={<Users className="h-8 w-8" />}
               title="Community"
-              description="Join our community of users to share tips, ask questions, and connect with others."
-              buttonText="Join Community"
+              description="Connect with other users and share tips and best practices"
+              buttonText="Join Us"
               delay={0.5}
             />
           </div>
         </div>
       </section>
       
-      {/* CTA Section */}
       <CtaSection />
     </div>
   );
 };
 
-// Helper components
-const FeatureItem = ({ text }: { text: string }) => (
-  <div className="flex items-start gap-3 transition-all duration-500 hover:translate-x-2">
-    <div className="bg-primary/10 p-1 rounded-full">
-      <div className="h-5 w-5 text-primary flex items-center justify-center">✓</div>
-    </div>
-    <p>{text}</p>
-  </div>
-);
-
-interface ContentTypeCardProps {
+// Modern Content Card Component
+interface ModernContentCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
-  bgClass: string;
+  gradient: string;
   delay: number;
 }
 
-const ContentTypeCard = ({ icon, title, description, bgClass, delay }: ContentTypeCardProps) => (
+const ModernContentCard = ({ icon, title, description, gradient, delay }: ModernContentCardProps) => (
   <div 
-    className="bg-white rounded-2xl p-8 text-center shadow-soft hover-3d transition-all duration-500 opacity-0"
+    className="group relative bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-900/10 transition-all duration-500 hover:-translate-y-2 opacity-0"
     style={{ 
-      animation: `fade-in 0.5s ease-out forwards, scale-in 0.5s ease-out forwards`,
+      animation: `fade-in 0.6s ease-out forwards`,
       animationDelay: `${delay}s`
     }}
   >
-    <div className={`${bgClass} p-5 rounded-2xl w-fit mx-auto mb-6 animate-pulse group-hover:scale-110 transition-all duration-300`} 
-      style={{ animationDuration: `${3 + delay}s` }}
-    >
-      {icon}
+    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${gradient} mb-6 group-hover:scale-110 transition-transform duration-300`}>
+      <div className="text-white">
+        {icon}
+      </div>
     </div>
-    <h3 className="text-xl font-medium">{title}</h3>
-    <p className="text-sm text-muted-foreground mt-2">{description}</p>
+    <h3 className="text-xl font-semibold mb-3 text-gray-900">{title}</h3>
+    <p className="text-gray-600 leading-relaxed">{description}</p>
   </div>
 );
 
-interface ResourceCardProps {
+// Feature Point Component
+interface FeaturePointProps {
+  text: string;
+  delay: number;
+}
+
+const FeaturePoint = ({ text, delay }: FeaturePointProps) => (
+  <div 
+    className="flex items-center gap-4 opacity-0"
+    style={{ 
+      animation: `fade-in 0.5s ease-out forwards`,
+      animationDelay: `${delay}s`
+    }}
+  >
+    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
+      <div className="text-white text-sm">✓</div>
+    </div>
+    <p className="text-gray-700">{text}</p>
+  </div>
+);
+
+// Search Demo Item Component
+interface SearchDemoItemProps {
+  text: string;
+  delay: number;
+}
+
+const SearchDemoItem = ({ text, delay }: SearchDemoItemProps) => (
+  <div 
+    className="bg-gray-50 rounded-xl p-4 border border-gray-100 hover:bg-gray-100 transition-colors duration-300 opacity-0"
+    style={{ 
+      animation: `fade-in 0.5s ease-out forwards`,
+      animationDelay: `${delay}s`
+    }}
+  >
+    <div className="text-gray-700">{text}</div>
+  </div>
+);
+
+// Modern Resource Card Component
+interface ModernResourceCardProps {
   icon: React.ReactNode;
   title: string;
   description: string;
@@ -233,38 +309,23 @@ interface ResourceCardProps {
   delay: number;
 }
 
-const ResourceCard = ({ icon, title, description, buttonText, delay }: ResourceCardProps) => (
+const ModernResourceCard = ({ icon, title, description, buttonText, delay }: ModernResourceCardProps) => (
   <div 
-    className="p-6 rounded-xl border border-primary/10 shadow-soft hover-3d opacity-0"
+    className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 opacity-0"
     style={{ 
-      animation: `fade-in 0.5s ease-out forwards, slide-up 0.5s ease-out forwards`,
+      animation: `fade-in 0.6s ease-out forwards`,
       animationDelay: `${delay}s`
     }}
   >
-    {icon}
-    <h3 className="text-xl font-semibold mb-3 mt-4">{title}</h3>
-    <p className="text-muted-foreground mb-4">{description}</p>
-    <Button variant="outline" className="gap-2 group">
+    <div className="text-primary mb-6">
+      {icon}
+    </div>
+    <h3 className="text-xl font-semibold mb-4 text-gray-900">{title}</h3>
+    <p className="text-gray-600 mb-6 leading-relaxed">{description}</p>
+    <Button variant="outline" className="group border-gray-200 hover:border-primary hover:bg-primary hover:text-white transition-all duration-300">
       {buttonText}
-      <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+      <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
     </Button>
-  </div>
-);
-
-interface SearchExampleProps {
-  text: string;
-  delay: number;
-}
-
-const SearchExample = ({ text, delay }: SearchExampleProps) => (
-  <div 
-    className="bg-accent/10 p-3 rounded-lg transform transition-all duration-500 hover:-translate-y-1 hover:shadow-md opacity-0"
-    style={{ 
-      animation: `fade-in 0.5s ease-out forwards, slide-up 0.5s ease-out forwards`,
-      animationDelay: `${delay}s`
-    }}
-  >
-    {text}
   </div>
 );
 
