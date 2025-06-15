@@ -43,29 +43,31 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'liga' 1, 'calt' 1, 'kern' 1;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading tracking-tight;
+    text-rendering: optimizeLegibility;
   }
 }
 
-/* Glass morphism - reduced blur */
+/* Removed glassmorphism - clean solid backgrounds */
 .glassmorphism {
-  @apply bg-white/90 shadow-glass border border-white/20;
-  backdrop-filter: blur(4px);
+  @apply bg-white shadow-lg border border-gray-200;
 }
 
 /* Custom card styles */
 .card-gradient {
-  @apply bg-gradient-to-br from-white to-secondary/50 shadow-soft;
+  @apply bg-gradient-to-br from-white to-secondary/50 shadow-lg;
 }
 
 .card-hover {
-  @apply transition-all duration-300 hover:shadow-glow hover:-translate-y-1;
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
 }
 
 /* Section styling */
@@ -215,9 +217,9 @@ html {
   animation: shine 1.8s infinite;
 }
 
-/* Enhanced card effects */
+/* Enhanced card effects - removed blur */
 .feature-card {
-  @apply bg-white/95 rounded-xl p-6 flex flex-col h-full transition-all duration-500 shadow-lg border border-gray-100;
+  @apply bg-white rounded-xl p-6 flex flex-col h-full transition-all duration-500 shadow-lg border border-gray-100;
 }
 
 .feature-card:hover {
@@ -253,40 +255,12 @@ html {
   left: 100%;
 }
 
-/* Fancy section separators */
-.wave-separator {
-  position: relative;
-  height: 150px;
-  overflow: hidden;
-}
-
-.wave-separator svg {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-
 /* Remove default App.css styling that conflicts with our design */
 #root {
   max-width: none;
   margin: 0;
   padding: 0;
   text-align: inherit;
-}
-
-/* Staggered animations for features */
-.feature-card:nth-child(1) {
-  animation-delay: 0.1s;
-}
-.feature-card:nth-child(2) {
-  animation-delay: 0.3s;
-}
-.feature-card:nth-child(3) {
-  animation-delay: 0.5s;
-}
-.feature-card:nth-child(4) {
-  animation-delay: 0.7s;
 }
 
 /* Enhanced text animations */
@@ -348,9 +322,9 @@ html {
   background: rgba(155, 135, 245, 0.5);
 }
 
-/* AI chat specific styles */
+/* AI chat specific styles - removed blur */
 .ai-chat-container {
-  @apply bg-gradient-to-br from-accent/5 to-primary/5 rounded-xl p-4 shadow-inner;
+  @apply bg-gradient-to-br from-accent/5 to-primary/5 rounded-xl p-4 shadow-lg;
 }
 
 .ai-message {
@@ -368,28 +342,6 @@ html {
   background: linear-gradient(white, white) padding-box,
               linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent))) border-box;
   border: 2px solid transparent;
-}
-
-/* Parallax effect */
-.parallax {
-  transform-style: preserve-3d;
-  transform: perspective(1000px);
-}
-
-.parallax > * {
-  transform: translateZ(0);
-}
-
-.parallax-layer-back {
-  transform: translateZ(-10px) scale(2);
-}
-
-.parallax-layer-base {
-  transform: translateZ(0);
-}
-
-.parallax-layer-front {
-  transform: translateZ(10px);
 }
 
 /* Enhanced card hover effects */
@@ -421,27 +373,6 @@ html {
   }
   100% {
     background-position: 0% 50%;
-  }
-}
-
-/* Morphing blob animations */
-.blob {
-  background: linear-gradient(120deg, hsl(var(--primary)), hsl(var(--accent)));
-  border-radius: 42% 58% 57% 43% / 43% 53% 47% 57%;
-  animation: morph 8s ease-in-out infinite;
-  transform-origin: center;
-  opacity: 0.7;
-}
-
-@keyframes morph {
-  0%, 100% {
-    border-radius: 42% 58% 57% 43% / 43% 53% 47% 57%;
-  }
-  34% {
-    border-radius: 70% 30% 39% 61% / 38% 62% 38% 62%;
-  }
-  67% {
-    border-radius: 35% 65% 73% 27% / 56% 35% 65% 44%;
   }
 }
 
@@ -485,33 +416,6 @@ html {
   transform: translateY(8px) translateX(8px);
 }
 
-/* Paper fold effect */
-.paper-fold {
-  position: relative;
-  overflow: hidden;
-}
-
-.paper-fold::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 25px;
-  height: 25px;
-  background: linear-gradient(135deg, transparent 50%, rgba(200, 200, 200, 0.2) 50%);
-  transform: translate(0, 0);
-  transition: all 0.3s ease;
-}
-
-.paper-fold:hover::before {
-  transform: translate(5px, 5px);
-}
-
-/* Font feature settings for better typography */
-body {
-  font-feature-settings: 'liga' 1, 'calt' 1, 'kern' 1;
-}
-
 /* Text highlight effect */
 .highlight-text {
   position: relative;
@@ -530,11 +434,4 @@ body {
   transform: skew(-12deg);
 }
 
-/* Blurred circle backgrounds */
-.blur-circle {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(20px);
-  z-index: -1;
-  opacity: 0.3;
-}
+/* Removed all blur circle backgrounds */

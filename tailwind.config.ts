@@ -118,10 +118,6 @@ export default {
 					from: { transform: 'scale(0.95)', opacity: '0' },
 					to: { transform: 'scale(1)', opacity: '1' }
 				},
-				'blur-in': {
-					from: { filter: 'blur(2px)', opacity: '0' },
-					to: { filter: 'blur(0)', opacity: '1' }
-				},
 				'pulse': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' }
@@ -179,7 +175,6 @@ export default {
 				'slide-left': 'slide-left 0.5s ease-out',
 				'slide-right': 'slide-right 0.5s ease-out',
 				'scale-in': 'scale-in 0.5s ease-out',
-				'blur-in': 'blur-in 0.4s ease-out',
 				'pulse': 'pulse 3s infinite',
 				'float': 'float 5s infinite ease-in-out',
 				'bounce': 'bounce 3s infinite ease-in-out',
@@ -204,7 +199,6 @@ export default {
 				'inner-sharp': 'inset 3px 3px 0 0 rgba(0, 0, 0, 0.1)'
 			},
 			backgroundImage: {
-				'glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1))',
 				'gradient-primary': 'linear-gradient(135deg, #7e69ab 0%, #9b87f5 100%)',
 				'gradient-secondary': 'linear-gradient(135deg, #6E59A5 0%, #D6BCFA 100%)',
 				'gradient-cool': 'linear-gradient(90deg, hsla(221, 45%, 73%, 1) 0%, hsla(220, 78%, 29%, 1) 100%)',
@@ -237,12 +231,6 @@ export default {
 				'md': '0 2px 4px rgba(0, 0, 0, 0.1)',
 				'lg': '0 8px 16px rgba(0, 0, 0, 0.1)',
 				'glow': '0 0 5px rgba(155, 135, 245, 0.5)'
-			},
-			backdropFilter: {
-				'none': 'none',
-				'sm': 'blur(2px)',
-				'md': 'blur(4px)',
-				'lg': 'blur(8px)'
 			}
 		}
 	},
