@@ -55,7 +55,7 @@ export const WelcomePopup = () => {
       }}
     >
       <DialogContent 
-        className="sm:max-w-md bg-white/95 backdrop-blur-sm border-primary/20 shadow-2xl relative overflow-hidden transition-all duration-500 animate-scale-in"
+        className="sm:max-w-md bg-white border-primary/20 shadow-2xl relative overflow-hidden transition-all duration-300 animate-scale-in"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
         
