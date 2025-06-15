@@ -119,7 +119,7 @@ export default {
 					to: { transform: 'scale(1)', opacity: '1' }
 				},
 				'blur-in': {
-					from: { filter: 'blur(5px)', opacity: '0' },
+					from: { filter: 'blur(2px)', opacity: '0' },
 					to: { filter: 'blur(0)', opacity: '1' }
 				},
 				'pulse': {
@@ -240,9 +240,9 @@ export default {
 			},
 			backdropFilter: {
 				'none': 'none',
-				'sm': 'blur(4px)',
-				'md': 'blur(8px)',
-				'lg': 'blur(16px)'
+				'sm': 'blur(2px)',
+				'md': 'blur(4px)',
+				'lg': 'blur(8px)'
 			}
 		}
 	},

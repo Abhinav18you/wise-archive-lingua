@@ -53,9 +53,10 @@
   }
 }
 
-/* Glass morphism */
+/* Glass morphism - reduced blur */
 .glassmorphism {
-  @apply bg-glass shadow-glass backdrop-blur-md border border-white/20;
+  @apply bg-white/90 shadow-glass border border-white/20;
+  backdrop-filter: blur(4px);
 }
 
 /* Custom card styles */
@@ -216,8 +217,7 @@ html {
 
 /* Enhanced card effects */
 .feature-card {
-  @apply glassmorphism rounded-xl p-6 flex flex-col h-full transition-all duration-500;
-  box-shadow: 0 10px 40px -15px rgba(0,0,0,0.1);
+  @apply bg-white/95 rounded-xl p-6 flex flex-col h-full transition-all duration-500 shadow-lg border border-gray-100;
 }
 
 .feature-card:hover {
@@ -534,7 +534,7 @@ body {
 .blur-circle {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(20px);
   z-index: -1;
-  opacity: 0.5;
+  opacity: 0.3;
 }
