@@ -1,297 +1,242 @@
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { 
-  Folder, 
-  Plus, 
-  Brain, 
-  Sparkles, 
-  Search,
-  Filter,
-  MoreVertical,
-  Share2,
-  Star,
-  Archive
-} from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useState, useEffect } from "react";
+import { Plus, FolderPlus, Palette, Share2, Lock, Unlock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/lib/toast";
 
 interface Collection {
   id: string;
   name: string;
   description: string;
-  itemCount: number;
-  tags: string[];
-  isAIGenerated: boolean;
-  lastUpdated: Date;
   color: string;
+  is_public: boolean;
+  is_ai_generated: boolean;
+  created_at: string;
+  item_count?: number;
 }
 
 interface ContentCollectionsProps {
-  onCollectionSelect: (collectionId: string) => void;
+  onCollectionSelect?: (collectionId: string) => void;
 }
 
-export const ContentCollections = ({ onCollectionSelect }: ContentCollectionsProps) => {
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [newCollectionName, setNewCollectionName] = useState('');
+const colors = [
+  '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', 
+  '#8B5A2B', '#EC4899', '#06B6D4', '#84CC16', '#F97316'
+];
 
-  // Mock collections data with AI-generated suggestions
+const ContentCollections = ({ onCollectionSelect }: ContentCollectionsProps) => {
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [newCollection, setNewCollection] = useState({
+    name: '',
+    description: '',
+    color: colors[0],
+    is_public: false
+  });
+
   useEffect(() => {
-    const mockCollections: Collection[] = [
-      {
-        id: '1',
-        name: 'AI & Machine Learning',
-        description: 'Articles and resources about artificial intelligence',
-        itemCount: 24,
-        tags: ['ai', 'machine-learning', 'technology'],
-        isAIGenerated: true,
-        lastUpdated: new Date(),
-        color: 'from-purple-500 to-pink-500'
-      },
-      {
-        id: '2',
-        name: 'Web Development',
-        description: 'Frontend and backend development resources',
-        itemCount: 18,
-        tags: ['javascript', 'react', 'node.js'],
-        isAIGenerated: false,
-        lastUpdated: new Date(Date.now() - 86400000),
-        color: 'from-blue-500 to-cyan-500'
-      },
-      {
-        id: '3',
-        name: 'Design Inspiration',
-        description: 'UI/UX design patterns and inspiration',
-        itemCount: 31,
-        tags: ['design', 'ui', 'ux', 'inspiration'],
-        isAIGenerated: true,
-        lastUpdated: new Date(Date.now() - 172800000),
-        color: 'from-emerald-500 to-teal-500'
-      },
-      {
-        id: '4',
-        name: 'Productivity Tools',
-        description: 'Apps and workflows for better productivity',
-        itemCount: 12,
-        tags: ['productivity', 'tools', 'workflow'],
-        isAIGenerated: true,
-        lastUpdated: new Date(Date.now() - 259200000),
-        color: 'from-orange-500 to-red-500'
-      }
-    ];
-    setCollections(mockCollections);
+    fetchCollections();
   }, []);
 
-  const createAICollection = async () => {
-    setIsCreating(true);
-    console.log("Creating AI-powered collection:", newCollectionName);
-    
+  const fetchCollections = async () => {
     try {
-      // Simulate AI analysis for collection creation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newCollection: Collection = {
-        id: Date.now().toString(),
-        name: newCollectionName,
-        description: `AI-curated collection for ${newCollectionName.toLowerCase()}`,
-        itemCount: 0,
-        tags: [newCollectionName.toLowerCase().replace(/\s+/g, '-')],
-        isAIGenerated: true,
-        lastUpdated: new Date(),
-        color: 'from-indigo-500 to-purple-500'
-      };
-      
-      setCollections(prev => [newCollection, ...prev]);
-      setNewCollectionName('');
+      const { data, error } = await supabase
+        .from('collections')
+        .select(`
+          *,
+          collection_items(count)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const collectionsWithCounts = data.map(collection => ({
+        ...collection,
+        item_count: collection.collection_items?.[0]?.count || 0
+      }));
+
+      setCollections(collectionsWithCounts);
     } catch (error) {
-      console.error('Error creating collection:', error);
+      console.error('Error fetching collections:', error);
+      toast.error('Failed to load collections');
     } finally {
-      setIsCreating(false);
+      setIsLoading(false);
     }
   };
 
-  const filteredCollections = collections.filter(collection =>
-    collection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    collection.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const createCollection = async () => {
+    if (!newCollection.name.trim()) {
+      toast.warning('Please enter a collection name');
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('collections')
+        .insert([{
+          name: newCollection.name,
+          description: newCollection.description,
+          color: newCollection.color,
+          is_public: newCollection.is_public
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setCollections([{ ...data, item_count: 0 }, ...collections]);
+      setNewCollection({ name: '', description: '', color: colors[0], is_public: false });
+      setIsCreateOpen(false);
+      toast.success('Collection created successfully');
+    } catch (error) {
+      console.error('Error creating collection:', error);
+      toast.error('Failed to create collection');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="h-32 bg-muted rounded-lg" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header with search and create */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Smart Collections</h2>
-          <p className="text-gray-600">AI-powered content organization</p>
+          <h2 className="text-2xl font-bold">Collections</h2>
+          <p className="text-muted-foreground">Organize your content into smart collections</p>
         </div>
-        
-        <div className="flex gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search collections..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600">
-                <Plus className="h-4 w-4 mr-2" />
-                Create
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-purple-500" />
-                  Create AI-Powered Collection
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
+        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+          <DialogTrigger asChild>
+            <Button className="gap-2">
+              <FolderPlus className="h-4 w-4" />
+              New Collection
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Collection</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="name">Collection Name</Label>
                 <Input
-                  placeholder="Collection name..."
-                  value={newCollectionName}
-                  onChange={(e) => setNewCollectionName(e.target.value)}
+                  id="name"
+                  value={newCollection.name}
+                  onChange={(e) => setNewCollection({ ...newCollection, name: e.target.value })}
+                  placeholder="Enter collection name..."
                 />
-                <Button 
-                  onClick={createAICollection}
-                  disabled={!newCollectionName.trim() || isCreating}
-                  className="w-full bg-gradient-to-r from-purple-500 to-blue-500"
-                >
-                  {isCreating ? (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2 animate-spin" />
-                      Creating with AI...
-                    </>
-                  ) : (
-                    <>
-                      <Brain className="h-4 w-4 mr-2" />
-                      Create Smart Collection
-                    </>
-                  )}
+              </div>
+              <div>
+                <Label htmlFor="description">Description (Optional)</Label>
+                <Textarea
+                  id="description"
+                  value={newCollection.description}
+                  onChange={(e) => setNewCollection({ ...newCollection, description: e.target.value })}
+                  placeholder="Describe this collection..."
+                />
+              </div>
+              <div>
+                <Label>Color</Label>
+                <div className="flex gap-2 mt-2">
+                  {colors.map((color) => (
+                    <button
+                      key={color}
+                      className={`w-8 h-8 rounded-full border-2 transition-all ${
+                        newCollection.color === color ? 'border-primary scale-110' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setNewCollection({ ...newCollection, color })}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="public"
+                  checked={newCollection.is_public}
+                  onCheckedChange={(checked) => setNewCollection({ ...newCollection, is_public: checked })}
+                />
+                <Label htmlFor="public">Make this collection public</Label>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Button onClick={createCollection} className="flex-1">
+                  Create Collection
+                </Button>
+                <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+                  Cancel
                 </Button>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {/* Collections Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCollections.map((collection) => (
-          <Card 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {collections.map((collection) => (
+          <Card
             key={collection.id}
-            className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer border-gray-200/50 bg-white/80 backdrop-blur-sm"
-            onClick={() => onCollectionSelect(collection.id)}
+            className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 border-l-4"
+            style={{ borderLeftColor: collection.color }}
+            onClick={() => onCollectionSelect?.(collection.id)}
           >
-            <CardHeader className="pb-4">
+            <CardHeader className="pb-2">
               <div className="flex items-start justify-between">
-                <div className={`p-3 rounded-xl bg-gradient-to-br ${collection.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  <Folder className="h-6 w-6 text-white" />
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {collection.isAIGenerated && (
-                    <Badge variant="secondary" className="bg-purple-100 text-purple-700 border-purple-200">
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      AI
-                    </Badge>
+                <div className="flex-1">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    {collection.name}
+                    {collection.is_ai_generated && (
+                      <Badge variant="secondary" className="text-xs">
+                        AI
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  {collection.description && (
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      {collection.description}
+                    </p>
                   )}
-                  
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Star className="h-4 w-4 mr-2" />
-                        Favorite
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Archive className="h-4 w-4 mr-2" />
-                        Archive
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
-              </div>
-              
-              <div>
-                <CardTitle className="text-lg mb-2 group-hover:text-purple-600 transition-colors">
-                  {collection.name}
-                </CardTitle>
-                <p className="text-sm text-gray-600 line-clamp-2">
-                  {collection.description}
-                </p>
+                <div className="flex items-center gap-1">
+                  {collection.is_public ? (
+                    <Unlock className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Lock className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </div>
               </div>
             </CardHeader>
-            
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">
-                  {collection.itemCount} items
-                </span>
-                <span className="text-gray-500">
-                  {collection.lastUpdated.toLocaleDateString()}
-                </span>
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                {collection.tags.map((tag) => (
-                  <Badge 
-                    key={tag} 
-                    variant="outline" 
-                    className="text-xs hover:bg-purple-50 border-gray-300"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
+            <CardContent>
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>{collection.item_count} items</span>
+                <span>{formatDate(collection.created_at)}</span>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {/* AI Suggestions */}
-      <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Sparkles className="h-5 w-5 text-purple-500" />
-            AI Collection Suggestions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 mb-4">
-            Based on your content, AI suggests creating these collections:
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {['Research Papers', 'Tutorial Videos', 'Design Resources', 'Code Snippets'].map((suggestion) => (
-              <Button 
-                key={suggestion}
-                variant="outline" 
-                size="sm"
-                className="hover:bg-purple-50 border-purple-200"
-              >
-                <Plus className="h-3 w-3 mr-2" />
-                {suggestion}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

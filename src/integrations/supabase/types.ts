@@ -9,6 +9,198 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_processing_queue: {
+        Row: {
+          content_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          processing_type: string
+          result: Json | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          processing_type: string
+          result?: Json | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          processing_type?: string
+          result?: Json | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_processing_queue_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "user_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_items: {
+        Row: {
+          added_at: string
+          collection_id: string
+          content_id: string
+          id: string
+        }
+        Insert: {
+          added_at?: string
+          collection_id: string
+          content_id: string
+          id?: string
+        }
+        Update: {
+          added_at?: string
+          collection_id?: string
+          content_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "user_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_ai_generated: boolean | null
+          is_public: boolean | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          is_public?: boolean | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          is_public?: boolean | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      content_analytics: {
+        Row: {
+          action_type: string
+          content_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          content_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          content_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_analytics_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "user_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_annotations: {
+        Row: {
+          annotation_text: string
+          annotation_type: string | null
+          content_id: string
+          created_at: string
+          id: string
+          position_data: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annotation_text: string
+          annotation_type?: string | null
+          content_id: string
+          created_at?: string
+          id?: string
+          position_data?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annotation_text?: string
+          annotation_type?: string | null
+          content_id?: string
+          created_at?: string
+          id?: string
+          position_data?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_annotations_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "user_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_content: {
         Row: {
           content: string
@@ -50,31 +242,55 @@ export type Database = {
       }
       user_materials: {
         Row: {
+          ai_keywords: string[] | null
+          ai_summary: string | null
           created_at: string
           data: string
           description: string
           id: string
+          is_archived: boolean | null
+          last_accessed_at: string | null
+          metadata: Json | null
+          priority_score: number | null
+          tags: string[] | null
           title: string
           type: string
           user_id: string | null
+          view_count: number | null
         }
         Insert: {
+          ai_keywords?: string[] | null
+          ai_summary?: string | null
           created_at?: string
           data: string
           description: string
           id?: string
+          is_archived?: boolean | null
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          priority_score?: number | null
+          tags?: string[] | null
           title: string
           type: string
           user_id?: string | null
+          view_count?: number | null
         }
         Update: {
+          ai_keywords?: string[] | null
+          ai_summary?: string | null
           created_at?: string
           data?: string
           description?: string
           id?: string
+          is_archived?: boolean | null
+          last_accessed_at?: string | null
+          metadata?: Json | null
+          priority_score?: number | null
+          tags?: string[] | null
           title?: string
           type?: string
           user_id?: string | null
+          view_count?: number | null
         }
         Relationships: []
       }
