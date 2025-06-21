@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Bot, User, Loader2, RefreshCw } from "lucide-react";
+import { Sparkles, Bot, User, Loader2, RefreshCw, Zap } from "lucide-react";
 import ChatInput from "@/components/chat/ChatInput";
 import ChatMessage, { ChatMessageType } from "@/components/chat/ChatMessage";
 import { supabase } from "@/integrations/supabase/client";
@@ -124,19 +124,36 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
   };
   
   return (
-    <div className="rounded-lg border bg-card shadow-sm overflow-hidden flex flex-col h-[70vh]">
-      <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Bot className="h-5 w-5" />
-          <h3 className="font-semibold">Llama 4 Maverick</h3>
+    <div className="rounded-xl border border-border/50 bg-gradient-to-br from-card/95 to-card/80 shadow-layered overflow-hidden flex flex-col h-[70vh] animate-scale-in hover:shadow-3d transition-all duration-500">
+      <div className="p-4 border-b border-border/50 bg-gradient-to-r from-muted/50 to-muted/30 flex items-center justify-between backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-accent/20 to-primary/20 border border-accent/20 animate-float">
+              <Bot className="h-5 w-5 text-accent" />
+            </div>
+            <div className="absolute -top-1 -right-1 p-0.5 rounded-full bg-primary animate-pulse">
+              <Zap className="h-2.5 w-2.5 text-primary-foreground" />
+            </div>
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">Llama 4 Maverick</h3>
+            <p className="text-xs text-muted-foreground">AI Assistant</p>
+          </div>
         </div>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Sparkles className="h-3 w-3" />
-          <span>Powered by OpenRouter API</span>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full border border-border/50">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span>Online</span>
+          </div>
+          <div className="w-px h-3 bg-border/50"></div>
+          <div className="flex items-center gap-1">
+            <Sparkles className="h-3 w-3 text-primary animate-spin-slow" />
+            <span>OpenRouter API</span>
+          </div>
         </div>
       </div>
       
-      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollBehavior: 'smooth' }}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-background/50 to-background/80" style={{ scrollBehavior: 'smooth' }}>
         {messages.map((message, index) => (
           <ChatMessage 
             key={index} 
@@ -145,22 +162,38 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
         ))}
         
         {isLoading && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/30 animate-pulse">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <p className="text-sm text-muted-foreground">Llama 4 is thinking...</p>
+          <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-muted/60 to-muted/40 border border-border/30 animate-pulse">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-accent/20 to-primary/20">
+              <Loader2 className="h-4 w-4 animate-spin text-accent" />
+            </div>
+            <div className="space-y-1">
+              <p className="font-medium text-sm text-foreground">Llama 4 is thinking...</p>
+              <div className="flex gap-1">
+                <div className="w-2 h-2 rounded-full bg-accent/60 animate-bounce"></div>
+                <div className="w-2 h-2 rounded-full bg-accent/60 animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-2 h-2 rounded-full bg-accent/60 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
+            </div>
           </div>
         )}
         
         {error && (
-          <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive space-y-2">
-            <p className="text-sm font-medium">Error: {error}</p>
+          <div className="p-4 rounded-xl bg-gradient-to-r from-destructive/10 to-destructive/5 border border-destructive/20 text-destructive space-y-3 animate-slide-up">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-full bg-destructive/20">
+                <RefreshCw className="h-3.5 w-3.5" />
+              </div>
+              <p className="text-sm font-medium">Connection Error</p>
+            </div>
+            <p className="text-sm opacity-90">{error}</p>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={handleRetry}
-              className="flex items-center gap-1"
+              className="flex items-center gap-2 hover:bg-destructive/10 hover:border-destructive/30 transition-all duration-200"
             >
-              <RefreshCw className="h-3 w-3" /> Try Again
+              <RefreshCw className="h-3.5 w-3.5" /> 
+              Try Again
             </Button>
           </div>
         )}
@@ -168,7 +201,7 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
         <div ref={messagesEndRef} />
       </div>
       
-      <div className="border-t p-4">
+      <div className="border-t border-border/50 p-4 bg-gradient-to-r from-muted/30 to-muted/20 backdrop-blur-sm">
         <ChatInput 
           onSend={handleSendMessage} 
           isLoading={isLoading} 
