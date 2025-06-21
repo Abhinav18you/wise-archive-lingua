@@ -15,7 +15,7 @@ interface ChatMessageProps {
   message: ChatMessageType;
 }
 
-// Meta logo as SVG component
+// Enhanced Meta logo as SVG component
 const MetaLogo = ({ className }: { className?: string }) => (
   <svg 
     viewBox="0 0 24 24" 
@@ -32,42 +32,42 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   return (
     <div
       className={cn(
-        "flex items-start gap-4 py-4 animate-slide-up opacity-0 message-animation",
+        "flex items-start gap-4 py-3 animate-slide-up opacity-0 message-animation group",
         isUser ? "flex-row-reverse" : ""
       )}
     >
       <Avatar className={cn(
-        "mt-1 transition-all duration-300 hover:scale-110 border-2 flex-shrink-0 w-10 h-10",
+        "mt-1 transition-all duration-300 group-hover:scale-110 border-2 flex-shrink-0 w-11 h-11 shadow-lg",
         isUser 
-          ? "border-primary/20 bg-primary/5 hover:border-primary/40" 
-          : "border-accent/20 bg-gradient-to-br from-blue-500/10 to-blue-600/10 hover:border-blue-500/40 hover:shadow-glow"
+          ? "border-primary/30 bg-gradient-to-br from-primary/10 to-primary/20 hover:border-primary/50 hover:shadow-primary/25" 
+          : "border-blue-500/30 bg-gradient-to-br from-blue-500/15 to-blue-600/15 hover:border-blue-500/50 hover:shadow-blue-500/25"
       )}>
         {isUser ? (
-          <AvatarFallback className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
-            <User className="h-4 w-4" />
+          <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/30 text-primary hover:from-primary/30 hover:to-primary/40 transition-all duration-300">
+            <User className="h-5 w-5" />
           </AvatarFallback>
         ) : (
-          <AvatarFallback className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 text-blue-600 hover:from-blue-500/30 hover:to-blue-600/30 transition-all duration-300 relative overflow-hidden">
+          <AvatarFallback className="bg-gradient-to-br from-blue-500/20 to-blue-600/25 text-blue-600 hover:from-blue-500/30 hover:to-blue-600/35 transition-all duration-300 relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-blue-600/10 animate-pulse"></div>
             <div className="relative flex items-center justify-center">
-              <MetaLogo className="h-5 w-5 text-blue-600" />
-              <Sparkles className="h-2 w-2 text-blue-500 absolute -top-0.5 -right-0.5 animate-pulse" />
+              <MetaLogo className="h-6 w-6 text-blue-600 drop-shadow-sm" />
+              <Sparkles className="h-2.5 w-2.5 text-blue-400 absolute -top-1 -right-1 animate-pulse" />
             </div>
           </AvatarFallback>
         )}
       </Avatar>
       <div
         className={cn(
-          "flex flex-col gap-2 rounded-xl px-4 py-3 max-w-[85%] sm:max-w-[75%] transition-all duration-300 hover:shadow-lg animate-scale-in",
+          "flex flex-col gap-2 rounded-2xl px-5 py-4 max-w-[85%] sm:max-w-[75%] transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-0.5 animate-scale-in shadow-lg",
           isUser
-            ? "bg-gradient-to-br from-primary to-primary/90 text-primary-foreground shadow-soft hover:shadow-glow hover:-translate-y-0.5"
-            : "bg-gradient-to-br from-muted/80 to-muted/60 hover:from-muted/90 hover:to-muted/70 border border-border/50 hover:border-accent/20 hover:-translate-y-0.5"
+            ? "bg-gradient-to-br from-primary/90 to-primary text-primary-foreground shadow-primary/20 hover:shadow-primary/30"
+            : "bg-gradient-to-br from-muted/95 to-muted/80 hover:from-muted to-muted/90 border border-border/40 hover:border-accent/30 shadow-muted/20"
         )}
       >
-        <div className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</div>
+        <div className="whitespace-pre-wrap text-sm leading-relaxed font-medium tracking-wide">{message.content}</div>
         {message.createdAt && (
           <div className={cn(
-            "text-xs opacity-60 mt-1 transition-opacity hover:opacity-80",
+            "text-xs opacity-60 mt-1 transition-opacity group-hover:opacity-80 font-medium",
             isUser ? "text-primary-foreground/70" : "text-muted-foreground"
           )}>
             {new Intl.DateTimeFormat('en-US', { 

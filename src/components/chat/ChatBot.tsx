@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Bot, User, Loader2, RefreshCw, Zap } from "lucide-react";
@@ -28,7 +27,6 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Smooth scroll to bottom function
@@ -131,89 +129,93 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
   };
   
   return (
-    <div className="flex flex-col h-[80vh] max-h-[800px] rounded-xl border border-border/50 bg-gradient-to-br from-card/95 to-card/80 shadow-layered overflow-hidden animate-scale-in hover:shadow-3d transition-all duration-500">
-      {/* Sticky Header */}
-      <div className="flex-shrink-0 p-4 border-b border-border/50 bg-gradient-to-r from-muted/50 to-muted/30 flex items-center justify-between backdrop-blur-sm sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-accent/20 to-primary/20 border border-accent/20 animate-float">
-              <Bot className="h-5 w-5 text-accent" />
+    <div className="flex flex-col h-[85vh] max-h-[900px] w-full max-w-4xl mx-auto rounded-2xl border border-border/30 bg-gradient-to-br from-card/98 to-card/95 shadow-2xl overflow-hidden backdrop-blur-sm">
+      {/* Fixed Header */}
+      <div className="flex-shrink-0 px-6 py-4 border-b border-border/40 bg-gradient-to-r from-background/95 to-muted/50 backdrop-blur-md">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="relative group">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300">
+                <Bot className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="absolute -top-1 -right-1 p-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse">
+                <Zap className="h-3 w-3 text-white" />
+              </div>
             </div>
-            <div className="absolute -top-1 -right-1 p-0.5 rounded-full bg-primary animate-pulse">
-              <Zap className="h-2.5 w-2.5 text-primary-foreground" />
+            <div>
+              <h3 className="text-xl font-bold text-foreground tracking-tight">Llama 4 Maverick</h3>
+              <p className="text-sm text-muted-foreground font-medium">AI Assistant by Meta</p>
             </div>
           </div>
-          <div>
-            <h3 className="font-semibold text-foreground">Llama 4 Maverick</h3>
-            <p className="text-xs text-muted-foreground">AI Assistant</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full border border-border/50">
-          <div className="flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span>Online</span>
-          </div>
-          <div className="w-px h-3 bg-border/50"></div>
-          <div className="flex items-center gap-1">
-            <Sparkles className="h-3 w-3 text-primary animate-spin-slow" />
-            <span>OpenRouter API</span>
+          <div className="flex items-center gap-3 text-sm bg-muted/60 px-4 py-2 rounded-full border border-border/50 backdrop-blur-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></div>
+              <span className="font-medium text-foreground">Online</span>
+            </div>
+            <div className="w-px h-4 bg-border/60"></div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-blue-500 animate-spin-slow" />
+              <span className="text-muted-foreground font-medium">OpenRouter</span>
+            </div>
           </div>
         </div>
       </div>
       
-      {/* Scrollable Messages Area */}
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <ChatMessage 
-              key={index} 
-              message={mapToChatMessageType(message, index)} 
-            />
-          ))}
-          
-          {isLoading && (
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-muted/60 to-muted/40 border border-border/30 animate-pulse">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-accent/20 to-primary/20">
-                <Loader2 className="h-4 w-4 animate-spin text-accent" />
-              </div>
-              <div className="space-y-1">
-                <p className="font-medium text-sm text-foreground">Llama 4 is thinking...</p>
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-accent/60 animate-bounce"></div>
-                  <div className="w-2 h-2 rounded-full bg-accent/60 animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 rounded-full bg-accent/60 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+      {/* Scrollable Messages Container */}
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full px-6 py-4">
+          <div className="space-y-6 pb-4">
+            {messages.map((message, index) => (
+              <ChatMessage 
+                key={index} 
+                message={mapToChatMessageType(message, index)} 
+              />
+            ))}
+            
+            {isLoading && (
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-muted/80 to-muted/60 border border-border/40 animate-pulse shadow-lg">
+                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30">
+                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+                </div>
+                <div className="space-y-2">
+                  <p className="font-semibold text-foreground">Llama 4 is thinking...</p>
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500/70 animate-bounce"></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500/70 animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500/70 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {error && (
-            <div className="p-4 rounded-xl bg-gradient-to-r from-destructive/10 to-destructive/5 border border-destructive/20 text-destructive space-y-3 animate-slide-up">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-full bg-destructive/20">
-                  <RefreshCw className="h-3.5 w-3.5" />
+            )}
+            
+            {error && (
+              <div className="p-5 rounded-xl bg-gradient-to-r from-destructive/15 to-destructive/10 border border-destructive/30 text-destructive space-y-4 animate-slide-up shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-destructive/20">
+                    <RefreshCw className="h-4 w-4" />
+                  </div>
+                  <p className="font-semibold">Connection Error</p>
                 </div>
-                <p className="text-sm font-medium">Connection Error</p>
+                <p className="text-sm opacity-90 leading-relaxed">{error}</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRetry}
+                  className="flex items-center gap-2 hover:bg-destructive/10 hover:border-destructive/40 transition-all duration-300 font-medium"
+                >
+                  <RefreshCw className="h-4 w-4" /> 
+                  Try Again
+                </Button>
               </div>
-              <p className="text-sm opacity-90">{error}</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleRetry}
-                className="flex items-center gap-2 hover:bg-destructive/10 hover:border-destructive/30 transition-all duration-200"
-              >
-                <RefreshCw className="h-3.5 w-3.5" /> 
-                Try Again
-              </Button>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef} />
-        </div>
-      </ScrollArea>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
+      </div>
       
-      {/* Sticky Input Bar */}
-      <div className="flex-shrink-0 border-t border-border/50 p-4 bg-gradient-to-r from-muted/30 to-muted/20 backdrop-blur-sm sticky bottom-0 z-10">
+      {/* Fixed Input Bar */}
+      <div className="flex-shrink-0 border-t border-border/40 p-6 bg-gradient-to-r from-background/95 to-muted/50 backdrop-blur-md">
         <ChatInput 
           onSend={handleSendMessage} 
           isLoading={isLoading} 

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -53,10 +54,10 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
 
   return (
     <nav 
-      className={`sticky top-0 z-40 w-full backdrop-blur transition-all duration-300 ${
+      className={`sticky top-0 z-40 w-full backdrop-blur-md transition-all duration-300 ${
         scrolled 
-          ? "bg-background/95 shadow-sm border-b" 
-          : "bg-background/50"
+          ? "bg-background/95 shadow-lg border-b border-border/50" 
+          : "bg-background/80"
       }`}
     >
       <div className="container flex h-16 items-center">
@@ -65,39 +66,54 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex md:flex-1 md:items-center md:justify-between">
-          <div className="flex items-center gap-8 text-sm">
+          <div className="flex items-center gap-10 text-sm ml-8">
             {isAuthenticated && (
               <>
                 <Link 
                   to="/dashboard" 
-                  className={`relative transition-colors hover:text-foreground/80 after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[2px] after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:bg-primary ${
+                  className={cn(
+                    "relative transition-all duration-300 hover:text-foreground font-medium px-2 py-1 rounded-md",
+                    "after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:rounded-full",
+                    "after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
+                    "hover:after:scale-x-100 hover:after:bg-gradient-to-r hover:after:from-primary hover:after:to-accent",
+                    "hover:bg-primary/5",
                     isActive("/dashboard") 
-                      ? "text-foreground font-medium after:scale-x-100 after:bg-primary" 
-                      : "text-foreground/60"
-                  }`}
+                      ? "text-foreground after:scale-x-100 after:bg-gradient-to-r after:from-primary after:to-accent bg-primary/5" 
+                      : "text-foreground/70"
+                  )}
                 >
                   Dashboard
                 </Link>
                 <Link 
                   to="/search" 
-                  className={`flex items-center gap-2 relative transition-colors hover:text-foreground/80 after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[2px] after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:bg-primary ${
+                  className={cn(
+                    "flex items-center gap-2 relative transition-all duration-300 hover:text-foreground font-medium px-2 py-1 rounded-md",
+                    "after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:rounded-full",
+                    "after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
+                    "hover:after:scale-x-100 hover:after:bg-gradient-to-r hover:after:from-primary hover:after:to-accent",
+                    "hover:bg-primary/5",
                     isActive("/search") 
-                      ? "text-foreground font-medium after:scale-x-100 after:bg-primary" 
-                      : "text-foreground/60"
-                  }`}
+                      ? "text-foreground after:scale-x-100 after:bg-gradient-to-r after:from-primary after:to-accent bg-primary/5" 
+                      : "text-foreground/70"
+                  )}
                 >
-                  <SearchIcon className="h-3.5 w-3.5" />
+                  <SearchIcon className="h-4 w-4" />
                   Search
                 </Link>
                 <Link 
                   to="/chat" 
-                  className={`flex items-center gap-2 relative transition-colors hover:text-foreground/80 after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[2px] after:origin-left after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:bg-primary ${
+                  className={cn(
+                    "flex items-center gap-2 relative transition-all duration-300 hover:text-foreground font-medium px-2 py-1 rounded-md",
+                    "after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:rounded-full",
+                    "after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
+                    "hover:after:scale-x-100 hover:after:bg-gradient-to-r hover:after:from-primary hover:after:to-accent",
+                    "hover:bg-primary/5 hover:scale-105",
                     isActive("/chat") 
-                      ? "text-foreground font-medium after:scale-x-100 after:bg-primary" 
-                      : "text-foreground/60"
-                  }`}
+                      ? "text-foreground after:scale-x-100 after:bg-gradient-to-r after:from-primary after:to-accent bg-primary/5 scale-105" 
+                      : "text-foreground/70"
+                  )}
                 >
-                  <Bot className="h-3.5 w-3.5" />
+                  <Bot className="h-4 w-4" />
                   AI Chat
                 </Link>
               </>
@@ -111,7 +127,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
                   variant="ghost" 
                   size="sm" 
                   onClick={() => navigate("/profile")}
-                  className="hover:bg-accent/20 transition-all duration-300"
+                  className="hover:bg-accent/20 transition-all duration-300 hover:scale-105 font-medium"
                 >
                   <User className="h-4 w-4 mr-2" />
                   Profile
@@ -121,7 +137,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
                   size="sm" 
                   onClick={handleSignOut} 
                   disabled={loggingOut}
-                  className="hover:bg-destructive/10 hover:text-destructive transition-all duration-300"
+                  className="hover:bg-destructive/10 hover:text-destructive transition-all duration-300 hover:scale-105 font-medium"
                 >
                   {loggingOut ? "Signing out..." : (
                     <>
@@ -135,7 +151,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
               <Button 
                 size="sm" 
                 onClick={() => navigate("/auth")} 
-                className="font-normal text-xl bg-gradient-primary hover:shadow-glow transition-all duration-300"
+                className="font-medium bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Sign in
               </Button>
@@ -143,13 +159,14 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
           </div>
         </div>
 
+        {/* Mobile menu button */}
         <div className="flex flex-1 items-center justify-end md:hidden">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={toggleMobileMenu} 
             aria-label="Toggle menu"
-            className="hover:bg-primary/10 transition-all duration-300"
+            className="hover:bg-primary/10 transition-all duration-300 hover:scale-110"
           >
             {mobileMenuOpen ? (
               <X className="h-5 w-5" />
@@ -160,8 +177,9 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
         </div>
       </div>
 
+      {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="border-t md:hidden animate-slide-down">
+        <div className="border-t md:hidden animate-slide-down bg-background/95 backdrop-blur-md">
           <div className="container py-4 space-y-3">
             {isAuthenticated ? (
               <>

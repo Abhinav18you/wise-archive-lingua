@@ -202,170 +202,77 @@ html {
   }
 }
 
-@keyframes typing-dots {
-  0%, 60%, 100% {
-    transform: initial;
+@keyframes scale-in {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
   }
-  30% {
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced navbar animations */
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
     transform: translateY(-10px);
   }
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(155, 135, 245, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(155, 135, 245, 0.6), 0 0 30px rgba(155, 135, 245, 0.4);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes avatar-float {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  25% {
-    transform: translateY(-2px) rotate(1deg);
-  }
-  50% {
-    transform: translateY(-4px) rotate(0deg);
-  }
-  75% {
-    transform: translateY(-2px) rotate(-1deg);
-  }
+/* Utility classes for animations */
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
 }
 
-.animate-float {
-  animation: float 5s ease-in-out infinite;
-}
-
-.animate-slide-left {
-  animation: slide-from-left 0.8s forwards;
-}
-
-.animate-slide-right {
-  animation: slide-from-right 0.8s forwards;
-}
-
-.animate-zoom {
-  animation: zoom-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-.animate-bounce-in {
-  animation: bounce-in 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards;
-}
-
-.animate-shine {
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  background-size: 200% 100%;
-  animation: shine 1.8s infinite;
-}
-
-/* Chat message animations */
 .message-animation {
   animation: message-slide-up 0.5s cubic-bezier(0.18, 1.25, 0.6, 1.09) forwards;
 }
 
-.animate-slide-up {
-  animation: message-slide-up 0.4s ease-out forwards;
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
 }
 
-.animate-typing-dots {
-  animation: typing-dots 1.4s infinite ease-in-out;
+/* Enhanced hover effects */
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
 }
 
-.animate-glow-pulse {
-  animation: glow-pulse 2s ease-in-out infinite;
+/* Enhanced scrollbar for chat */
+.chat-scroll-area::-webkit-scrollbar {
+  width: 6px;
 }
 
-.animate-avatar-float {
-  animation: avatar-float 3s ease-in-out infinite;
+.chat-scroll-area::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
 }
 
-/* Enhanced card effects */
-.feature-card {
-  @apply bg-white rounded-xl p-6 flex flex-col h-full transition-all duration-500 shadow-lg border border-gray-100;
+.chat-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 3px;
 }
 
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 50px -12px rgba(133, 89, 244, 0.3);
-}
-
-.feature-icon {
-  @apply relative overflow-hidden;
-}
-
-.feature-icon:after {
-  content: '';
-  @apply absolute inset-0 bg-primary/10 rounded-lg scale-0 transition-transform duration-300;
-  transform-origin: center;
-}
-
-.feature-card:hover .feature-icon:after {
-  transform: scale(1.5);
-}
-
-/* Shiny button effect */
-.button-shine {
-  @apply relative overflow-hidden;
-}
-
-.button-shine:after {
-  content: '';
-  @apply absolute top-0 -left-[100%] h-full w-[120%] bg-white/20 skew-x-[25deg] transition-all duration-1000;
-}
-
-.button-shine:hover:after {
-  left: 100%;
-}
-
-/* Remove default App.css styling that conflicts with our design */
-#root {
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  text-align: inherit;
-}
-
-/* Enhanced text animations */
-@keyframes text-shimmer {
-  0% {
-    background-position: -100% 50%;
-  }
-  100% {
-    background-position: 200% 50%;
-  }
-}
-
-.text-shimmer {
-  background: linear-gradient(
-    90deg,
-    var(--tw-gradient-stops)
-  );
-  background-size: 200% 100%;
-  animation: text-shimmer 2s ease-in-out infinite;
-  @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
-}
-
-/* Customized scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(155, 135, 245, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(155, 135, 245, 0.5);
+.chat-scroll-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
 }
 
 /* AI chat specific styles */
@@ -517,4 +424,52 @@ html {
   background: linear-gradient(135deg, #166fe5, #3b9ae8);
   border-color: rgba(24, 119, 242, 0.4);
   box-shadow: 0 4px 20px rgba(24, 119, 242, 0.3);
+}
+
+/* Remove default App.css styling that conflicts with our design */
+#root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: inherit;
+}
+
+/* Enhanced text animations */
+@keyframes text-shimmer {
+  0% {
+    background-position: -100% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--tw-gradient-stops)
+  );
+  background-size: 200% 100%;
+  animation: text-shimmer 2s ease-in-out infinite;
+  @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+}
+
+/* Customized scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(155, 135, 245, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(155, 135, 245, 0.5);
 }
