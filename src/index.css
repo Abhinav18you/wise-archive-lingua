@@ -473,3 +473,102 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(155, 135, 245, 0.5);
 }
+
+/* Mobile-specific chat improvements */
+@media (max-width: 768px) {
+  /* Prevent zoom on input focus on iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Improve touch targets */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better scrolling on mobile */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  /* Smooth scroll for chat messages */
+  .chat-scroll-area {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent body scroll when chat is focused */
+  .chat-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+
+  /* Mobile-friendly message bubbles */
+  .message-bubble {
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+  }
+
+  /* Better tap highlighting */
+  .mobile-button {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+    touch-action: manipulation;
+  }
+}
+
+/* Enhanced mobile animations */
+@media (max-width: 768px) {
+  .message-animation {
+    animation: mobile-message-slide-up 0.4s cubic-bezier(0.18, 1.25, 0.6, 1.09) forwards;
+  }
+
+  @keyframes mobile-message-slide-up {
+    0% {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Faster transitions on mobile for better performance */
+  .transition-fast {
+    transition-duration: 0.15s;
+  }
+}
+
+/* Mobile viewport fixes */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari specific fixes */
+  .ios-fix {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Better mobile scrollbars */
+@media (max-width: 768px) {
+  .chat-scroll-area::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .chat-scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-scroll-area::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.2);
+    border-radius: 2px;
+  }
+}

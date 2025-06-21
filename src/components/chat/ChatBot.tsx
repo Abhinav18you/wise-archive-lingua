@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Bot, User, Loader2, RefreshCw, Zap } from "lucide-react";
@@ -6,6 +7,7 @@ import ChatInput from "@/components/chat/ChatInput";
 import ChatMessage, { ChatMessageType } from "@/components/chat/ChatMessage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -28,6 +30,7 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   // Smooth scroll to bottom function
   const scrollToBottom = () => {
@@ -129,42 +132,64 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
   };
   
   return (
-    <div className="flex flex-col h-[85vh] max-h-[900px] w-full max-w-4xl mx-auto rounded-2xl border border-border/30 bg-gradient-to-br from-card/98 to-card/95 shadow-2xl overflow-hidden backdrop-blur-sm">
-      {/* Fixed Header */}
-      <div className="flex-shrink-0 px-6 py-4 border-b border-border/40 bg-gradient-to-r from-background/95 to-muted/50 backdrop-blur-md">
+    <div className={`flex flex-col w-full mx-auto rounded-2xl border border-border/30 bg-gradient-to-br from-card/98 to-card/95 shadow-2xl overflow-hidden backdrop-blur-sm ${
+      isMobile 
+        ? 'h-[calc(100vh-8rem)] max-h-none' 
+        : 'h-[85vh] max-h-[900px] max-w-4xl'
+    }`}>
+      {/* Fixed Header - Mobile Optimized */}
+      <div className={`flex-shrink-0 border-b border-border/40 bg-gradient-to-r from-background/95 to-muted/50 backdrop-blur-md ${
+        isMobile ? 'px-4 py-3' : 'px-6 py-4'
+      }`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className={`flex items-center ${isMobile ? 'gap-3' : 'gap-4'}`}>
             <div className="relative group">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300">
-                <Bot className="h-6 w-6 text-blue-600" />
+              <div className={`rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300 ${
+                isMobile ? 'p-2' : 'p-3'
+              }`}>
+                <Bot className={`text-blue-600 ${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
               </div>
               <div className="absolute -top-1 -right-1 p-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse">
-                <Zap className="h-3 w-3 text-white" />
+                <Zap className={`text-white ${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-foreground tracking-tight">Llama 4 Maverick</h3>
-              <p className="text-sm text-muted-foreground font-medium">AI Assistant by Meta</p>
+              <h3 className={`font-bold text-foreground tracking-tight ${isMobile ? 'text-lg' : 'text-xl'}`}>
+                Llama 4 Maverick
+              </h3>
+              <p className={`text-muted-foreground font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                AI Assistant by Meta
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-3 text-sm bg-muted/60 px-4 py-2 rounded-full border border-border/50 backdrop-blur-sm">
+          
+          {/* Status indicator - responsive */}
+          <div className={`flex items-center gap-2 bg-muted/60 rounded-full border border-border/50 backdrop-blur-sm ${
+            isMobile ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'
+          }`}>
             <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></div>
+              <div className={`rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50 ${
+                isMobile ? 'w-2 h-2' : 'w-2.5 h-2.5'
+              }`}></div>
               <span className="font-medium text-foreground">Online</span>
             </div>
-            <div className="w-px h-4 bg-border/60"></div>
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-blue-500 animate-spin-slow" />
-              <span className="text-muted-foreground font-medium">OpenRouter</span>
-            </div>
+            {!isMobile && (
+              <>
+                <div className="w-px h-4 bg-border/60"></div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-blue-500 animate-spin-slow" />
+                  <span className="text-muted-foreground font-medium">OpenRouter</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
       
-      {/* Scrollable Messages Container */}
+      {/* Scrollable Messages Container - Mobile Optimized */}
       <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full px-6 py-4">
-          <div className="space-y-6 pb-4">
+        <ScrollArea className="h-full">
+          <div className={`space-y-4 pb-4 ${isMobile ? 'px-4 py-3' : 'px-6 py-4'}`}>
             {messages.map((message, index) => (
               <ChatMessage 
                 key={index} 
@@ -173,33 +198,49 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
             ))}
             
             {isLoading && (
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-r from-muted/80 to-muted/60 border border-border/40 animate-pulse shadow-lg">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30">
-                  <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+              <div className={`flex items-center gap-3 rounded-xl bg-gradient-to-r from-muted/80 to-muted/60 border border-border/40 animate-pulse shadow-lg ${
+                isMobile ? 'p-3' : 'p-4'
+              }`}>
+                <div className={`rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 ${
+                  isMobile ? 'p-2' : 'p-3'
+                }`}>
+                  <Loader2 className={`animate-spin text-blue-600 ${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
                 </div>
                 <div className="space-y-2">
-                  <p className="font-semibold text-foreground">Llama 4 is thinking...</p>
+                  <p className={`font-semibold text-foreground ${isMobile ? 'text-sm' : ''}`}>
+                    Llama 4 is thinking...
+                  </p>
                   <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500/70 animate-bounce"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500/70 animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-blue-500/70 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className={`rounded-full bg-blue-500/70 animate-bounce ${
+                      isMobile ? 'w-2 h-2' : 'w-2.5 h-2.5'
+                    }`}></div>
+                    <div className={`rounded-full bg-blue-500/70 animate-bounce ${
+                      isMobile ? 'w-2 h-2' : 'w-2.5 h-2.5'
+                    }`} style={{ animationDelay: '0.1s' }}></div>
+                    <div className={`rounded-full bg-blue-500/70 animate-bounce ${
+                      isMobile ? 'w-2 h-2' : 'w-2.5 h-2.5'
+                    }`} style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
             )}
             
             {error && (
-              <div className="p-5 rounded-xl bg-gradient-to-r from-destructive/15 to-destructive/10 border border-destructive/30 text-destructive space-y-4 animate-slide-up shadow-lg">
+              <div className={`rounded-xl bg-gradient-to-r from-destructive/15 to-destructive/10 border border-destructive/30 text-destructive space-y-3 animate-slide-up shadow-lg ${
+                isMobile ? 'p-4' : 'p-5'
+              }`}>
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-full bg-destructive/20">
                     <RefreshCw className="h-4 w-4" />
                   </div>
-                  <p className="font-semibold">Connection Error</p>
+                  <p className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>Connection Error</p>
                 </div>
-                <p className="text-sm opacity-90 leading-relaxed">{error}</p>
+                <p className={`opacity-90 leading-relaxed ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                  {error}
+                </p>
                 <Button 
                   variant="outline" 
-                  size="sm" 
+                  size={isMobile ? "sm" : "sm"}
                   onClick={handleRetry}
                   className="flex items-center gap-2 hover:bg-destructive/10 hover:border-destructive/40 transition-all duration-300 font-medium"
                 >
@@ -214,13 +255,15 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
         </ScrollArea>
       </div>
       
-      {/* Fixed Input Bar */}
-      <div className="flex-shrink-0 border-t border-border/40 p-6 bg-gradient-to-r from-background/95 to-muted/50 backdrop-blur-md">
+      {/* Fixed Input Bar - Mobile Optimized */}
+      <div className={`flex-shrink-0 border-t border-border/40 bg-gradient-to-r from-background/95 to-muted/50 backdrop-blur-md ${
+        isMobile ? 'px-4 py-4' : 'px-6 py-6'
+      }`}>
         <ChatInput 
           onSend={handleSendMessage} 
           isLoading={isLoading} 
           disabled={isLoading} 
-          placeholder="Type your message to Llama 4..."
+          placeholder={isMobile ? "Type message..." : "Type your message to Llama 4..."}
         />
       </div>
     </div>
