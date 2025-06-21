@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { toast } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 import { Menu, X, LogOut, User, Bot, Search as SearchIcon } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 
