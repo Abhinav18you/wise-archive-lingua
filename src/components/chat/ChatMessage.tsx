@@ -15,6 +15,17 @@ interface ChatMessageProps {
   message: ChatMessageType;
 }
 
+// Meta logo as SVG component
+const MetaLogo = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    className={cn("fill-current", className)}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M17.6 4.1c-2.6 0-4.7 1.9-5.6 4.4-.9-2.5-3-4.4-5.6-4.4C3.7 4.1 1.5 6.3 1.5 9v6c0 2.7 2.2 4.9 4.9 4.9 1.8 0 3.4-.1 4.6-1.9 1.2 1.8 2.8 1.9 4.6 1.9 2.7 0 4.9-2.2 4.9-4.9V9c0-2.7-2.2-4.9-4.9-4.9zM8.5 16.5c-.8 0-1.5-.7-1.5-1.5V9c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v6c0 .8-.7 1.5-1.5 1.5zm7 0c-.8 0-1.5-.7-1.5-1.5V9c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v6c0 .8-.7 1.5-1.5 1.5z"/>
+  </svg>
+);
+
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === "user";
 
@@ -26,26 +37,23 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       )}
     >
       <Avatar className={cn(
-        "mt-1 transition-all duration-300 hover:scale-110 border-2",
+        "mt-1 transition-all duration-300 hover:scale-110 border-2 flex-shrink-0 w-10 h-10",
         isUser 
           ? "border-primary/20 bg-primary/5 hover:border-primary/40" 
-          : "border-accent/20 bg-gradient-to-br from-accent/10 to-primary/10 hover:border-accent/40 hover:shadow-glow"
+          : "border-accent/20 bg-gradient-to-br from-blue-500/10 to-blue-600/10 hover:border-blue-500/40 hover:shadow-glow"
       )}>
         {isUser ? (
           <AvatarFallback className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors">
             <User className="h-4 w-4" />
           </AvatarFallback>
         ) : (
-          <>
-            <AvatarImage src="/placeholder.svg" alt="Llama 4 AI" />
-            <AvatarFallback className="bg-gradient-to-br from-accent/20 to-primary/20 text-primary hover:from-accent/30 hover:to-primary/30 transition-all duration-300 relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/10 to-primary/10 animate-pulse"></div>
-              <div className="relative flex items-center justify-center">
-                <Bot className="h-3.5 w-3.5 text-accent animate-float" />
-                <Sparkles className="h-2 w-2 text-primary absolute -top-0.5 -right-0.5 animate-pulse" />
-              </div>
-            </AvatarFallback>
-          </>
+          <AvatarFallback className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 text-blue-600 hover:from-blue-500/30 hover:to-blue-600/30 transition-all duration-300 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-blue-600/10 animate-pulse"></div>
+            <div className="relative flex items-center justify-center">
+              <MetaLogo className="h-5 w-5 text-blue-600" />
+              <Sparkles className="h-2 w-2 text-blue-500 absolute -top-0.5 -right-0.5 animate-pulse" />
+            </div>
+          </AvatarFallback>
         )}
       </Avatar>
       <div

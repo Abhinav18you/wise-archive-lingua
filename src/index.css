@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -479,4 +478,43 @@ html {
   background-color: hsl(var(--primary)/0.2);
   z-index: -1;
   transform: skew(-12deg);
+}
+
+/* Custom scrollbar for chat area */
+.chat-scroll-area [data-radix-scroll-area-viewport] {
+  scroll-behavior: smooth !important;
+}
+
+/* Ensure smooth scrolling in chat messages */
+.message-scroll-container {
+  scroll-behavior: smooth;
+  overflow-anchor: auto;
+}
+
+/* Enhanced message animations */
+.message-animation {
+  animation: message-slide-up 0.4s cubic-bezier(0.18, 1.25, 0.6, 1.09) forwards;
+}
+
+@keyframes message-slide-up {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Meta logo specific styling */
+.meta-logo-container {
+  background: linear-gradient(135deg, #1877f2, #42a5f5);
+  border: 2px solid rgba(24, 119, 242, 0.2);
+}
+
+.meta-logo-container:hover {
+  background: linear-gradient(135deg, #166fe5, #3b9ae8);
+  border-color: rgba(24, 119, 242, 0.4);
+  box-shadow: 0 4px 20px rgba(24, 119, 242, 0.3);
 }
