@@ -1,12 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
+import MobileBackButton from "./MobileBackButton";
 import { supabase } from "@/integrations/supabase/client";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { getSession, SESSION_STORAGE_KEY } from "@/lib/auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   // Check authentication status on mount and route change
   useEffect(() => {
@@ -120,7 +122,7 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Navbar isAuthenticated={false} />
-        <main className="flex-1 container py-8 px-4 sm:px-6 flex items-center justify-center">
+        <main className="flex-1 container py-4 px-4 sm:px-6 flex items-center justify-center">
           <Spinner size="lg" />
         </main>
       </div>
@@ -131,11 +133,11 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
     return (
       <div className="flex flex-col min-h-screen bg-background">
         <Navbar isAuthenticated={false} />
-        <main className="flex-1 container py-8 px-4 sm:px-6 flex items-center justify-center">
-          <div className="max-w-md w-full p-6 bg-card rounded-lg shadow">
-            <h2 className="text-2xl font-bold mb-4">Error Loading Application</h2>
-            <p className="text-muted-foreground mb-6">{error}</p>
-            <Button onClick={() => window.location.reload()}>Reload Page</Button>
+        <main className="flex-1 container py-4 px-4 sm:px-6 flex items-center justify-center">
+          <div className="max-w-md w-full p-4 sm:p-6 bg-card rounded-lg shadow mx-4">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">Error Loading Application</h2>
+            <p className="text-muted-foreground mb-6 text-sm sm:text-base">{error}</p>
+            <Button onClick={() => window.location.reload()} className="w-full">Reload Page</Button>
           </div>
         </main>
       </div>
@@ -145,12 +147,13 @@ const Layout = ({ children, requireAuth = false }: LayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Navbar isAuthenticated={!!isAuthenticated} />
-      <main className="flex-1 container py-8 px-4 sm:px-6">
+      <MobileBackButton />
+      <main className={`flex-1 ${isMobile ? 'px-4 py-4' : 'container py-8 px-4 sm:px-6'}`}>
         {children}
       </main>
-      <footer className="border-t py-6 bg-background/80 backdrop-blur-sm">
-        <div className="container flex flex-col items-center justify-center gap-2 text-center">
-          <p className="text-sm text-muted-foreground">
+      <footer className="border-t py-4 sm:py-6 bg-background/80 backdrop-blur-sm">
+        <div className="container flex flex-col items-center justify-center gap-2 text-center px-4">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             &copy; {new Date().getFullYear()} Memoria. All rights reserved.
           </p>
         </div>

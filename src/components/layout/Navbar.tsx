@@ -7,6 +7,7 @@ import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import { Menu, X, LogOut, User, Bot, Search as SearchIcon } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -18,6 +19,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loggingOut, setLoggingOut] = useState(false);
+  const isMobile = useIsMobile();
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -61,19 +63,19 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
           : "bg-background/80"
       }`}
     >
-      <div className="container flex h-16 items-center">
+      <div className={`${isMobile ? 'px-4' : 'container'} flex ${isMobile ? 'h-14' : 'h-16'} items-center`}>
         {/* Logo and brand */}
         <Logo />
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex md:flex-1 md:items-center md:justify-between">
-          <div className="flex items-center gap-10 text-sm ml-8">
+          <div className="flex items-center gap-8 lg:gap-10 text-sm ml-6 lg:ml-8">
             {isAuthenticated && (
               <>
                 <Link 
                   to="/dashboard" 
                   className={cn(
-                    "relative transition-all duration-300 hover:text-foreground font-medium px-2 py-1 rounded-md",
+                    "relative transition-all duration-300 hover:text-foreground font-medium px-3 py-2 rounded-md",
                     "after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:rounded-full",
                     "after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
                     "hover:after:scale-x-100 hover:after:bg-gradient-to-r hover:after:from-primary hover:after:to-accent",
@@ -88,7 +90,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
                 <Link 
                   to="/search" 
                   className={cn(
-                    "flex items-center gap-2 relative transition-all duration-300 hover:text-foreground font-medium px-2 py-1 rounded-md",
+                    "flex items-center gap-2 relative transition-all duration-300 hover:text-foreground font-medium px-3 py-2 rounded-md",
                     "after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:rounded-full",
                     "after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
                     "hover:after:scale-x-100 hover:after:bg-gradient-to-r hover:after:from-primary hover:after:to-accent",
@@ -104,7 +106,7 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
                 <Link 
                   to="/chat" 
                   className={cn(
-                    "flex items-center gap-2 relative transition-all duration-300 hover:text-foreground font-medium px-2 py-1 rounded-md",
+                    "flex items-center gap-2 relative transition-all duration-300 hover:text-foreground font-medium px-3 py-2 rounded-md",
                     "after:absolute after:left-0 after:right-0 after:-bottom-1 after:h-[3px] after:rounded-full",
                     "after:origin-left after:scale-x-0 after:transition-transform after:duration-300",
                     "hover:after:scale-x-100 hover:after:bg-gradient-to-r hover:after:from-primary hover:after:to-accent",
@@ -167,12 +169,12 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
             size="icon" 
             onClick={toggleMobileMenu} 
             aria-label="Toggle menu"
-            className="hover:bg-primary/10 transition-all duration-300 hover:scale-110"
+            className="hover:bg-primary/10 transition-all duration-300 hover:scale-110 h-9 w-9"
           >
             {mobileMenuOpen ? (
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             ) : (
-              <Menu className="h-5 w-5" />
+              <Menu className="h-4 w-4" />
             )}
           </Button>
         </div>
@@ -181,12 +183,12 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="border-t md:hidden animate-slide-down bg-background/95 backdrop-blur-md">
-          <div className="container py-4 space-y-3">
+          <div className="px-4 py-3 space-y-2">
             {isAuthenticated ? (
               <>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300" 
+                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300 h-12 text-base font-medium" 
                   onClick={() => {
                     navigate("/dashboard");
                     setMobileMenuOpen(false);
@@ -196,50 +198,50 @@ const Navbar = ({ isAuthenticated }: NavbarProps) => {
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300" 
+                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300 h-12 text-base font-medium" 
                   onClick={() => {
                     navigate("/search");
                     setMobileMenuOpen(false);
                   }}
                 >
-                  <SearchIcon className="h-4 w-4 mr-2" />
+                  <SearchIcon className="h-4 w-4 mr-3" />
                   Search
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300" 
+                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300 h-12 text-base font-medium" 
                   onClick={() => {
                     navigate("/chat");
                     setMobileMenuOpen(false);
                   }}
                 >
-                  <Bot className="h-4 w-4 mr-2" />
+                  <Bot className="h-4 w-4 mr-3" />
                   AI Chat
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300" 
+                  className="w-full justify-start hover:bg-primary/10 transition-all duration-300 h-12 text-base font-medium" 
                   onClick={() => {
                     navigate("/profile");
                     setMobileMenuOpen(false);
                   }}
                 >
-                  <User className="h-4 w-4 mr-2" />
+                  <User className="h-4 w-4 mr-3" />
                   Profile
                 </Button>
                 <Button 
                   variant="outline" 
-                  className="w-full hover:bg-destructive/10 hover:text-destructive transition-all duration-300" 
+                  className="w-full hover:bg-destructive/10 hover:text-destructive transition-all duration-300 h-12 text-base font-medium mt-2" 
                   onClick={handleSignOut} 
                   disabled={loggingOut}
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-4 w-4 mr-3" />
                   {loggingOut ? "Signing out..." : "Sign out"}
                 </Button>
               </>
             ) : (
               <Button 
-                className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300" 
+                className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300 h-12 text-base font-medium" 
                 onClick={() => {
                   navigate("/auth");
                   setMobileMenuOpen(false);

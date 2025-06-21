@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import ChatBot from "@/components/chat/ChatBot";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import ApiKeyInstructionsDialog from "@/components/chat/ApiKeyInstructionsDialog";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Chat = () => {
   const [activeTab, setActiveTab] = useState("llama4");
@@ -19,6 +19,7 @@ const Chat = () => {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const isMobile = useIsMobile();
   
   // Check if user has seen instructions and if API key exists
   useEffect(() => {
@@ -105,34 +106,40 @@ const Chat = () => {
   };
   
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <div className={`mx-auto ${isMobile ? 'px-0 py-4' : 'max-w-5xl px-4 py-8'}`}>
       {/* Instructions Dialog */}
       <ApiKeyInstructionsDialog 
         open={showInstructions} 
         onOpenChange={setShowInstructions} 
       />
       
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 text-center animate-fade-in flex items-center justify-center gap-2">
-          <MessagesSquare className="h-8 w-8" />
+      <div className={isMobile ? 'mb-4' : 'mb-8'}>
+        <h1 className={`font-bold text-center animate-fade-in flex items-center justify-center gap-2 ${
+          isMobile ? 'text-2xl mb-2' : 'text-3xl mb-2'
+        }`}>
+          <MessagesSquare className={isMobile ? 'h-6 w-6' : 'h-8 w-8'} />
           AI Chat Assistant
         </h1>
-        <p className="text-muted-foreground text-center mb-4 animate-fade-in" style={{ animationDelay: "100ms" }}>
+        <p className={`text-muted-foreground text-center animate-fade-in ${
+          isMobile ? 'text-sm mb-3 px-4' : 'mb-4'
+        }`} style={{ animationDelay: "100ms" }}>
           Chat with Llama 4 Maverick, an advanced AI assistant powered by Meta via OpenRouter API
         </p>
         
-        <div className="flex justify-center mb-4 animate-fade-in" style={{ animationDelay: "150ms" }}>
+        <div className={`flex justify-center animate-fade-in ${isMobile ? 'mb-3 px-4' : 'mb-4'}`} style={{ animationDelay: "150ms" }}>
           <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
             <DialogTrigger asChild>
-              <Button size="lg" className="flex items-center gap-2 text-base font-medium px-5 py-6">
-                <Key className="h-5 w-5" />
+              <Button size={isMobile ? "default" : "lg"} className={`flex items-center gap-2 font-medium ${
+                isMobile ? 'text-sm px-4 py-3 w-full max-w-xs' : 'text-base px-5 py-6'
+              }`}>
+                <Key className="h-4 w-4" />
                 {apiKeyConfigured ? "Change OpenRouter API Key" : "Configure OpenRouter API Key"}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle className="text-xl">Configure OpenRouter API Key</DialogTitle>
-                <DialogDescription className="text-base">
+                <DialogTitle className={isMobile ? 'text-lg' : 'text-xl'}>Configure OpenRouter API Key</DialogTitle>
+                <DialogDescription className={isMobile ? 'text-sm' : 'text-base'}>
                   Enter your OpenRouter API key to use Llama 4 Maverick.
                 </DialogDescription>
               </DialogHeader>
@@ -166,11 +173,11 @@ const Chat = () => {
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     type="password"
-                    className="text-base py-6"
+                    className={isMobile ? 'text-base py-3' : 'text-base py-6'}
                   />
                   <Button 
                     type="submit" 
-                    className="w-full py-6 text-base font-medium" 
+                    className={`w-full font-medium ${isMobile ? 'py-3 text-base' : 'py-6 text-base'}`}
                     disabled={checking}
                   >
                     {checking ? (
@@ -194,7 +201,7 @@ const Chat = () => {
       
       <div className="animate-fade-in" style={{ animationDelay: "200ms" }}>
         <Tabs defaultValue="llama4" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-1 mb-6">
+          <TabsList className={`grid w-full grid-cols-1 mx-auto ${isMobile ? 'max-w-full mb-4' : 'max-w-md mb-6'}`}>
             <TabsTrigger value="llama4" className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
               Llama 4 Maverick Chat
@@ -203,26 +210,28 @@ const Chat = () => {
           
           <TabsContent value="llama4">
             {!apiKeyConfigured && (
-              <Card className="mb-6 border-amber-500">
+              <Card className={`border-amber-500 ${isMobile ? 'mb-4 mx-0' : 'mb-6'}`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 text-amber-500">
                     <AlertCircle className="h-5 w-5" />
-                    <CardTitle>OpenRouter API Key Required</CardTitle>
+                    <CardTitle className={isMobile ? 'text-base' : ''}>OpenRouter API Key Required</CardTitle>
                   </div>
-                  <CardDescription>
+                  <CardDescription className={isMobile ? 'text-sm' : ''}>
                     An OpenRouter API key is required to access Llama 4 Maverick.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className={`text-muted-foreground mb-4 ${isMobile ? 'text-xs' : 'text-sm'}`}>
                     To use the chat feature, please configure your OpenRouter API key which provides access to Meta's Llama 4 Maverick assistant.
                   </p>
                   <Button 
                     onClick={() => setShowApiKeyDialog(true)} 
-                    className="flex items-center gap-2 font-medium text-base py-6"
-                    size="lg"
+                    className={`flex items-center gap-2 font-medium ${
+                      isMobile ? 'text-sm py-3 w-full' : 'text-base py-6'
+                    }`}
+                    size={isMobile ? "default" : "lg"}
                   >
-                    <Key className="h-5 w-5" />
+                    <Key className="h-4 w-4" />
                     Configure API Key
                   </Button>
                 </CardContent>
@@ -234,16 +243,16 @@ const Chat = () => {
         </Tabs>
       </div>
       
-      <Card className="bg-muted/30 mt-8 animate-fade-in" style={{ animationDelay: "300ms" }}>
+      <Card className={`bg-muted/30 animate-fade-in ${isMobile ? 'mt-4 mx-0' : 'mt-8'}`} style={{ animationDelay: "300ms" }}>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+          <CardTitle className={`flex items-center gap-2 ${isMobile ? 'text-base' : ''}`}>
+            <Sparkles className="h-4 w-4 text-primary" />
             Chat with Llama 4 Maverick
           </CardTitle>
-          <CardDescription>Get intelligent responses to your questions and prompts</CardDescription>
+          <CardDescription className={isMobile ? 'text-sm' : ''}>Get intelligent responses to your questions and prompts</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-2 text-muted-foreground">
+          <ul className={`space-y-2 text-muted-foreground ${isMobile ? 'text-sm' : ''}`}>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
               <span>Ask questions about any topic - Llama 4 has broad knowledge</span>
