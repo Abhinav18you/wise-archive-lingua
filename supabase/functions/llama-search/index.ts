@@ -18,7 +18,7 @@ serve(async (req) => {
     
     if (!LLAMA_API_KEY) {
       console.error('LLAMA_API_KEY is not set');
-      throw new Error('LLAMA_API_KEY is not set');
+      throw new Error('OpenRouter API key is not configured');
     }
 
     // Parse request body
@@ -48,7 +48,7 @@ serve(async (req) => {
 
     if (userError || !user) {
       console.error('User authentication failed:', userError);
-      throw new Error('Unauthorized');
+      throw new Error('User authentication failed');
     }
 
     console.log('User authenticated:', user.id);
@@ -74,70 +74,72 @@ serve(async (req) => {
       );
     }
 
-    // Prepare data for the Llama API
-    const documents = materials.map(item => ({
-      id: item.id,
-      text: `${item.title || ''} ${item.description || ''} ${item.data || ''}`,
-      metadata: { 
-        type: item.type,
-        created_at: item.created_at
-      }
-    }));
+    // Prepare data for the OpenRouter API
+    const documentsText = materials.map(item => 
+      `ID: ${item.id}\nTitle: ${item.title || ''}\nDescription: ${item.description || ''}\nContent: ${item.data || ''}\nType: ${item.type}\n---`
+    ).join('\n');
 
-    console.log('Calling Perplexity API (Llama 4) for semantic search');
+    console.log('Calling OpenRouter API for semantic search');
 
-    // Call Llama API using Perplexity's API
-    const llamaResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+    // Call OpenRouter API using Llama model
+    const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LLAMA_API_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://lovable.dev',
+        'X-Title': 'Memoria Search App'
       },
       body: JSON.stringify({
-        model: 'llama-3.1-sonar-small-128k-online', // Using llama-3.1 which is compatible with Llama 4 Maverick
+        model: 'meta-llama/llama-4-maverick:free',
         messages: [
           {
             role: 'system',
-            content: `You are an AI assistant that helps users search through their personal content collection. 
-                    Given a search query and a collection of documents, identify the most relevant documents 
-                    to the query. Understand semantic meanings and user intent. 
-                    Only return document IDs in a JSON array, nothing else.`
+            content: `You are a semantic search assistant. Given a user's search query and their personal content collection, identify the most relevant content IDs that match the query. 
+
+Instructions:
+1. Analyze the query semantically to understand user intent
+2. Match against titles, descriptions, and content
+3. Return ONLY a JSON array of relevant document IDs in order of relevance
+4. If no relevant content is found, return an empty array []
+5. Format: ["id1", "id2", "id3"]`
           },
           {
             role: 'user',
-            content: `Query: "${query}"
-                    Documents: ${JSON.stringify(documents)}
-                    Return only a JSON array of the most relevant document IDs matching the query, 
-                    ordered by relevance. Format: ["id1", "id2", ...]`
+            content: `Search Query: "${query}"
+
+User's Content Collection:
+${documentsText}
+
+Return only the JSON array of most relevant document IDs:`
           }
         ],
-        temperature: 0.2, // Lower temperature for more deterministic results
+        temperature: 0.2,
         max_tokens: 500
       })
     });
 
-    if (!llamaResponse.ok) {
-      const errorText = await llamaResponse.text();
-      console.error('Perplexity API error:', errorText);
-      throw new Error(`Perplexity API error: ${llamaResponse.status}`);
+    if (!openRouterResponse.ok) {
+      const errorText = await openRouterResponse.text();
+      console.error('OpenRouter API error:', errorText);
+      throw new Error(`OpenRouter API error: ${openRouterResponse.status}`);
     }
 
-    // Parse Llama response
-    const llamaData = await llamaResponse.json();
+    // Parse OpenRouter response
+    const openRouterData = await openRouterResponse.json();
     
-    if (!llamaData.choices || !llamaData.choices[0]) {
-      console.error('Invalid response from Perplexity API:', llamaData);
-      throw new Error('Invalid response from Perplexity API');
+    if (!openRouterData.choices || !openRouterData.choices[0]) {
+      console.error('Invalid response from OpenRouter API:', openRouterData);
+      throw new Error('Invalid response from OpenRouter API');
     }
 
-    console.log('Received response from Perplexity API');
+    console.log('Received response from OpenRouter API');
 
-    // Extract document IDs from Llama response
-    const content = llamaData.choices[0].message.content;
+    // Extract document IDs from OpenRouter response
+    const content = openRouterData.choices[0].message.content;
     let relevantIds;
     
     try {
-      // The content should be a JSON array of IDs
       console.log('Parsing response content:', content.trim());
       relevantIds = JSON.parse(content.trim());
       
@@ -148,7 +150,7 @@ serve(async (req) => {
       
       console.log('Successfully parsed relevant IDs:', relevantIds);
     } catch (e) {
-      console.error('Error parsing Perplexity response:', e);
+      console.error('Error parsing OpenRouter response:', e);
       console.log('Raw response:', content);
       
       // Try to extract IDs using regex as fallback

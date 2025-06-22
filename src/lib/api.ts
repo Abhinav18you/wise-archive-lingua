@@ -13,7 +13,7 @@ class APIError extends Error {
 
 const retryWithBackoff = async <T>(
   operation: () => Promise<T>,
-  maxRetries: number = 2,
+  maxRetries: number = 1,
   baseDelay: number = 1000
 ): Promise<T> => {
   let lastError: Error;
@@ -27,6 +27,11 @@ const retryWithBackoff = async <T>(
       // Don't retry on authentication errors or client errors
       if (error instanceof APIError && error.statusCode && error.statusCode < 500) {
         throw error;
+      }
+      
+      // Don't retry on certain error types
+      if (lastError.message.includes('401') || lastError.message.includes('403')) {
+        throw lastError;
       }
       
       if (attempt < maxRetries) {
@@ -245,7 +250,7 @@ export const api = {
     },
     
     search: async (query: string, useLlama: boolean = false): Promise<{ results: Content[]; error: any }> => {
-      console.log("Searching for:", query, "Using Llama:", useLlama);
+      console.log("Searching for:", query, "Using AI Search:", useLlama);
       
       try {
         const { session } = await getSession();
@@ -275,23 +280,27 @@ export const api = {
           return { results, error: null };
         }
         
-        // If Llama is enabled, use the searchWithLlama edge function with retry logic
+        // If AI search is enabled, use the llama-search edge function with retry logic
         if (useLlama) {
-          console.log("Using Llama for semantic search");
+          console.log("Using AI search via OpenRouter API");
           try {
-            const llamaSearchOperation = async () => {
+            const aiSearchOperation = async () => {
               const { data, error } = await supabase.functions.invoke('llama-search', {
                 body: { query }
               });
               
               if (error) {
-                // Create a more specific error based on the response
+                console.error("AI search error details:", error);
+                
+                // Create more specific errors based on the response
                 if (error.message?.includes('401') || error.message?.includes('Authorization')) {
-                  throw new APIError('AI search service authentication failed. Please check API key configuration.', 'AUTH_ERROR', 401);
+                  throw new APIError('AI search authentication failed. Please check your OpenRouter API key configuration.', 'AUTH_ERROR', 401);
                 } else if (error.message?.includes('429')) {
-                  throw new APIError('AI search service rate limit exceeded. Please try again later.', 'RATE_LIMIT', 429);
+                  throw new APIError('AI search rate limit exceeded. Please try again in a moment.', 'RATE_LIMIT', 429);
                 } else if (error.message?.includes('500')) {
                   throw new APIError('AI search service is temporarily unavailable.', 'SERVER_ERROR', 500);
+                } else if (error.message?.includes('timeout')) {
+                  throw new APIError('AI search request timed out. Please try again.', 'TIMEOUT_ERROR', 408);
                 } else {
                   throw new APIError(`AI search failed: ${error.message}`, 'SEARCH_ERROR');
                 }
@@ -300,19 +309,21 @@ export const api = {
               return data;
             };
             
-            const data = await retryWithBackoff(llamaSearchOperation, 1, 1500);
+            const data = await retryWithBackoff(aiSearchOperation, 1, 1500);
             
-            console.log("Llama search results:", data);
+            console.log("AI search results:", data);
             return { results: data.results || [], error: null };
           } catch (err) {
-            console.error("Error with Llama search:", err);
+            console.error("Error with AI search:", err);
             
             // Provide user-friendly error messages based on error type
             if (err instanceof APIError) {
               if (err.statusCode === 401) {
-                toast.error("AI search is not configured. Contact support or use regular search.");
+                toast.error("AI search is not properly configured. Please contact support or use regular search.");
               } else if (err.statusCode === 429) {
-                toast.warning("AI search is busy. Trying regular search instead.");
+                toast.warning("AI search is temporarily busy. Trying regular search instead.");
+              } else if (err.statusCode === 408) {
+                toast.warning("AI search timed out. Using regular search instead.");
               } else {
                 toast.warning("AI search temporarily unavailable. Using regular search.");
               }
@@ -321,7 +332,7 @@ export const api = {
             }
             
             // Automatically fall back to regular search
-            console.log("Falling back to regular search");
+            console.log("Falling back to regular search due to AI search failure");
           }
         }
         

@@ -67,7 +67,7 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
       const conversationHistory = messages.filter(m => m.role !== 'system');
       
       const apiKeyToUse = customApiKey || localStorage.getItem('llamaApiKey');
-      console.log("Using API key:", apiKeyToUse ? "API key provided" : "No API key");
+      console.log("Using API key for LLaMA chat:", apiKeyToUse ? "API key provided" : "No API key");
       
       // Call the Llama chat edge function with custom API key
       const { data, error: funcError } = await supabase.functions.invoke('llama-chat', {
@@ -78,20 +78,30 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
         }
       });
       
-      console.log("Response from Llama chat function:", data);
+      console.log("Response from LLaMA chat function:", data);
       
       if (funcError) {
         console.error("Edge function error:", funcError);
-        throw new Error(`Edge function error: ${funcError.message || 'Unknown error'}`);
+        throw new Error(`LLaMA chat service error: ${funcError.message || 'Unknown error'}`);
       }
       
       if (data?.error) {
-        console.error("Data error:", data.error);
-        throw new Error(data.error);
+        console.error("LLaMA chat API error:", data.error);
+        
+        // Handle specific OpenRouter API errors
+        if (data.error.includes('401') || data.error.includes('Authorization')) {
+          throw new Error('LLaMA chat authentication failed. Please check your OpenRouter API key.');
+        } else if (data.error.includes('429')) {
+          throw new Error('LLaMA chat rate limit exceeded. Please wait a moment and try again.');
+        } else if (data.error.includes('timeout')) {
+          throw new Error('LLaMA chat request timed out. Please try again.');
+        } else {
+          throw new Error('LLaMA chat is currently unavailable. Please try again later.');
+        }
       }
       
       if (!data?.message) {
-        throw new Error("No response received from AI");
+        throw new Error("LLaMA chat is currently unavailable. Please try again later.");
       }
       
       // Add AI response to the chat
@@ -103,10 +113,20 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
       
       setMessages(prev => [...prev, aiMessage]);
     } catch (err) {
-      console.error('Error calling Llama chat:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get response from AI';
+      console.error('Error calling LLaMA chat:', err);
+      const errorMessage = err instanceof Error ? err.message : 'LLaMA chat is currently unavailable. Please try again later.';
       setError(errorMessage);
-      toast.error('Failed to get response from Llama 4. Please try again.');
+      
+      // Show user-friendly toast message
+      if (errorMessage.includes('authentication') || errorMessage.includes('API key')) {
+        toast.error('LLaMA chat authentication issue. Please check your API key configuration.');
+      } else if (errorMessage.includes('rate limit')) {
+        toast.warning('LLaMA chat is temporarily busy. Please wait a moment and try again.');
+      } else if (errorMessage.includes('timeout')) {
+        toast.warning('LLaMA chat request timed out. Please try again.');
+      } else {
+        toast.error('LLaMA chat is currently unavailable. Please try again later.');
+      }
     } finally {
       setIsLoading(false);
     }
