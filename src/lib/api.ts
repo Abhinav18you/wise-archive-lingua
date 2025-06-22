@@ -3,6 +3,43 @@ import { toast } from "@/lib/toast";
 import { AuthFormData, Content, ContentType } from "@/types";
 import { signUpWithEmail, signInWithEmail, signOut, getSession } from "@/lib/auth";
 
+// Enhanced error handling utilities
+class APIError extends Error {
+  constructor(message: string, public code?: string, public statusCode?: number) {
+    super(message);
+    this.name = 'APIError';
+  }
+}
+
+const retryWithBackoff = async <T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 2,
+  baseDelay: number = 1000
+): Promise<T> => {
+  let lastError: Error;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error as Error;
+      
+      // Don't retry on authentication errors or client errors
+      if (error instanceof APIError && error.statusCode && error.statusCode < 500) {
+        throw error;
+      }
+      
+      if (attempt < maxRetries) {
+        const delay = baseDelay * Math.pow(2, attempt);
+        console.log(`Retry attempt ${attempt + 1} after ${delay}ms delay`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError!;
+};
+
 export const api = {
   auth: {
     signUp: async (data: AuthFormData): Promise<{ user: any; error: any }> => {
@@ -238,29 +275,59 @@ export const api = {
           return { results, error: null };
         }
         
-        // If Llama is enabled, use the searchWithLlama edge function instead
+        // If Llama is enabled, use the searchWithLlama edge function with retry logic
         if (useLlama) {
           console.log("Using Llama for semantic search");
           try {
-            const { data, error } = await supabase.functions.invoke('llama-search', {
-              body: { query }
-            });
+            const llamaSearchOperation = async () => {
+              const { data, error } = await supabase.functions.invoke('llama-search', {
+                body: { query }
+              });
+              
+              if (error) {
+                // Create a more specific error based on the response
+                if (error.message?.includes('401') || error.message?.includes('Authorization')) {
+                  throw new APIError('AI search service authentication failed. Please check API key configuration.', 'AUTH_ERROR', 401);
+                } else if (error.message?.includes('429')) {
+                  throw new APIError('AI search service rate limit exceeded. Please try again later.', 'RATE_LIMIT', 429);
+                } else if (error.message?.includes('500')) {
+                  throw new APIError('AI search service is temporarily unavailable.', 'SERVER_ERROR', 500);
+                } else {
+                  throw new APIError(`AI search failed: ${error.message}`, 'SEARCH_ERROR');
+                }
+              }
+              
+              return data;
+            };
             
-            if (error) throw error;
+            const data = await retryWithBackoff(llamaSearchOperation, 1, 1500);
             
             console.log("Llama search results:", data);
             return { results: data.results || [], error: null };
           } catch (err) {
             console.error("Error with Llama search:", err);
-            toast.error("Llama search failed. Falling back to regular search.");
-            // Fall back to regular search
+            
+            // Provide user-friendly error messages based on error type
+            if (err instanceof APIError) {
+              if (err.statusCode === 401) {
+                toast.error("AI search is not configured. Contact support or use regular search.");
+              } else if (err.statusCode === 429) {
+                toast.warning("AI search is busy. Trying regular search instead.");
+              } else {
+                toast.warning("AI search temporarily unavailable. Using regular search.");
+              }
+            } else {
+              toast.warning("AI search failed. Using regular search instead.");
+            }
+            
+            // Automatically fall back to regular search
+            console.log("Falling back to regular search");
           }
         }
         
-        // Normalize query for search
+        // Regular search in Supabase using ILIKE for text search
         const normalizedQuery = query.toLowerCase().trim();
         
-        // Search in Supabase using ILIKE for text search - adjusted for user_materials structure
         const { data: materials, error } = await supabase
           .from('user_materials')
           .select('*')
@@ -269,7 +336,7 @@ export const api = {
         
         if (error) throw error;
         
-        // Map Supabase data to Content type - matching the user_materials schema
+        // Map Supabase data to Content type
         const mappedResults: Content[] = materials.map(item => ({
           id: item.id,
           user_id: session.user.id,
