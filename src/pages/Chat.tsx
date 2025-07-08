@@ -123,7 +123,7 @@ const Chat = () => {
         <p className={`text-muted-foreground text-center animate-fade-in ${
           isMobile ? 'text-sm mb-3 px-4' : 'mb-4'
         }`} style={{ animationDelay: "100ms" }}>
-          Chat with Llama 4 Maverick, an advanced AI assistant powered by Meta via OpenRouter API
+          Chat with Mistral, an advanced AI assistant powered by Mistral AI via OpenRouter API
         </p>
         
         <div className={`flex justify-center animate-fade-in ${isMobile ? 'mb-3 px-4' : 'mb-4'}`} style={{ animationDelay: "150ms" }}>
@@ -140,7 +140,7 @@ const Chat = () => {
               <DialogHeader>
                 <DialogTitle className={isMobile ? 'text-lg' : 'text-xl'}>Configure OpenRouter API Key</DialogTitle>
                 <DialogDescription className={isMobile ? 'text-sm' : 'text-base'}>
-                  Enter your OpenRouter API key to use Llama 4 Maverick.
+                  Enter your OpenRouter API key to use Mistral AI.
                 </DialogDescription>
               </DialogHeader>
               
@@ -204,7 +204,7 @@ const Chat = () => {
           <TabsList className={`grid w-full grid-cols-1 mx-auto ${isMobile ? 'max-w-full mb-4' : 'max-w-md mb-6'}`}>
             <TabsTrigger value="llama4" className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
-              Llama 4 Maverick Chat
+              Mistral AI Chat
             </TabsTrigger>
           </TabsList>
           
@@ -222,7 +222,7 @@ const Chat = () => {
                 </CardHeader>
                 <CardContent>
                   <p className={`text-muted-foreground mb-4 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                    To use the chat feature, please configure your OpenRouter API key which provides access to Meta's Llama 4 Maverick assistant.
+                    To use the chat feature, please configure your OpenRouter API key which provides access to Mistral AI assistant.
                   </p>
                   <Button 
                     onClick={() => setShowApiKeyDialog(true)} 
@@ -247,7 +247,7 @@ const Chat = () => {
         <CardHeader>
           <CardTitle className={`flex items-center gap-2 ${isMobile ? 'text-base' : ''}`}>
             <Sparkles className="h-4 w-4 text-primary" />
-            Chat with Llama 4 Maverick
+            Chat with Mistral AI
           </CardTitle>
           <CardDescription className={isMobile ? 'text-sm' : ''}>Get intelligent responses to your questions and prompts</CardDescription>
         </CardHeader>
@@ -255,7 +255,7 @@ const Chat = () => {
           <ul className={`space-y-2 text-muted-foreground ${isMobile ? 'text-sm' : ''}`}>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>
-              <span>Ask questions about any topic - Llama 4 has broad knowledge</span>
+              <span>Ask questions about any topic - Mistral has broad knowledge</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-primary">•</span>

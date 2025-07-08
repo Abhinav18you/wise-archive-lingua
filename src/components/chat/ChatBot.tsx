@@ -23,7 +23,7 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     { 
       role: 'assistant', 
-      content: "Hello! I'm Llama 4 Maverick, an AI assistant powered by Meta. How can I help you today?",
+      content: "Hello! I'm Mistral, an AI assistant powered by Mistral AI. How can I help you today?",
       timestamp: new Date().toISOString()
     }
   ]);
@@ -67,7 +67,7 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
       const conversationHistory = messages.filter(m => m.role !== 'system');
       
       const apiKeyToUse = customApiKey || localStorage.getItem('llamaApiKey');
-      console.log("Using API key for LLaMA chat:", apiKeyToUse ? "API key provided" : "No API key");
+      console.log("Using API key for Mistral chat:", apiKeyToUse ? "API key provided" : "No API key");
       
       // Call the Llama chat edge function with custom API key
       const { data, error: funcError } = await supabase.functions.invoke('llama-chat', {
@@ -78,30 +78,30 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
         }
       });
       
-      console.log("Response from LLaMA chat function:", data);
+      console.log("Response from Mistral chat function:", data);
       
       if (funcError) {
         console.error("Edge function error:", funcError);
-        throw new Error(`LLaMA chat service error: ${funcError.message || 'Unknown error'}`);
+        throw new Error(`Mistral chat service error: ${funcError.message || 'Unknown error'}`);
       }
       
       if (data?.error) {
-        console.error("LLaMA chat API error:", data.error);
+        console.error("Mistral chat API error:", data.error);
         
         // Handle specific OpenRouter API errors
         if (data.error.includes('401') || data.error.includes('Authorization')) {
-          throw new Error('LLaMA chat authentication failed. Please check your OpenRouter API key.');
+          throw new Error('Mistral chat authentication failed. Please check your OpenRouter API key.');
         } else if (data.error.includes('429')) {
-          throw new Error('LLaMA chat rate limit exceeded. Please wait a moment and try again.');
+          throw new Error('Mistral chat rate limit exceeded. Please wait a moment and try again.');
         } else if (data.error.includes('timeout')) {
-          throw new Error('LLaMA chat request timed out. Please try again.');
+          throw new Error('Mistral chat request timed out. Please try again.');
         } else {
-          throw new Error('LLaMA chat is currently unavailable. Please try again later.');
+          throw new Error('Mistral chat is currently unavailable. Please try again later.');
         }
       }
       
       if (!data?.message) {
-        throw new Error("LLaMA chat is currently unavailable. Please try again later.");
+        throw new Error("Mistral chat is currently unavailable. Please try again later.");
       }
       
       // Add AI response to the chat
@@ -113,19 +113,19 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
       
       setMessages(prev => [...prev, aiMessage]);
     } catch (err) {
-      console.error('Error calling LLaMA chat:', err);
-      const errorMessage = err instanceof Error ? err.message : 'LLaMA chat is currently unavailable. Please try again later.';
+      console.error('Error calling Mistral chat:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Mistral chat is currently unavailable. Please try again later.';
       setError(errorMessage);
       
       // Show user-friendly toast message
       if (errorMessage.includes('authentication') || errorMessage.includes('API key')) {
-        toast.error('LLaMA chat authentication issue. Please check your API key configuration.');
+        toast.error('Mistral chat authentication issue. Please check your API key configuration.');
       } else if (errorMessage.includes('rate limit')) {
-        toast.warning('LLaMA chat is temporarily busy. Please wait a moment and try again.');
+        toast.warning('Mistral chat is temporarily busy. Please wait a moment and try again.');
       } else if (errorMessage.includes('timeout')) {
-        toast.warning('LLaMA chat request timed out. Please try again.');
+        toast.warning('Mistral chat request timed out. Please try again.');
       } else {
-        toast.error('LLaMA chat is currently unavailable. Please try again later.');
+        toast.error('Mistral chat is currently unavailable. Please try again later.');
       }
     } finally {
       setIsLoading(false);
@@ -175,10 +175,10 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
             </div>
             <div>
               <h3 className={`font-bold text-foreground tracking-tight ${isMobile ? 'text-lg' : 'text-xl'}`}>
-                Llama 4 Maverick
+                Mistral AI
               </h3>
               <p className={`text-muted-foreground font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                AI Assistant by Meta
+                AI Assistant by Mistral
               </p>
             </div>
           </div>
@@ -228,7 +228,7 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
                 </div>
                 <div className="space-y-2">
                   <p className={`font-semibold text-foreground ${isMobile ? 'text-sm' : ''}`}>
-                    Llama 4 is thinking...
+                    Mistral is thinking...
                   </p>
                   <div className="flex gap-1.5">
                     <div className={`rounded-full bg-blue-500/70 animate-bounce ${
@@ -283,7 +283,7 @@ const ChatBot = ({ customApiKey }: ChatBotProps) => {
           onSend={handleSendMessage} 
           isLoading={isLoading} 
           disabled={isLoading} 
-          placeholder={isMobile ? "Type message..." : "Type your message to Llama 4..."}
+          placeholder={isMobile ? "Type message..." : "Type your message to Mistral..."}
         />
       </div>
     </div>

@@ -78,7 +78,7 @@ serve(async (req) => {
     const messages = [
       {
         role: 'system',
-        content: `You are Llama 4 Maverick, an AI assistant powered by Meta's Llama model. 
+        content: `You are Mistral, an AI assistant powered by Mistral AI's advanced language model. 
                   You are helpful, knowledgeable, and friendly. You provide accurate information
                   and assist users with their questions. If you don't know the answer, you
                   admit that you don't know instead of making something up.`
@@ -103,7 +103,7 @@ serve(async (req) => {
       content: message
     });
 
-    console.log('Calling OpenRouter API with Llama 4 Maverick model');
+    console.log('Calling OpenRouter API with Mistral Small model');
     
     // Call OpenRouter API to access Llama 4 Maverick
     try {
@@ -116,7 +116,7 @@ serve(async (req) => {
           'X-Title': 'Memoria Chat App'  // Optional title for rankings
         },
         body: JSON.stringify({
-          model: 'meta-llama/llama-4-maverick:free', // Updated to the correct model string
+          model: 'mistralai/mistral-small-3.2-24b-instruct:free',
           messages,
           temperature: 0.7,
           max_tokens: 2000
@@ -146,7 +146,7 @@ serve(async (req) => {
       }
 
       const aiResponse = data.choices[0].message.content;
-      console.log('Received response from Llama 4 via OpenRouter:', aiResponse.substring(0, 100) + '...');
+      console.log('Received response from Mistral via OpenRouter:', aiResponse.substring(0, 100) + '...');
 
       // Return the AI response
       return new Response(
